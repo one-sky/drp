@@ -1,0 +1,37 @@
+.search-component .searchbox{
+  border-top-right-radius: 19px;
+  border-bottom-right-radius: 19px;
+}
+
+.search-component .searchbox input{
+  border:0;
+}
+/*下拉框*/
+.search-component .searchbox .el-select {
+  width:86px;
+}
+
+.search-component .searchbox .split{
+  height:20px;
+  width:1px;
+  background-color:#000;
+}
+
+/*内容输入框*/
+.search-component .searchbox .input{
+  width: 400px;
+}
+
+.search-component .searchbox .el-button{
+  width:100px;
+  height:36px;
+  border-top-right-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+.search-component .shoppingCart{
+  width: 40px;
+  height:40px;
+  background-color:#ffdb15;
+  border-radius: 20px 20px;
+}

@@ -1,0 +1,131 @@
+.brand-list, .brand-detail{
+  background-color :#f2f2f2;
+  padding-bottom: 80px;
+}
+.brand-list>div{
+  width: 1200px;
+}
+
+.brand-list .top{
+  height: 70px;
+  margin: 5px auto 0 auto;
+  background-color: #fff;
+}
+.brand-list .top .seperate{
+  margin:auto 28px;
+}
+
+/*menu title item common stye*/
+.brand-list .menu div h2{
+  font-size: 2.4rem;
+  font-family: FZHTK;
+}
+.brand-list .menu div h4{
+  font-size: 1.6rem;
+}
+.brand-list .item a{
+  background-color: #fff;
+}
+
+
+
+.brand-list .middle .menu{
+  margin: 80px auto 30px auto;
+}
+.brand-list .middle .menu div{
+  width: 220px;
+}
+.brand-list .middle .item{
+  margin-left: -5px;
+}
+.brand-list .middle .item a{
+  margin-left: 5px;
+  border: 1px solid #f2f2f2;
+  width: 234px;
+  height: 234px;
+}
+
+
+
+.brand-list .bottom{
+  margin-top: 50px;
+}
+.brand-list .bottom:nth-of-type(2n){
+  background-color: #fff;
+}
+
+.brand-list .bottom .menu{
+  width: 350px;
+}
+.brand-list .bottom .menu img{
+  margin: 10px auto;
+}
+
+.brand-list .bottom .menu .el-button span{
+  color: #000;
+}
+
+.brand-list .bottom .item{
+  display: flex;
+  flex: 1;
+  padding: 40px 3%;
+  margin-left: -12px;
+}
+.brand-list .bottom .item a{
+  margin-left: 10px;
+  margin-top: 10px;
+  border: 1px solid #f2f2f2;
+  width: 142px;
+  height: 142px;
+}
+
+
+
+
+
+.brand-detail .top, .brand-detail .middle{
+  width: 1200px;
+  margin-top: 30px;
+}
+
+.brand-detail .top{
+  background-color: #fff;
+}
+
+.brand-detail .top .right{
+  padding: 30px 10px 20px 20px;
+}
+.brand-detail .top .right .seperate{
+  margin: auto 20px;
+}
+
+.brand-detail .top .right h1{
+  margin-bottom: 6px;
+}
+
+.brand-detail .top .right p{
+  margin-top: 20px;
+  line-height: 1.8rem;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp:4;
+  display: -webkit-box;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+
+
+.brand-detail .middle .product{
+  width: 230px;
+  padding-left: 4px;
+  padding-right: 4px;
+  border: 1px solid #fff;
+}
+.brand-detail .middle .product:hover, .brand-detail .middle .product:focus{
+  border-color: #ffdb15;
+}
+
+.brand-detail .middle .product a:first-child{
+  width: 220px;
+  height: 250px;
+}

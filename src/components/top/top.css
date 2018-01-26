@@ -1,0 +1,19 @@
+.common-top{
+  width:100%;
+  height:30px;
+  background-color:#000;
+
+}
+.common-top .content{
+  width:1200px;
+}
+.common-top .content .slogan{
+  width: 178px;
+  margin-right: 120px;
+}
+.common-top .content .user{
+  margin: auto 14px;
+}
+.common-top .content img{
+  margin-right: 4px;
+}

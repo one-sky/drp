@@ -1,0 +1,97 @@
+
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+/* remember to define focus styles! */
+:focus {
+  outline: 0;
+}
+
+/* remember to highlight inserts somehow! */
+ins {
+  text-decoration: none;
+}
+del {
+  text-decoration: line-through;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+html{
+  font-size:62.5%;
+}
+
+body{
+  min-width:1200px;
+}
+
+*{
+  margin:0;
+  padding:0;
+}
+a{
+  text-decoration: none;
+  color:#000;
+}
+
+div{
+  box-sizing: border-box !important;
+  -webkit-box-sizing: border-box !important;
+  -moz-box-sizing: border-box !important;
+}
+img {
+  max-width: 100%;
+}
+
+.el-row .el-col:first-child{
+  padding-left:0 !important;
+}
+
+.el-button{
+  border-radius:0 0;
+  padding: 0 0 !important;
+}
+.el-button+.el-button{
+  margin-left: 0 !important;
+}
+
+.el-tabs__header{
+  margin-bottom: 0;
+}
+.el-tabs__item{
+  font-size: 1.6rem;
+}
+.el-menu-item{
+  line-height:1;
+}
+
+.el-form .el-form-item__label{
+  color: #000;
+}
+.el-form .el-form-item__content{
+  line-height: 1;
+}
+.el-table__header tr th, .el-table__header tr th .cell{
+  background-color: #ffdb15;
+}
+
+.weight-border{
+  border: 2px solid #ffdb15 !important;
+}
+.base-border{
+  border: 1px solid #ffdb15 !important;
+}
+
+.pagination{
+  margin-top: 30px;
+  margin-bottom: 42px;
+}

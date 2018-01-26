@@ -1,0 +1,73 @@
+.shopping-cart{
+    width: 1200px;
+    margin: 20px auto 80px auto;
+}
+
+.shopping-cart .el-table{
+    margin-top: 14px;
+}
+
+.shopping-cart .el-table__row{
+    padding: 20px auto !important;
+}
+
+/* table 中的sku图片 */
+.shopping-cart .sku-img {
+    margin: 8px 10px 4px 0;
+}
+
+/* table 中的spu规格 */
+.shopping-cart .spu-size {
+    color: #e5e5e5;
+}
+
+/* table 中的增加数量框 */
+.shopping-cart .quantity .el-input-number{
+    width: 140px;
+}
+
+/* table 下面的统计一行 */
+.shopping-cart .statistic-box {
+    background-color: #f7f7f7;
+    display: flex;
+    align-items: center;
+}
+
+/* 全选按钮 */
+.shopping-cart .statistic-box .el-checkbox {
+    margin-left: 14px;
+}
+
+/* 删除 移动到收藏夹按钮 */
+.shopping-cart .statistic-box .el-button{ 
+    margin-left: 30px !important;
+}
+
+/* 移动到收藏夹按钮右边所有 */
+.shopping-cart .statistic-box .statistic-list{
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.shopping-cart .statistic-box .statistic-list .statistic-item {
+    font-size: 1.6rem !important;
+    margin-left: 30px;
+}
+
+.shopping-cart .statistic-box .statistic-list .statistic-item span {
+    color: #ffdb15;
+}
+
+/* 结算按钮 */
+.shopping-cart .statistic-box .statistic-list .calculate.el-button {
+    background-color: #000;
+    border: none;
+    width: 140px;
+    height: 60px;
+}
+.shopping-cart .statistic-box .statistic-list .calculate.el-button span{
+    font-size: 2.4rem;
+    color: #ffdb15;
+}

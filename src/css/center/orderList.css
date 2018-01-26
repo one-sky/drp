@@ -1,0 +1,30 @@
+.order-list .search .receiver{
+  margin-left: 50px !important;
+}
+
+.order-list .table .el-table .cell, .el-table th>div{
+  padding-left: 0;
+  padding-right: 0;
+}
+.order-list .table .el-table__expanded-cell{
+  padding-right: 0;
+  padding-left: 0;
+  padding-bottom: 0;
+}
+.order-list .table .el-table__expanded-cell>div{
+  padding-left: 48px;
+}
+
+.order-list .table img{
+  margin-right: 6px;
+}
+
+.order-list .table .more{
+  background-color :#ffdb15;
+  margin-top:10px;
+}
+.order-list .table .more .el-button{
+  margin-left: 10px;
+  border: none;
+
+}

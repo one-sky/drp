@@ -1,0 +1,112 @@
+.pay {
+    padding-bottom: 80px;
+}
+
+/* 灰色bar */
+.pay .seperate-bar {
+    height: 5px;
+    background-color: #f2f2f2;
+}
+
+/* 订单价格地址box */
+.pay .order {
+    width: 1200px;
+    margin: 20px auto; 
+    border: 1px solid #eeeeee;
+    padding-top: 53px;
+}
+
+/* 宝贝马上到手... */
+.pay .order h1 {
+    font-size: 2.2rem;
+}
+
+/* 请尽快支付... */
+.pay .order .attention {
+    margin-top: 18px;
+}
+
+/* 金额两行 */
+.pay .order .statistic {
+    color: #999999;
+    margin-top: 4px;
+}
+
+/* 价格数字、¥ */
+.pay .order .statistic span {
+    color: #ffdb15;
+    font-size: 1.8rem;
+}
+
+/* ¥ */
+.pay .order .statistic .icon {
+    font-size: 1rem;
+    margin-right: 4px;
+}
+
+/* 交易编号 */
+.pay .order .trade {
+    margin-top: 40px;
+    width: 1200px;
+    padding-left: 24px;
+    padding-bottom: 14px;
+}
+
+/* 收货人信息一行 */
+.pay .order .receiver {
+    width: 1200px;
+    border-top:1px solid #f2f2f2;
+    padding: 14px 30px;
+}
+
+.pay .order .address {
+    margin-left: 30px;
+}
+
+.pay .pay-title {
+    width: 1200px;
+    margin: 22px auto ;
+    font-size: 2rem;
+    padding-left: 58px;
+}
+
+.pay .channel {
+    width: 1200px;
+    margin: 0 auto;
+    background-color:#f8f8f8; 
+    border: 1px solid #eeeeee;
+    padding-bottom: 40px;
+}
+
+.pay .channel h4{
+    color: #999999;
+    margin: 10px 26px;
+    font-size: 1.6rem;
+}
+
+.pay .channel .el-button {
+    margin-left: 36px !important;
+    width: 149px;
+    height: 62px;
+    background: #f7f7f7;
+}
+
+.pay .pay-btn.el-button {
+    padding: 20px 40px !important;
+    margin: 30px auto;
+}
+
+.pay .pay-btn.el-button span {
+    font-size: 2rem !important
+}
+
+.pay .order.success {
+    padding-bottom: 100px;
+}
+
+.pay .success .success-icon {
+    margin-right: 30px;
+}
+.pay .success .success-icon+div{
+    font-size: 2rem;
+}

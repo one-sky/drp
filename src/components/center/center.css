@@ -1,0 +1,22 @@
+/*common style*/
+.notice-component, .breadcrumb-component{
+  width: 1200px;
+  height:30px;
+}
+
+
+/*notice start*/
+.notice-component .icon{
+  background: url("../../imgs/center/notice.png") no-repeat;
+  width: 12px;
+  height: 13px;
+}
+.notice-component span {
+  margin-left: 10px;
+}
+.notice-component .content {
+  width:915px;
+  margin-left: 10px;
+}
+/*notice end*/
+

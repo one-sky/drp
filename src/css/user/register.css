@@ -1,0 +1,71 @@
+.register>div{
+  width: 1200px;
+  border: 2px solid #ededed;
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 80px;
+  padding-bottom: 60px;
+}
+
+
+.register .step-one .el-form{
+  width: 320px;
+  margin-top: 60px;
+}
+
+.register .step-one .el-input, .register .step-one .el-input .el-input__inner{
+  width: 220px;
+}
+
+.register .step-one .el-form .code input{
+  width: 120px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.register .step-one .el-form .code .el-button{
+  padding: 4px 15px !important;
+  border: 1px solid rgb(217, 216, 191);
+  border-left: none;
+}
+.register .step-one .next.el-button{
+  padding: 4px 80px !important;
+  margin-top: 10px;
+}
+
+
+
+.register .step-two h1{
+  margin: 20px auto auto 40px;
+}
+.register .step-two .el-form{
+  margin-top: 40px
+}
+
+.register .step-two .el-form .channel .el-form-item__content, .register .step-two .el-form .partner .el-form-item__content{
+  line-height: 36px;
+}
+.register .step-two .el-form .channel .el-form-item__content .el-checkbox{
+  width: 130px;
+}
+.register .step-two .el-form .partner .el-form-item__content .el-radio{
+  width: 124px;
+}
+.register .step-two .el-button{
+  padding: 4px 80px !important;
+  margin-top: 10px;
+}
+
+
+
+.register .step-three{
+  padding-top: 100px;
+  padding-bottom: 200px;
+  letter-spacing: 2px;
+}
+.register .step-three img{
+  margin-bottom: 14px;
+}
+.register .step-three div{
+  margin-top: 6px;
+}

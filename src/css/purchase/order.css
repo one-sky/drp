@@ -1,0 +1,138 @@
+.generator {
+    width: 100%;
+    margin-bottom: 80px;
+    margin-top: 20px;
+}
+
+.generator>div {
+    width: 1200px;
+    margin: 0 auto;
+}
+
+/* 地址box */
+.generator .address{
+    background-color:#f9fbff;
+    height: 70px;
+    padding-top: 20px;
+    padding-left: 20px;
+    margin-bottom: 10px;
+}
+
+/* 收货人信息 */
+.generator .address h4 {
+    font-size: 1.6rem;
+    margin-top: -2px;
+    margin-right: 20px;
+}
+
+/* 收货具体信息 */
+.generator .address .info {
+    display: flex;
+    align-content: center;
+    margin-left: 12px;
+}
+
+/* 收货信息icon */
+.generator .address .info img {
+    margin: 4px 8px;
+}
+
+/* 收货信息按钮 新增 更改 临时地址 */
+.generator .address .el-button {
+    height: 1.6rem;
+    margin-left: 10%;
+}
+
+/* 收货信息按钮 临时地址的间距 */
+.generator .address .el-button :last-child {
+    padding-left: 10px;
+}
+
+.generator .el-table__row{
+    padding: 20px auto !important;
+}
+
+/* table 中的sku图片 */
+.generator .sku-img {
+    margin: 8px 10px 4px 0;
+}
+
+/* table 中的spu规格 */
+.generator .spu-size {
+    color: #e5e5e5;
+}
+
+/* 备注box */
+.generator .buyer-message {
+    border: 1px solid #f7f7f7;
+    background-color:#f9fbff;
+    padding: 14px 20px;
+}
+
+/* 备注两个字 */
+.generator .buyer-message div {
+    width: auto;
+}
+
+/* 备注的多行文本框 */
+.generator .buyer-message .el-textarea__inner{
+    width: 300px;
+    margin-left: 20px;
+}
+
+/* 统计box */
+.generator .statistic {
+    background-color:#fef8e1;
+    padding-top: 10px;
+    padding-right: 8px;
+    padding-bottom: 20px;
+}
+
+/* 统计文字 */
+.generator .statistic p {
+    font-size: 1.7rem;
+    margin-left: 30px;
+}
+
+.generator .statistic p:first-child {
+    margin-left: 20px;
+}
+
+.generator .statistic .statistic-box {
+    text-align: right;
+}
+
+.generator .statistic span {
+    font-size: 2.2rem;
+    color: #ffdb15;
+    margin: auto 4px;
+}
+
+/* 返回进货单一行按钮 */
+.generator .option{
+    margin-top: 12px;
+    background-color:#f7f7f7; 
+    padding-left: 20px;
+}
+
+/* 应付金额 */
+.generator .option .money {
+    font-size: 1.7rem;
+    margin-right: 20px;
+}
+
+.generator .option .money span {
+    font-size: 2.2rem;
+    color: #ffdb15;
+    margin: auto 4px;
+}
+
+/* 提交订单按钮 */
+.generator .option .submit.el-button {
+    width: 140px;
+    height: 60px;
+}
+.generator .option .submit.el-button span{
+    font-size: 2.4rem;
+}
+

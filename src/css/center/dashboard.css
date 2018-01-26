@@ -1,0 +1,96 @@
+.dashboard .top, .dashboard .top~div{
+  background-color:#fff;
+  padding-left: 30px;
+}
+.dashboard .top~div{
+  margin-top:4px;
+}
+
+.dashboard .top{
+  height: 140px;
+}
+
+.dashboard .top .el-button{
+  width: 80px;
+  height: 80px;
+  border: hidden;
+}
+.dashboard .top .avatar-uploader{
+  border: 2px dashed #d9d9d9;
+  color: #8c939d;
+  width: 76px;
+  height: 76px;
+}
+.dashboard .top .avatar-uploader-icon{
+  font-size: 2.8rem;
+}
+.dashboard .top .avatar-uploader:hover {
+  border-color: #ffdb15;
+}
+.dashboard .top .avatar-uploader-icon:hover{
+  color: #ffdb15;
+}
+
+.dashboard .top .right{
+  margin-left: 20px;
+  height: 80px;
+}
+
+/*您好...*/
+.dashboard .top .right .name div{
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+
+
+.dashboard .top .right img:last-child{
+  margin-left: 4px;
+}
+
+.dashboard .middle{
+  height: 360px;
+}
+
+.dashboard .middle .name{
+  background-color: #eeeeee;
+  width: 170px;
+  height: 34px;
+  margin-top:2px;
+  padding-left: 16px;
+}
+.dashboard .middle .flex-row{
+  border: 1px solid #eeeeee;
+  height: 60px;
+  width: 740px;
+}
+/*指标名称*/
+.dashboard .middle .flex-row div{
+  margin-left:80px;
+}
+.dashboard .middle .flex-row div:first-child{
+  margin-left:16px;
+}
+/*指标值*/
+.dashboard .middle .flex-row span{
+  color: #ffdb15;
+  width:20px;
+}
+
+.dashboard .bottom{
+  padding-top: 30px;
+  padding-bottom:30px;
+}
+.dashboard .bottom .name{
+  padding-left: 16px;
+}
+.dashboard .bottom .flex-row-col{
+  width: 780px;
+  margin-left: -9px;
+  margin-top: 10px;
+}
+.dashboard .bottom a{
+  width: 138px;
+  height: 80px;
+  border: 1px solid #eeeeee;
+  margin-left: 9px;
+}

@@ -1,0 +1,50 @@
+
+.message .top{
+  padding: 20px 0 20px 16px;
+}
+.message .top h2{
+  margin-top: 10px;
+}
+.message .top .el-button{
+  border-radius: 10px 10px;
+  width: 110px;
+  height: 22px;
+  margin-top: 14px;
+}
+
+.message-list .table .message-title div:first-child{
+  width: 120px;
+}
+
+.message-list .table .message-title div:last-child{
+  margin-left: 50px;
+}
+
+.message-detail .middle {
+  margin: 20px 0 20px 16px;
+  padding: 20px;
+  background-color:#ededed;
+}
+
+.message-detail .middle h2 {
+  font-size: 1.6rem;
+}
+.message-detail .middle p {
+  margin-top: 10px;
+}
+
+.message-detail .content {
+  margin-left: 34px;
+  margin-top: 20px;
+  width: 960px;
+  line-height: 1.8rem;
+  word-break: break-all;
+}
+
+.test {
+  background-color: #ff0;
+  width: fit-content;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  margin: 0 auto;
+}

@@ -1,0 +1,91 @@
+.center{
+  background-color: rgb(246, 246, 238);
+  padding-top:4px;
+}
+
+.center .content{
+  width: 1200px;
+  margin-bottom: 42px;
+}
+
+.center .content .child-content{
+  flex: 1;
+  margin-left: 0.8%;
+}
+
+/*left menu*/
+.center .center-menu{
+  width:178px;
+}
+
+.center .center-menu .first{
+  background: url("../../imgs/center/left_first.png") no-repeat 30px 13px #eeeeee;
+  background-position: 4px 50%;
+  color:#000000;
+  height:34px;
+  padding-left: 20px;
+  font-size: 1.6rem
+}
+
+
+.center .center-menu .second{
+  height:32px !important;
+  background-color:#ffffff;
+  border: 1px solid #f2f2f2;
+  padding-left: 26px !important;
+}
+.center .center-menu .second:hover, .center .center-menu .second:link{
+  border-color: #ffdb15;
+  background: url("../../imgs/center/left_triangle.png") no-repeat 30px 13px #ffffff;
+  background-position: 90% 50%;
+}
+
+/*all center page tab */
+.center-tab .el-tabs__header{
+  background-color: #fff;
+}
+.center-tab .el-tabs__header .el-tabs__item{
+  font-size: 1.6rem;
+}
+
+/*all center page search form */
+.search {
+  padding: 10px 0 10px 40px;
+  background-color: #fff;
+}
+.search .el-row:first-child~div{
+  margin-top:14px;
+}
+.search .el-form-item{
+  margin-bottom: 0px;
+}
+.search .el-input, .search .el-input .el-input__inner{
+  width: 140px;
+}
+.search span{
+  margin: 0 4px;
+}
+.search .el-button{
+  padding: 7px 20px !important;
+  margin-top: 2px;
+}
+.search .el-form .el-form-item:first-child~div{
+  margin-left: 20px;
+}
+
+/*all center page pagination footer*/
+.pagination{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+/*all center page dialog footer*/
+.center-dialog-bottom .el-button{
+  padding: 6px 12px !important;
+}
+
+
+
+
