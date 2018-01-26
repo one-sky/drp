@@ -1,2 +1,2 @@
-/node_modules
-!/node_modules/element-ui
+node_modules
+!node_modules/element-ui/lib/theme-default
