@@ -80,13 +80,16 @@
 </style>
 
 <script>
-  import { getOrderStatistics, getOrderList} from '../../api/api';
+  import {
+    getOrderStatistics,
+    getOrderList
+  } from '../../api/api';
   export default {
-    data() {
+    data () {
       return {
         user: null,
         loading: false,
-        //detail_prop
+        // detail_prop
         orderList: [],
         searchGroup: {
           orderCode: '',
@@ -97,67 +100,57 @@
         searchForm: {},
         currentPage: 1,
         totalCount: 40,
-        pageSize:10,
+        pageSize: 10,
 
-        //statistic_prop
-        statisticList:[],
-        totalOrders:{}
-
-
-
+        // statistic_prop
+        statisticList: [],
+        totalOrders: {}
       };
     },
     methods: {
 
-      //detail_event
-      getOrderList() {
+      // detail_event
+      getOrderList: () => {
         let param = Object.assign({}, this.searchForm, {distributorId: 30, vendorId: 1, pageNum: this.currentPage});
         getOrderList(param).then((res) => {
-          if(res.status==200){
+          if (res.status == 200) {
             this.totalCount = res.page.totalNum;
             var orderList = res.data;
-            for(var i =0; i<orderList.length; i++){
-              for(var j=0; j<orderList[i].oOrderItems.length;j++){
-                this.orderList.push( Object.assign({}, orderList[i].oOrderItems[j], {orderCode: orderList[i].orderCode, orderTime: orderList[i].orderTime}));
+            for (var i = 0; i < orderList.length; i++) {
+              for (var j = 0; j < orderList[i].oOrderItems.length; j++) {
+                this.orderList.push(Object.assign({}, orderList[i].oOrderItems[j], {orderCode: orderList[i].orderCode, orderTime: orderList[i].orderTime}));
               }
-
             }
           }
-          console.log(this.orderList)
-
-
-        })
+        });
       },
-
-
       // form_button_event
-      handleSearch() {
-        for ( var p in this.searchGroup ){
-          this.searchForm[ p ]=  this.searchGroup[ p ];
+      handleSearch: () => {
+        for (var p in this.searchGroup) {
+          this.searchForm[p] = this.searchGroup[ p ];
         }
         this.searchForm.startDate = (!this.searchForm.startDate || this.searchForm.startDate == '') ? '' : date.formatDate.format(new Date(this.searchForm.startDate), 'yyyy-MM-dd');
         this.searchForm.endDate = (!this.searchForm.endDate || this.searchForm.endDate == '') ? '' : date.formatDate.format(new Date(this.searchForm.endDate), 'yyyy-MM-dd');
-        if(this.activeName==='detail'){
+        if (this.activeName === 'detail') {
           this.getOrderList();
-        }else if(this.activeName==='statistic'){
+        } else if (this.activeName === 'statistic') {
           this.getStatisticList();
-        }else{
+        } else {
           this.handleChangeYear();
           this.handleChangeMonth();
         }
       },
-      //页码变更
-      handleCurrentChange: function(val) {
+      // 页码变更
+      handleCurrentChange: (val) => {
         this.currentPage = val;
-        if(this.activeName==='detail'){
+        if (this.activeName === 'detail') {
           this.getOrderList();
-        }else{
+        } else {
           this.getStatisticList();
         }
-
       }
     },
-    created()  {
+    created () {
       this.getOrderList();
     }
   };

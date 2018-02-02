@@ -50,13 +50,16 @@
 </style>
 
 <script>
-  import { getOrderStatistics, getOrderList} from '../../api/api';
+  import {
+    getOrderStatistics,
+    getOrderList
+  } from '../../api/api';
   export default {
     data() {
       return {
         user: null,
         loading: false,
-        //detail_prop
+        // detail_prop
         orderList: [],
         searchGroup: {
           orderCode: '',
@@ -67,39 +70,39 @@
         searchForm: {},
         currentPage: 1,
         totalCount: 40,
-        pageSize:10,
+        pageSize: 10,
 
-        //statistic_prop
-        statisticList:[],
-        totalOrders:{}
-
-
-
+        // statistic_prop
+        statisticList: [],
+        totalOrders: {}
       };
     },
     methods: {
 
-      //statistic_event
-      getStatisticList() {
-        this.statisticList = [{
-          orderID: '1558990000112256',
-          contact: 'crystal',
-          sumAmount: '210.00',
-          isRefund: '是',
-          payChannel: '支付宝',
-          orderStatus: '退款成功',
-          orderTime: '2017/1/1 0:00:00',
-          payTime: '2017/1/1 0:00:00',
-        },{
-          orderID: '1558990000112256',
-          contact: 'crystal',
-          sumAmount: '210.00',
-          isRefund: '是',
-          payChannel: '支付宝',
-          orderStatus: '退款成功',
-          orderTime: '2017/1/1 0:00:00',
-          payTime: '2017/1/1 0:00:00',
-        }];
+      // statistic_event
+      getStatisticList: () => {
+        this.statisticList = [
+          {
+            orderID: '1558990000112256',
+            contact: 'crystal',
+            sumAmount: '210.00',
+            isRefund: '是',
+            payChannel: '支付宝',
+            orderStatus: '退款成功',
+            orderTime: '2017/1/1 0:00:00',
+            payTime: '2017/1/1 0:00:00',
+          },
+          {
+            orderID: '1558990000112256',
+            contact: 'crystal',
+            sumAmount: '210.00',
+            isRefund: '是',
+            payChannel: '支付宝',
+            orderStatus: '退款成功',
+            orderTime: '2017/1/1 0:00:00',
+            payTime: '2017/1/1 0:00:00',
+          }
+        ];
         this.totalOrders = {
           totalOrderAmount: '0.00',
           totalProductAmount: '0.00',
@@ -120,35 +123,33 @@
          */
       },
 
-      //form_button_event
-      handleSearch() {
-        for ( var p in this.searchGroup ){
-          this.searchForm[ p ]=  this.searchGroup[ p ];
+      // form_button_event
+      handleSearch: () => {
+        for (var p in this.searchGroup) {
+          this.searchForm[p] = this.searchGroup[p];
         }
         this.searchForm.startDate = (!this.searchForm.startDate || this.searchForm.startDate == '') ? '' : date.formatDate.format(new Date(this.searchForm.startDate), 'yyyy-MM-dd');
         this.searchForm.endDate = (!this.searchForm.endDate || this.searchForm.endDate == '') ? '' : date.formatDate.format(new Date(this.searchForm.endDate), 'yyyy-MM-dd');
-        if(this.activeName==='detail'){
+        if (this.activeName === 'detail') {
           this.getOrderList();
-        }else if(this.activeName==='statistic'){
+        } else if (this.activeName === 'statistic') {
           this.getStatisticList();
-        }else{
+        } else {
           this.handleChangeYear();
           this.handleChangeMonth();
         }
       },
-      //页码变更
-      handleCurrentChange: function(val) {
+      // 页码变更
+      handleCurrentChange: (val) => {
         this.currentPage = val;
-        if(this.activeName==='detail'){
+        if (this.activeName === 'detail') {
           this.getOrderList();
-        }else{
+        } else {
           this.getStatisticList();
         }
-
-
       }
     },
-    created()  {
+    created () {
       this.getStatisticList();
     }
   };

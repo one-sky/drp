@@ -28,45 +28,90 @@
 
 <script>
   export default{
-    data() {
+    data () {
       return {
         router: '',
-        menuItem:[{
-          label: '账户管理', children:[{
-            label: '基本信息', router: '/center/account'
-          }, {
-            label: '收货地址', router: '/center/addressList'
-          }, {
-            label: '积分管理', router: '/center/scoreList'
-          }]
-        }, {
-          label: '订单管理', children: [{
-            label: '我的订单', router: '/center/orderList'
-          }, {
-            label: '订单退换', router: '/center/refundList'
-          }]
-        }, {
-          label: '我的分销', children: [{
-            label: '已代理品牌', router: '/center/centerBrand'
-          },{
-            label: '已关注商品', router: '/center/centerProduct'
-          }]
-        }, {
-          label: '消息中心', children: [{
-            label: '消息列表', router: '/center/messageList'
-          }]
-        }, {
-          label: '统计报表', children: [{
-            label: '订单报表', router: '/center/statisticReport'
-          },{
-            label: '订单明细', router: '/center/statisticItem'
-          },{
-            label: '订单统计', router: '/center/statisticOrder'
-          }]
-        }]
+        menuItem: [
+          {
+            label: '账户管理',
+            children: [
+              {
+                label: '基本信息',
+                router: '/center/account'
+              },
+              {
+                label: '收货地址',
+                router: '/center/addressList'
+              },
+              {
+                label: '积分管理',
+                router: '/center/scoreList'
+              }
+            ]
+          },
+          {
+            label: '订单管理',
+            children: [
+              {
+                label: '我的订单',
+                router: '/center/orderList'
+              },
+              {
+                label: '订单退换',
+                router: '/center/refundList'
+              }
+            ]
+          },
+          {
+            label: '我的分销',
+            children: [
+              {
+                label: '已代理品牌',
+                router: '/center/centerBrand'
+              },
+              {
+                label: '已关注商品',
+                router: '/center/centerProduct'
+              }
+            ]
+          },
+          {
+            label: '消息中心',
+            children: [
+              {
+                label: '消息列表', router: '/center/messageList'
+              }
+            ]
+          },
+          {
+            label: '统计报表',
+            children: [
+              {
+                label: '订单报表',
+                router: '/center/statisticReport'
+              },
+              {
+                label: '订单明细',
+                router: '/center/statisticItem'
+              },
+              {
+                label: '订单统计',
+                router: '/center/statisticOrder'
+              }
+            ]
+          }
+        ]
+      };
+    },
+    created () {
+      const user = JSON.parse(sessionStorage.getItem('user'));
+      if (user && user.distributorId != 0) {
+        this.user = user;
+      } else {
+        this.$router.push({ path: '/login' });
       }
-    }
-  }
+    },
+  };
 </script>
 
 

@@ -28,32 +28,32 @@
 <script>
   import { getNoticebyId } from '../../api/api';
   export default{
-    data() {
+    data () {
       return {
-        message:{},
-      }
+        message: {},
+      };
     },
     methods: {
-      //获取消息详情
-      getMessageById(){
-        let param ={
+      // 获取消息详情
+      getMessageById: () => {
+        let param = {
           id: 1
         };
         getNoticebyId(param).then((res) => {
-          if(res.status ==200){
-            this.message=res.data;
+          if (res.status == 200) {
+            this.message = res.data;
           }
-
-        })
+        });
       },
-      returnMessageList(){
+      returnMessageList: () => {
         this.$router.push({ path: '/center/messageList' });
       },
 
     },
 
     created () {
+      
       this.getMessageById();
     }
-  }
+  };
 </script>

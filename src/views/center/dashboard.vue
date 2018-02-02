@@ -4,10 +4,10 @@
       <el-button>
         <el-upload
           action="http://106.12.21.230:8484/inheater-distribution/fileupload/UploadAvatarImg"
-          :data="{distributorId:user.distributorId,userId:user.userId,originalPath:this.imageUrl}"
+          :data="{distributorId:user.distributorId,originalPath:user.headUrl}"
           :show-file-list="false"
           :on-success="handleAvatarSuccess">
-          <img v-if="!(imageUrl&&imageUrl!='')" width="80" height="80" :src="imageUrl">
+          <img v-if="!(user.headUrl && user.headUrl!='')" width="80" height="80" :src="user.headUrl">
           <div v-else  class="hor-ver-center avatar-uploader">
             <i class="el-icon-plus avatar-uploader-icon"></i>
           </div>
@@ -18,7 +18,7 @@
       <div class="right flex-col hor-between">
         <div class="name flex-row ver-center">
           <div>
-            您好，{{user.nickname}}
+            您好，{{user.nickName}}
           </div>
           <div class="third-font-color">
             【已认证】
@@ -59,11 +59,11 @@
           <div class="flex-row ver-center">
             <img v-bind:src="require('@/imgs/center/vipLevel_'+user.vipId+'.png')" width="14" height="14">
             &nbsp;{{user.vipName}}
-            <span v-show="user.nextvipName&&user.nextvipName!=''">（ 距下次升级为{{user.nextvipName}}仅需</span>
-            <div v-show="user.nextvipName&&user.nextvipName!=''" class="third-font-color">
+            <span v-show="user.nextVipName">（ 距下次升级为{{user.nextVipName}}仅需</span>
+            <div v-show="user.nextVipName" class="third-font-color">
               {{user.nextLevelPoints}}
             </div>
-            <div v-show="user.nextvipName&&user.nextvipName!=''">
+            <div v-show="user.nextVipName">
               &nbsp;分）
             </div>
           </div>
@@ -71,7 +71,7 @@
             &nbsp;|&nbsp;上次登录时间：
           </div>
           <div>
-            {{user.lastUpdateTime|formatDate(user.lastUpdateTime)}}
+            {{user.lastLoginTime|formatDate(user.lastLoginTime)}}
           </div>
 
         </div>
@@ -174,119 +174,106 @@
   @import '../../css/center/dashboard.css';
 </style>
 <script>
-  import { getCenter, orderAmount , getRecommendBrandList, getOrderStatistics} from '../../api/api';
+  import {
+    getDistributorDetail,
+    getNewBrandList,
+  } from '../../api/api';
   export default {
     data () {
       return {
         user: {
-          vendorId: 1,
-          userId: 13,
-          image: null,
+          distributorId: null,
+          headUrl: null,
           nickname: '',
           phone: '',
           email: '',
           points: null,
           vipId: 1,
-          vioName: '',
-          nextvipName: '',
+          vipName: '',
+          nextVipName: '',
           nextLevelPoints: '',
           totalAmount: '',
-          lastUpdateTime: '',
-          distributorId: 1
+          lastLoginTime: '',
         },
         statisticList: {},
         brandList: [{
         }],
         message: {},
-        imageUrl: '',// 当前的头像
-      }
+      };
     },
     methods: {
-      getUser: function() {
-        let param = {
-          userId: 13
+      getDistributorDetail: function () {
+        const param = {
+          id: this.user.distributorId
         };
-        getCenter(param).then((res) => {
-          if(res.status == 200) {
-            this.user = res.data
-            console.log( this.user)
-            this.$set(this.user, 'distributorId', 1);
-            this.imageUrl = res.data.headUrl;
-          }
-        })
-      },
-      getOrderStatistic() {
-        let param = {
-          distributorId: 1,
-          vendorId: 1
-        }
-        orderAmount(param).then((res) => {
-          if(res.status ==200) {
-            this.statisticList = res.data
-            param = {}
-            var startDate = new Date()
-            var year = startDate.getFullYear()
-            var month = startDate.getMonth() + 1;
-            var date1 = new Date(year + '-' + (parseInt(month + 1) + '-01' )).getTime() - 24 * 60 * 60 * 1000
-            var yesterday = new Date()
-            yesterday.setTime(date1)
-            var endDate = yesterday.getDate();
-            param = {
-              distributorId: this.user.distributorId,
-              startDate: '2015-01-01',
-              endDate: year + '-' + month + '-' + endDate,
-              type: 2
-            }
-            console.log(param)
-            getOrderStatistics(param).then((res) => {
-              if(res.status == 200) {
-                var statistic = res.data;
-                this.$set(this.statisticList, 'monthGrossProfit', 0)
-                this.$set(this.statisticList, 'grossProfit', 0)
-                if(statistic && statistic.length > 0) {
-                  var profit = 0
-                  for(var i = 0; i < statistic.length; i++) {
-                    if(parseInt(statistic[i].dateStr.split[0]) == year && parseInt(statistic[i].dateStr.split[1]) == month) {
-                      this.$set(this.statisticList,'monthGrossProfit', (statistic[i].orderProfit||statistic[i].orderProfit=='')?0:statistic[i].orderProfit);
-                    }
-                    profit += (statistic[i].orderProfit||statistic[i].orderProfit =='')?0:statistic[i].orderProfit
-                  }
-                  this.$set(this.statisticList, 'grossProfit', profit)
-                }
-              }
-              console.log(profit)
-
-            })
+        getDistributorDetail(param).then((res) => {
+          if (res.status == 200) {
+            this.user = res.data;
           }
         });
-
-
       },
+      // getOrderStatistic: () => {
+      //   let param = {
+      //     distributorId: 1,
+      //   };
+      //   orderAmount(param).then((res) => {
+      //     if (res.status == 200) {
+      //       this.statisticList = res.data;
+      //       param = {};
+      //       var startDate = new Date();
+      //       var year = startDate.getFullYear();
+      //       var month = startDate.getMonth() + 1;
+      //       var date1 = new Date(year + '-' + (parseInt(month + 1) + '-01')).getTime() - 24 * 60 * 60 * 1000;
+      //       var yesterday = new Date();
+      //       yesterday.setTime(date1);
+      //       var endDate = yesterday.getDate();
+      //       param = {
+      //         distributorId: this.user.distributorId,
+      //         startDate: '2015-01-01',
+      //         endDate: year + '-' + month + '-' + endDate,
+      //         type: 2
+      //       };
+      //       getOrderStatistics(param).then((res) => {
+      //         if (res.status == 200) {
+      //           var statistic = res.data;
+      //           this.$set(this.statisticList, 'monthGrossProfit', 0);
+      //           this.$set(this.statisticList, 'grossProfit', 0);
+      //           if (statistic && statistic.length > 0) {
+      //             var profit = 0;
+      //             for (var i = 0; i < statistic.length; i++) {
+      //               if (parseInt(statistic[i].dateStr.split[0]) == year && parseInt(statistic[i].dateStr.split[1]) == month) {
+      //                 this.$set(this.statisticList, 'monthGrossProfit', (statistic[i].orderProfit || statistic[i].orderProfit == '') ? 0 : statistic[i].orderProfit);
+      //               }
+      //               profit += (statistic[i].orderProfit || statistic[i].orderProfit == '') ? 0 : statistic[i].orderProfit;
+      //             }
+      //             this.$set(this.statisticList, 'grossProfit', profit);
+      //           }
+      //         }
+      //       });
+      //     }
+      //   });
+      // },
 
-      getRecommendBrandList() {
-        let param = {
-          vendorId: 1
+      getNewBrandList: function () {
+        const param = {
+          num: 20
         };
-        getRecommendBrandList(param).then((res) => {
-          if(res.status == 200){
+        getNewBrandList(param).then((res) => {
+          if (res.status == 200) {
             this.brandList = res.data;
           }
-
-        })
+        });
       },
-
-
-      handleAvatarSuccess(res, file) {
-        this.imageUrl = res.data.filePath;//当前照片的路径
+      handleAvatarSuccess: (res, file) => {
+        this.user.headUrl = res.data.filePath; // 当前照片的路径
       }
     },
 
-
-
-    created() {
-      this.getUser();
-      this.getOrderStatistic();
-      this.getRecommendBrandList();
+    created () {
+      this.user = JSON.parse(sessionStorage.getItem('user'));
+      this.getDistributorDetail();
+      // this.getOrderStatistic();
+      this.getNewBrandList();
     },
 
   };

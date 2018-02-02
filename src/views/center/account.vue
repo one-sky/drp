@@ -11,7 +11,7 @@
             <el-row justify="space-between">
               <el-col :span="8">
                 <div>
-                  会员账号：{{user.nickname}}
+                  会员账号：{{user.nickName}}
                 </div>
               </el-col>
               <el-col :span="8">
@@ -59,29 +59,29 @@
           </el-row>
           <el-form :model="user" :rules="form_rules" ref="accountForm" label-width="100px" status-icon=true>
                   <el-form-item label="公司名称："  prop="name">
-                    <el-input type="text" v-model="user.name" :disabled="isDisable.name && isDisable.name!=''?true:false"></el-input>
+                    <el-input type="text" v-model="user.name" :disable="disableList.name"></el-input>
                   </el-form-item>
                   <el-form-item label="联系人：" prop="contractor">
-                    <el-input type="text" v-model="user.contractor" :disabled="isDisable.contractor && isDisable.contractor!=''?true:false"></el-input>
+                    <el-input type="text" v-model="user.contractor" :disable="disableList.contractor"></el-input>
                   </el-form-item>
 
                   <el-form-item label="性别：" prop="sexual">
-                    <el-radio v-model="user.sexual" label="1" :disabled="isDisable.sexual && isDisable.sexual!=''?true:false">男</el-radio>
-                    <el-radio v-model="user.sexual" label="2" :disabled="isDisable.sexual && isDisable.sexual!=''?true:false" style="margin-left:14px;">女</el-radio>
+                    <el-radio v-model="user.sexual" label="1" :disable="disableList.sexual">男</el-radio>
+                    <el-radio v-model="user.sexual" label="2" :disable="disableList.sexual" style="margin-left:14px;">女</el-radio>
                   </el-form-item>
 
                   <el-form-item label="在线QQ：" prop="qq">
-                    <el-input v-model="user.qq" :disabled="isDisable.qq && isDisable.qq!=''?true:false"></el-input>
+                    <el-input v-model="user.qq" :disable="disableList.qq"></el-input>
                   </el-form-item>
 
                   <el-form-item label="旺旺号：" prop="wwId">
-                    <el-input type="text" v-model="user.wwId" :disabled="isDisable.wwId && isDisable.wwId!=''?true:false"></el-input>
+                    <el-input type="text" v-model="user.wwId" :disable="disableList.wwId"></el-input>
                   </el-form-item>
 
                   <el-form-item label="所在地区：" class="area">
 
-                    <el-select class="province_select" v-model="user.province" placeholder="省"
-                               :disabled="isDisable.province && isDisable.province!=''?true:false" >
+                    <el-select class="province_select" ref="province" v-model="user.province" placeholder="省" @change="getCityListByProvince"
+                               :disable="disableList.province" >
                       <el-option
                         v-for="province in provinceList"
                         :key="province.regionCode"
@@ -89,7 +89,7 @@
                         :value="province.regionCode">
                       </el-option>
                     </el-select>
-                    <el-select class="city_select" v-model="user.city" :disabled="isDisable.city && isDisable.city!=''?true:false" placeholder="市" >
+                    <el-select class="city_select" ref="city" v-model="user.city" :disable="disableList.city" placeholder="市" @change="getAreaListByCity">
                       <el-option
                         v-for="city in cityList"
                         :key="city.regionCode"
@@ -97,7 +97,7 @@
                         :value="city.regionCode">
                       </el-option>
                     </el-select>
-                    <el-select class="county_select" v-model="user.area" :disabled="isDisable.area && isDisable.area!=''?true:false" placeholder="区">
+                    <el-select class="county_select" ref="area" v-model="user.area" :disable="disableList.area" placeholder="区" >
                       <el-option
                         v-for="area in areaList"
                         :key="area.regionCode"
@@ -108,7 +108,11 @@
                   </el-form-item>
 
                   <el-form-item label="详细地址："prop="contractAddress">
-                    <el-input type="text" v-model="user.contractAddress" :disabled="isDisable.contractAddress && isDisable.contractAddress!=''?true:false"></el-input>
+                    <el-input
+                      type="text"
+                      v-model="user.contractAddress"
+                      :disable="disableList.contractAddress"
+                    ></el-input>
                   </el-form-item>
                 </el-form>
         </div>
@@ -127,22 +131,22 @@
           <el-form :inline="true" v-model="storeDataList" label-width="100px">
             <template v-for="storeData in storeDataList">
               <el-form-item label="分销渠道：">
-                <el-select v-model="storeData.channelId" :disabled="true">
+                <el-select v-model="storeData.channelId" disable=true>
                   <el-option v-for="item in channelOption" :key="item.id" :label="item.channelName" :value="item.id"></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="店铺名：">
-                <el-input type="text" :disabled="true" v-model="storeData.storeName" />
+                <el-input type="text" disable=true v-model="storeData.storeName" />
               </el-form-item>
               <el-form-item label="线下地址：" v-if="storeData.channelId===1">
                 <div class="flex-row ver-center">
-                  <el-input type="text" :disabled="true" v-model="storeData.storePath" />
+                  <el-input type="text" disable=true v-model="storeData.storePath" />
                   <el-button v-on:click="fileDownload(storeData.storePic)" type="primary">下载文件</el-button>
                 </div>
 
               </el-form-item>
               <el-form-item label="店铺链接：" v-else >
-                <el-input type="text" :disabled="true" v-model="storeData.storePath" />
+                <el-input type="text" disable=true v-model="storeData.storePath" />
               </el-form-item>
             </template>
           </el-form>
@@ -171,7 +175,7 @@
           </el-row>
           <el-form :model="resetUser" :rules="form_rules" ref="accountPassForm" labelWidth="120px" status-icon=true>
             <el-form-item label="会员账号：" >
-              <el-input type="text" v-model="user.phone" :disabled="true"></el-input>
+              <el-input type="text" v-model="user.phone" disable=true></el-input>
             </el-form-item>
             <el-form-item label="登录旧密码：" >
               <el-input type="password" v-model="resetUser.oldPassword"></el-input>
@@ -215,84 +219,87 @@
 
 <script>
   import md5 from '../../../node_modules/md5.js';
-  import { getCenter, saveInformation, getProvinceList, getCityListByProvince, getAreaListByCity, getChannelList, getChannelOption, saveChannel, modifyPassword } from '../../api/api';
-  import ElFormItem from "../../../node_modules/element-ui/packages/form/src/form-item";
+  import {
+    getDistributorDetail,
+    saveInformation,
+    getChannelList,
+    getChannelOptionList,
+    saveChannel,
+    modifyPassword
+  } from '../../api/api';
+  import {
+    GetProvinceList,
+    GetCityListByProvince,
+    GetAreaListByCity
+  } from '../../js/common';
+
   export default{
-    components: {ElFormItem},
-    data() {
-      var validateQQ = (rule, value, callback) => {
-        if(!value||value.length<=0){
+    data () {
+      const VALIDATE_QQ = (rule, value, callback) => {
+        if (!value || value.length <= 0) {
           return callback(new Error('请输入在线qq号'));
-        }else{
+        } else {
           if (!(/^\d{5,10}$/.test(value))) {
             return callback(new Error('请输入正确格式的在线qq号'));
-          }else{
+          } else {
             callback();
           }
         }
-
       };
-      var validatePic = (rule, value, callback) => {
+      const VALIDATE_PIC = (rule, value, callback) => {
         if (!value.length) {
           return callback(new Error('请上传文件'));
-        }else{
+        } else {
           callback();
         }
       };
       return {
-
         activeTab: 'account',
         user: {
           id: 1,
           userId: 13,
-          headUrl:null,
-          nickname:null,
-          email:null,
-          totalAmount:null,
-          vipId:null,
-          vipName:null,
-          points:null,
-          nextvipName:null,
-          nextLevelPoints:null,
-          name:null, // companyName
-          contractor:null,
-          phone:null,
-          sexual:null, // 1-男 2-女
-          qq:null,
-          wwId:null,
-          province:null,
-          city:null,
-          area:null,
-          contractAddress:null
+          headUrl: null,
+          nickname: null,
+          email: null,
+          totalAmount: null,
+          vipId: null,
+          vipName: null,
+          points: null,
+          nextvipName: null,
+          nextLevelPoints: null,
+          name: null, // companyName
+          contractor: null,
+          phone: null,
+          sexual: null, // 1-男 2-女
+          qq: null,
+          wwId: null,
+          province: null,
+          city: null,
+          area: null,
+          contractAddress: null
 
         },
-        resetUser:{
-          vendorId: 1,
-          target:null,
-          oldPassword:null,
-          password:null,
-          rePassWord:null,
-          sendType:null,
+        resetUser: {
+          target: null,
+          oldPassword: null,
+          password: null,
+          rePassWord: null,
+          sendType: null,
         },
         // 记录每一个formItem的填写状态
-        isDisable:{},
+        disableList: {},
         // 记录form是否都填写完整
         isAllDisable: false,
 
         storeDataList: [],
         provinceList: [{
           regionCode: null,
-          regionName : null
+          regionName: null
         }],
-        cityList: [
-          {
-            regionCode: null,
-            regionName: null,
-          }
-        ],
+        cityList: [],
         areaList: [],
 
-        channelOption: [{
+        channelOptionList: [{
           id: '',
           channelName: null
         }],
@@ -305,211 +312,163 @@
         // 上传图片返回的URL
         storePic: null,
         // 修改账号密码提示信息icon
-        inputMsg: [require('@/imgs/login/success_icon.png'), require('@/imgs/login/fail_icon.png')],
+        INPUTMSG: [
+          require('@/imgs/login/success_icon.png'),
+          require('@/imgs/login/fail_icon.png')
+        ],
         acpassMsgFlag: -1,
         acrePassMsgFlag: -1,
         loading: false,
         storeDialog: false,
-
-
         // rules
         form_rules: {
           name: [
-            {required: true, message:'请输入公司名称', trigger: 'blur'}
+            {required: true, message: ' ', trigger: 'blur'}
           ],
           contractor: [
-            {required: true, message:'请输入联系人', trigger: 'blur'}
+            {required: true, message: ' ', trigger: 'blur'}
           ],
           sexual: [
-            { required: true, message: '请选择性别', trigger: 'change' }
+            { required: true, message: ' ', trigger: 'change' }
           ],
           qq: [
-            { validator: validateQQ, trigger: 'blur'},
+            {validator: VALIDATE_QQ, trigger: 'blur'},
           ],
           wwId: [
-            { required: true, message:'请输入旺旺账号', trigger: 'blur'}
+            {required: true, message: ' ', trigger: 'blur'}
           ],
           province: [
-            {required: true, message:'请输入所在地区', trigger: 'change'}
+            {required: true, message: '请输入所在地区', trigger: 'change'}
           ],
           contractAddress: [
-            {required: true, message:'请输入详细地址', trigger: 'blur'}
+            {required: true, message: '请输入详细地址', trigger: 'blur'}
           ],
         },
 
         dialog_rules: {
           channelId: [
-            {type: "number", required: true, message:'请选择分销渠道', trigger: 'change'}
+            {type: 'number', required: true, message: '请选择分销渠道', trigger: 'change'}
           ],
           storeName: [
-            {required: true, message:'请输入店铺名', trigger: 'blur'}
+            {required: true, message: '请输入店铺名', trigger: 'blur'}
           ],
           storePath: [
-            {required: true, message:'线上渠道请输入店铺链接；线下渠道请输入店铺地址并上传文件', trigger: 'blur'}
+            {required: true, message: '线上渠道请输入店铺链接；线下渠道请输入店铺地址并上传文件', trigger: 'blur'}
           ],
           storePic: [
-            { validator: validatePic, trigger: 'change' }
+            { validator: VALIDATE_PIC, trigger: 'change' }
           ]
         },
 
-        onlyOne: false,
-
-        regxs: [/[^a-zA-Z0-9_]/g,/[a-zA-Z]/g,/[0-9]/g],
-        //密码强度级数
-        sec:0
-
-      }
+        REGXS: [/[^a-zA-Z0-9_]/g, /[a-zA-Z]/g, /[0-9]/g],
+        // 密码强度级数
+        sec: 0
+      };
     },
     methods: {
 
-      //密码验证
-      //密码强度验证
-      validatePassSafety(){
+      // 密码验证
+      // 密码强度验证
+      validatePassSafety: function () {
         this.sec = 0;
-        for (var i = 0; i < this.regxs.length; i++) {
-          if (this.resetUser.password.match(this.regxs[i])) {
-            this.sec++;
-          }
-        }
-      },
-      validatePass() {
-        if (this.resetUser.password === '') {
-          this.acpassMsgFlag = 1;
-        } else {
-          if (this.resetUser.password .length>=6 && this.resetUser.password.length<=16) {
-            this.acpassMsgFlag = 0;
-          }else{
-            this.acpassMsgFlag = 1;
-          }
-          return;
-        }
+        this.REGXS.map(item => {
+          this.sec = this.resetUser.password.match(item) ? this.sec + 1 : this.sec;
+        });
       },
 
-      validateRePass() {
-        if (this.resetUser.rePassword === '') {
-          this.acrePassMsgFlag = 1;
-        } else if (this.resetUser.rePassword !== this.resetUser.password) {
-          this.acrePassMsgFlag = 1;
-        } else {
-          this.acrePassMsgFlag = 0;
-        }
+      validatePass: function () {
+        this.acpassMsgFlag = this.resetUser.password &&
+          this.resetUser.password.length >= 6 &&
+          this.resetUser.password.length <= 16 ? 0 : 1;
       },
-      getUser: function() {
+
+      validateRePass: function () {
+        this.acrePassMsgFlag = this.resetUser.rePassword &&
+          this.resetUser.rePassword === this.resetUser.password ? 0 : 1;
+      },
+      getDistributorDetail: function () {
         this.loading = true;
-        let param = {
-          userId: 13
+        const param = {
+          id: this.user.distributorId
         };
-        getCenter(param).then((res) => {
+        getDistributorDetail(param).then((res) => {
           this.loading = false;
-          this.user = res.data;
-          this.$set(this.user, 'distributorId', 1);
-          for ( var p in this.user ){
-            this.isDisable[ p ]=  this.user[ p ];
-          }
-          if(this.isDisable["name"]&&this.isDisable["contractor"]&&this.isDisable["sexual"]&&this.isDisable["qq"]&&this.isDisable["wwId"]&&this.isDisable["province"]&&this.isDisable["contractAddress"]){
-
+          this.$set(this, 'user', {...res.data});
+          this.$set(this, 'disableList', {...res.data});
+          if (this.disableList['name'] && this.disableList['contractor'] &&
+            this.disableList['sexual'] && this.disableList['qq'] && this.disableList['wwId'] &&
+            this.disableList['province'] && this.disableList['contractAddress']) {
             this.isAllDisable = true;
-          }else{
+          } else {
             this.isAllDisable = false;
           }
-          console.log(this.isAllDisable);
-          console.log(this.user);
-          this.getStoreData();
+          this.getChannelList();
         });
-
       },
 
       // 获取店铺信息
-      getStoreData(){
-        let param = {
-          distributorId: 1
+      getChannelList: function () {
+        const param = {
+          distributorId: this.user.distributorId
         };
         getChannelList(param).then((res) => {
-          this.storeDataList = res.data;
-        })
+          this.$set(this, 'storeDataList', res.data);
+        });
       },
 
       // 获取省列表
-      getProvince() {
-        let param = {};
-        getProvinceList(param).then((res) => {
-          this.provinceList = res.data;
-        });
-
-
+      getProvinceList: function () {
+        GetProvinceList((provinceList) => this.$set(this, 'provinceList', provinceList));
       },
 
       // 获取市列表
-      handleChangeProvince(value) {
-        if(value && value!='') {
-          let param = {
-            parentCode: value
-          };
-          getCityListByProvince(param).then((res) => {
-            this.cityList = res.data;
-            if(this.cityList.length>0){
-              this.user.city = this.cityList[0].regionCode;
-            }
-          });
-        }
-
-      },
-
-      // 获取地区列表
-      handleChangeCity(value) {
-        console.log('city:'+value);
-        if(value!=''&&value) {
-          let param = {
-            parentCode: value
-          };
-          getAreaListByCity(param).then((res) => {
-            this.areaList = res.data;
-            if(this.areaList.length>0){
-              this.user.area = this.areaList[0].regionCode;
-            }
-          });
-
-        }
-      },
-
-      // 获取渠道列表
-      getChannelOption() {
-        let param = {};
-        this.channelOption = new Array();
-        getChannelOption(param).then((res) => {
-          if(res.status ==200) {
-            var channelOption = res.data;
-            for(var i in channelOption){
-              if(channelOption[i].status==1){
-                this.channelOption.push(channelOption[i]);
-              }
-            }
-            console.log(this.channelOption)
-          }
+      getCityListByProvince: function (value) {
+        GetCityListByProvince(value, (cityList) => {
+          this.$set(this, 'cityList', cityList);
+          this.user.city = this.cityList[0].regionCode;
         });
       },
 
+      // 获取地区列表
+      getAreaListByCity: function (value) {
+        GetAreaListByCity(value, (areaList) => {
+          this.$set(this, 'areaList', areaList);
+          this.user.area = this.areaList[0].regionCode;
+        });
+      },
 
+      // 获取渠道列表
+      getChannelOptionList: function () {
+        const param = {
+          userType: 1
+        };
+        getChannelOptionList(param).then((res) => {
+          if (res.status == 200) {
+            this.channelOptionList = res.data;
+          }
+        });
+      },
       // 提交修改申请
-      submitUserInfo(formName) {
+      submitUserInfo: function (formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            if(this.activeTab=='account'){
+            if (this.activeTab == 'account') {
               this.loading = true;
-              let param = Object.assign({}, this.user);
-              saveInformation(param).then((res) => {
-                if(res.status ==200) {
+              this.$set(this.user, 'provinceDesc', this.$refs.province.selectedLabel);
+              this.$set(this.user, 'cityDesc', this.$refs.city.selectedLabel);
+              this.$set(this.user, 'areaDesc', this.$refs.area.selectedLabel);
+              saveInformation(this.user).then((res) => {
+                if (res.status == 200) {
                   this.loading = false;
                   this.$message({
                     message: '提交成功',
                     type: 'success'
                   });
-                  this.getUser();
+                  this.getDistributorDetail();
                 }
-
               });
-            }else{
-              if(!(this.acrePassMsgFlag==0 && this.acrePassMsgFlag==0)){
+            } else {
+              if (!(this.acrePassMsgFlag == 0 && this.acrePassMsgFlag == 0)) {
                 this.$message({
                   message: '请填写正确的信息',
                   type: 'warning'
@@ -526,89 +485,68 @@
               param.oldPassword = md5(param.oldPassword).toUpperCase();
               param.newPassword = md5(param.newPassword).toUpperCase();
               modifyPassword(param).then((res) => {
-                if(res.status ==300) {
+                if (res.status == 300) {
                   this.$message({
                     message: '原密码错误，请重新输入原密码',
                     type: 'warning'
                   });
                   return;
                 }
-                if(res.status ==200) {
-                  sessionStorage.removeItem("user");
+                if (res.status == 200) {
+                  sessionStorage.removeItem('user');
                   this.$message({
                     message: '您的密码已经修改，请重新登录',
                     type: 'success'
                   });
                   this.$router.push({path: '/login'});
                 }
-
               });
             }
-
-          }else {
-            console.log('error');
+          } else {
             return false;
           }
-
         });
-
       },
 
       // 提交新增渠道
-      submitShopInfo(formName) {
+      submitShopInfo: function (formName) {
         this.$refs[formName].validate((valid) => {
-          if(valid){
+          if (valid) {
             this.storeDialog = false;
-            this.dialogStoreData.distributorId = 1;
             let param = Object.assign({}, this.dialogStoreData);
-            if(this.dialogStoreData.channelId==1){
+            if (this.dialogStoreData.channelId == 1) {
               this.$set(param, 'storePic', this.storePic);
             }
             saveChannel(param).then((res) => {
-              if(res.status ==200) {
+              if (res.status == 200) {
                 this.$message({
                   message: '提交成功',
                   type: 'success'
                 });
-
               }
             });
-
-          }else {
-            console.log("unsubmit   "+this.dialogStoreData.storePic);
+          } else {
             return false;
-
           }
-
         });
       },
 
-
-
-      //file download
-      fileDownload(file){
-        console.log(file);
-        window.open(file,"_blank")
+      // file download
+      fileDownload: function (file) {
+        window.open(file, '_blank');
       },
 
-      //file upload
-      handleRemove(file, fileList) {
+      // file upload
+      handleRemove: function (file, fileList) {
         this.dialogStoreData.storePic = null;
-        this.onlyOne = false;
       },
 
-      handleFileSuccess(response, file, fileList) {
+      handleFileSuccess: function (response, file, fileList) {
         this.dialogStoreData.storePic = fileList;
         this.storePic = fileList[0].response.data.filePath;
-        console.log(this.dialogStoreData.storePic);
-        this.onlyOne = true;
       },
 
-      handlePreview(file) {
-        console.log(file);
-      },
-
-      resetDialog(formName){
+      resetDialog: function (formName) {
         this.dialogStoreData = {
           channelId: '',
           storeName: '',
@@ -616,31 +554,17 @@
           storePic: [],
         };
         this.$refs[formName].resetFields();
-
+      },
+      setData: function (value) {
+        this.$set(this, 'provinceList', value);
       },
 
     },
-    created() {
-      var sessionUser = sessionStorage.getItem('user');
-
-      this.getUser();
-      this.getProvince();
-      this.getChannelOption();
-    },
-    watch: {
-      'user.province': function(val,oldVal) {
-        if(val){
-          this.handleChangeProvince(val);
-
-        }
-      },
-      'user.city': function(val,oldVal) {
-        if(val!=oldVal){
-          this.handleChangeCity(val);
-        }
-
-      }
+    created () {
+      this.user = JSON.parse(sessionStorage.getItem('user'));
+      this.getProvinceList();
+      this.getDistributorDetail();
+      this.getChannelOptionList();
     }
   };
-
 </script>

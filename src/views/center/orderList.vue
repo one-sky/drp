@@ -240,13 +240,19 @@
 </style>
 
 <script>
-  import { getOrderList, cancelOrder, getRefundReasons, saveRefund, getRefundNum} from '../../api/api';
+  import {
+    getOrderList,
+    cancelOrder,
+    getRefundReasons,
+    saveRefund,
+    getRefundNum
+  } from '../../api/api';
   export default {
-    data() {
+    data () {
       return {
         activeName: '100',
         collapseName: '',
-        user:{
+        user: {
           userId: 147,
           vendorId: 2,
           distributorId: 64
@@ -269,19 +275,17 @@
           payStatus: '',
           reveivePhone: ''
         },
-
-
         orderList: [],
         orderItem: [],
 
-        //订单状态
+        // 订单状态
         orderStatus: [
-          {key:100, value:'全部订单'},
-          {key:10, value:'待付款'},
-          {key:20, value:'待发货'},
-          {key:30, value:'待收货'},
-          {key:40, value:'已完成'},
-          {key:0, value:'已取消'},
+          {key: 100, value: '全部订单'},
+          {key: 10, value: '待付款'},
+          {key: 20, value: '待发货'},
+          {key: 30, value: '待收货'},
+          {key: 40, value: '已完成'},
+          {key: 0, value: '已取消'},
         ],
 
         payStatus: [
@@ -291,49 +295,51 @@
           {value: 0, label: '未付款'},
         ],
 
-        //申请售后
-        refund:{
-          orderId:null,
-          orderItemId:null,
-          type:"1",
-          reason:null,
-          number:1,
-          text:null,
+        // 申请售后
+        refund: {
+          orderId: null,
+          orderItemId: null,
+          type: '1',
+          reason: null,
+          number: 1,
+          text: null,
           avaNumber: null
         },
 
-        //退款原因
-        refundReason:[],
+        // 退款原因
+        refundReason: [],
         refundDialogVisible: false,
         form_rules: {
           reason: [
-            {required: true,type:'number', message:'请选择申请原因', trigger: 'change,blur'}
+            {
+              required: true,
+              type: 'number',
+              message: '请选择申请原因',
+              trigger: 'change,blur'
+            }
           ]
 
         },
 
-        n:0,
-        currentPage:1,
+        n: 0,
+        currentPage: 1,
         pageSize: 4,
-        totalCount:0,
+        totalCount: 0,
         isShowAll: false,
         more_button_message: '展开',
-        loading:false,
+        loading: false,
 
       };
     },
     methods: {
-
-
-      getOrderList() {
+      getOrderList: () => {
         let param = {};
-        if(this.searchForm.orderStatus==100){
+        if (this.searchForm.orderStatus == 100) {
           param = Object.assign({}, this.searchForm, {distributorId: this.user.distributorId, vendorId: this.user.vendorId, pageNum: this.currentPage});
           param.orderStatus = '';
-        }else{
+        } else {
           param = Object.assign({}, this.searchForm, {distributorId: this.user.distributorId, vendorId: this.user.vendorId, pageNum: this.currentPage});
         }
-        console.log(param)
 //        getOrderList(param).then((res) => {
 //          this.loading = false;
 //          if(res.status==200){
@@ -350,46 +356,24 @@
 //
 //
 //        })
-  this.orderList = [{
-    orderCode: '1111',
-    orderTime: '12232312313',
-    orderItem: [{
-      skuAttributes: '颜色分类：红；'
-    },
-    {
-      skuAttributes: '颜色分类：白；'
-    }],
-    productName: 'aa',
-    receiveName: 'cyw',
-    reveivePhone: '17826856409',
-    provinceDesc: '浙江省',
-    cityDesc: '杭州市',
-    areaDesc: '浙江理工大学生活一区'
-
-  }]
       },
 
-      cancelOrder(order) {
-
-        this.loading= true;
+      cancelOrder: (order) => {
+        this.loading = true;
         let param = {
           orderId: order.id,
           userId: this.user.userId,
           vendorId: this.user.vendorId,
           orderCode: order.orderCode
-
         };
         cancelOrder(param).then((res) => {
-
-          if(res.status==200){
+          if (res.status == 200) {
             this.getOrderList();
           }
-
-
-        })
+        });
       },
 
-      getOrderDetail(activeName) {
+      getOrderDetail: (activeName) => {
         this.orderItem = this.orderList.find((item) => {
           return item.id === activeName;
         }).oOrderItems;
@@ -397,65 +381,59 @@
         this.more_button_message = '更多';
       },
 
-
-      //form_button_event
-      handleSearch() {
-        for ( var p in this.searchGroup ){
-          this.searchForm[ p ]=  this.searchGroup[ p ];
+      // form_button_event
+      handleSearch: () => {
+        for (var p in this.searchGroup) {
+          this.searchForm[ p ] = this.searchGroup[ p ];
         }
         this.searchForm.startDate = (!this.searchForm.startDate || this.searchForm.startDate == '') ? '' : date.formatDate.format(new Date(this.searchForm.startDate), 'yyyy-MM-dd');
         this.searchForm.endDate = (!this.searchForm.endDate || this.searchForm.endDate == '') ? '' : date.formatDate.format(new Date(this.searchForm.endDate), 'yyyy-MM-dd');
-        this.activeName = this.searchGroup.orderStatus+'';
+        this.activeName = this.searchGroup.orderStatus + '';
         this.currentPage = 1;
         this.getOrderList();
       },
 
-
-      //list_button_event
-      handleRefund(orderId, orderItemId){
+      // list_button_event
+      handleRefund (orderId, orderItemId) {
         this.$set(this.refund, 'orderItemId', orderItemId);
         this.$set(this.refund, 'orderId', orderId);
         this.$set(this.refund, 'type', 1);
         this.$set(this.refund, 'number', 1);
         this.getRefundReasons();
         this.getRefundNum();
-
       },
-      resetDialog(formName){
-        this.refund ={
-          orderId:null,
-          type:null,
-          reason:null,
-          price:null,
-          text:null
+      resetDialog: (formName) => {
+        this.refund = {
+          orderId: null,
+          type: null,
+          reason: null,
+          price: null,
+          text: null
         };
         this.$refs[formName].resetFields();
       },
 
-      handleShowAll(){
+      handleShowAll: () => {
         this.isShowAll = !this.isShowAll;
-        if(this.isShowAll){
+        if (this.isShowAll) {
           this.more_button_message = '收起';
-        }else{
+        } else {
           this.more_button_message = '更多';
-
         }
       },
 
-
-      //页码变更
-      handleCurrentChange: function(val) {
-        for ( var p in this.searchForm ){
-          this.searchGroup[ p ]=  this.searchForm[ p ];
+      // 页码变更
+      handleCurrentChange: (val) => {
+        for (var p in this.searchForm) {
+          this.searchGroup[p] = this.searchForm[p];
         }
         this.currentPage = val;
         this.getOrderList();
-
       },
 
-      //tab_event
-      handleClick(tab, event) {
-        //reset
+      // tab_event
+      handleClick: (tab, event) => {
+        // reset
 
         this.searchGroup = {};
         this.searchForm = {};
@@ -465,42 +443,38 @@
         this.getOrderList();
       },
 
-      //collapse_event
-      handleChangeCollapse(activeName){
-        if(activeName != ''){
+      // collapse_event
+      handleChangeCollapse: (activeName) => {
+        if (activeName != '') {
           this.getOrderDetail(activeName);
         }
       },
 
-      //获取售后原因
-      getRefundReasons(){
+      // 获取售后原因
+      getRefundReasons: () => {
         let param = {};
         getRefundReasons(param).then((res) => {
-          if(res.status==200){
+          if (res.status == 200) {
             this.refundReason = res.data;
           }
-
-
-        })
+        });
       },
-      //获取可退款数量
-      getRefundNum(){
+
+      // 获取可退款数量
+      getRefundNum: () => {
         let param = {
           orderItemId: this.refund.orderItemId
         };
-        console.log(param)
         getRefundNum(param).then((res) => {
-          if(res.status==200){
-            this.$set(this.refund, 'avaNumber', parseInt(res.data)||0);
+          if (res.status == 200) {
+            this.$set(this.refund, 'avaNumber', parseInt(res.data) || 0);
             this.refundDialogVisible = true;
           }
-
-
-        })
+        });
       },
 
-      //申请售后提交
-      submitRefund(formName) {
+      // 申请售后提交
+      submitRefund: (formName) => {
         this.$refs[formName].validate((valid) => {
           if (valid) {
             let param = {
@@ -511,9 +485,7 @@
               orderId: this.refund.orderId,
               orderItemId: this.refund.orderItemId,
               type: parseInt(this.refund.type)
-
-            }
-            console.log(param)
+            };
             saveRefund(param).then((res) => {
               this.$message({
                 message: '提交成功',
@@ -529,12 +501,11 @@
             });
           }
         });
-
-
       }
 
     },
-    created()  {
+    created () {
+      this.user = JSON.parse(sessionStorage.getItem('user'));
       this.getOrderList();
     }
   };

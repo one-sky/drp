@@ -4,7 +4,7 @@
       <div class="icon"></div>
       <span>最新公告</span>
       <span>:</span>
-      <div class="content flex-row" v-for="item in notices">
+      <div class="content flex-row" v-for="item in noticeList">
         <div>[{{item.effectDate|formatDate(item.effectDate)}}]</div>
         <router-link :to="{path:'/noticesDetail', query:{name: 'notice', id:item.id }}">{{item.title}}</router-link>
       </div>
@@ -19,45 +19,33 @@
   @import "center.css";
 </style>
 <script>
-  import { getNotices } from '../../api/api';
+  import { getNoticeList } from '../../api/api';
   export default{
     data () {
       return {
         user: {},
-        notices: null
-      }
+        noticeList: {}
+      };
     },
     methods: {
 //      获取公告详情
-      getNotices() {
+      getNoticeList: function () {
         let param = {
-          vendorId: 1,
-          userId: null,
-          isIndexPage: 'N',
-          distributorId: 1,
-          pageNum: 1
-        }
-        getNotices(param).then((res) => {
-          if(res.status == 200){
-            if(res.data && res.data.length > 0) {
-              this.notices = res.data
-            }
+          isIndex: false,
+          userType: 1,
+          pageNum: 1,
+          pageSize: 10
+        };
+        getNoticeList(param).then((res) => {
+          if (res.status == 200) {
+            this.noticeList = res.data;
           }
-
-        })
+        });
       },
     },
     created () {
-      var sessionUser = sessionStorage.getItem('user')
-      if(sessionUser) {
-        sessionUser = JSON.parse(sessionUser)
-        this.$set(this.user, 'userId', 1)
-        this.$set(this.user, 'distributorId', 1)
-      }
-      this.getNotices()
-
+      this.$set(this, 'user', this.$store.state.user);
+      this.getNoticeList();
     }
-
-  }
-
+  };
 </script>

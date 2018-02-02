@@ -166,84 +166,88 @@
 </style>
 
 <script>
-  import { getProductList, getRecommendBrandList, getProvinceList, getCityListByProvince, getAgentBrand } from "../../api/api.js";
+  import {
+    getProductList,
+    getRecommendBrandList,
+    getProvinceList,
+    getCityListByProvince,
+    getAgentBrand
+    } from '../../api/api.js';
   export default{
-    data() {
-      return{
+    data () {
+      return {
         loading: false,
-        user:{},
-        curPage:1,
-        count:0, //条目总数
-        pageCount:0, //页码总数
-        attributeList: [],  //top属性显示
-        search:{
-          type:'一件代发',
-          orderField:'productId',
-          orderDirection:1
+        user: {},
+        curPage: 1,
+        count: 0, // 条目总数
+        pageCount: 0, // 页码总数
+        attributeList: [],  // top属性显示
+        search: {
+          type: '一件代发',
+          orderField: 'productId',
+          orderDirection: 1
         },
-        lastChosen:'productId',
+        lastChosen: 'productId',
 
-        brandList:[],//查询列表
+        brandList: [], // 查询列表
 
-        checkAttributeList:[], //checkBox监听列表
-        //品牌首字母
-        brandFirstLetters:{
-          isMore:false,
-          isShow:false,
-          firstLetters:[]
+        checkAttributeList: [], // checkBox监听列表
+        // 品牌首字母
+        brandFirstLetters: {
+          isMore: false,
+          isShow: false,
+          firstLetters: []
         },
-        productList:[{
-          productId:null,
-          productName:null,
+        productList: [{
+          productId: null,
+          productName: null,
           thumbnailImage: null,
           retailPrice: null,
-          priceRange:null
+          priceRange: null
 
         }],
 
-        //推荐商品
-        recommendBrand:[],
+        // 推荐商品
+        recommendBrand: [],
 
-        //area
-        areaList:[],
-        area:[],
-        city:null,
-
-        //属性栏是否展开
+        // area
+        areaList: [],
+        area: [],
+        city: null,
+        // 属性栏是否展开
         isShowAll: false,
         more_button_message: '更 多',
 
-      }
+      };
     },
     methods: {
-      init() {
+      init () {
         // 属性栏初始化
-        this.isShowAll = false
-        this.more_button_message = '更 多'
+        this.isShowAll = false;
+        this.more_button_message = '更 多';
         for (var p in this.attributeList) {
-          this.$set( this.attributeList[p], 'isMore', false)
-          this.$set( this.attributeList[p], 'isShow', false)
+          this.$set(this.attributeList[p], 'isMore', false);
+          this.$set(this.attributeList[p], 'isShow', false);
         }
       },
-      updateAndToggle(val){
-        if(this.lastChosen==val){
-          this.search.orderDirection = this.search.orderDirection==1?2:1;
-        }else{
-          this.lastChosen=val;
-          this.search.orderField=val;
-          this.search.orderDirection=1;
+      updateAndToggle: (val) => {
+        if (this.lastChosen == val) {
+          this.search.orderDirection = this.search.orderDirection == 1 ? 2 : 1;
+        } else {
+          this.lastChosen = val;
+          this.search.orderField = val;
+          this.search.orderDirection = 1;
         }
-        this.getProductList()
+        this.getProductList();
       },
 
-
-      getProductList() {
+      getProductList: () => {
         this.loading = true;
-        this.productList= [];
-        var firstLetters=new Array();
-        var brandIds=new Array();
-        var attributeIds=new Array();
-        var attributeValueIds=new Array();
+        this.productList = [];
+        var firstLetters = new Array();
+        var brandIds = new Array();
+        var attributeIds = new Array();
+        var attributeValueIds = new Array();
 //        for(var i in this.brandList){
 //          //字母
 //          if(this.brandList[i].attributeName=='按品牌首字母'){
@@ -288,90 +292,82 @@
           vendorId: 1,
           pageNum: 1
         };
-        console.log(param)
         getProductList(param).then((res) => {
-          if(res.status == 200) {
-            if(res.data && res.data != '') {
-              this.productList = res.data.productList
+          if (res.status == 200) {
+            if (res.data && res.data != '') {
+              this.productList = res.data.productList;
               // 品牌首字母
               if (res.data.firstLetters && res.data.firstLetters != '') {
-                this.attributeList.push({'attributeId': 0, 'attributeName': '品牌首字母', 'attributeValueItemVOList': null })
+                this.attributeList.push({ 'attributeId': 0, 'attributeName': '品牌首字母', 'attributeValueItemVOList': null });
                 // 首字母转成大写字母
                 this.$set(this.attributeList[0], 'attributeValueItemVOList', res.data.firstLetters.map(function (item) {
-                    return {'attributeValueId': item.toUpperCase(), 'attributeValueName': item.toUpperCase()}
+                    return {'attributeValueId': item.toUpperCase(), 'attributeValueName': item.toUpperCase()};
                   })
-                )
-
+                );
               }
-              for( var i in res.data.attibutes){
-                this.attributeList.push(res.data.attibutes[i])
+              for (var i in res.data.attibutes) {
+                this.attributeList.push(res.data.attibutes[i]);
               }
 
               // 区别一件代发与批发价
               for (var p in this.productList) {
-                this.$set(this.productList[p], 'lowPrice', this.productList[p].priceRange.split('~')[0])
-                this.$set(this.productList[p], 'highPrice', this.productList[p].priceRange.split('~')[1])
+                this.$set(this.productList[p], 'lowPrice', this.productList[p].priceRange.split('~')[0]);
+                this.$set(this.productList[p], 'highPrice', this.productList[p].priceRange.split('~')[1]);
               }
               this.count = res.data.count;
               this.pageCount = res.data.pageCount;
               if (this.user.userId && this.user.userId != '') {
-                this.getAgentBrand()
+                this.getAgentBrand();
               }
             }
 
-            this.init()
+            this.init();
 //            if(null != this.$store.state.showType && this.$store.state.showType =='批发'){
 //              this.$set(this.search, 'type', '批发');
 //            }else{
 //              this.$set(this.search, 'type', '一件代发');
 //            }
             this.loading = false;
-            console.log(this.attributeList)
-
-
           }
-        })
+        });
       },
       // 在没有多选下，更多按钮有效
-      showCategory(moreVal, showVal, id){
-        if(!moreVal){
+      showCategory: (moreVal, showVal, id) => {
+        if (!moreVal) {
           this.$set(this.attributeList[id], 'isShow', !showVal);
         }
-
       },
-      //展开多选，并展示更多
-      isAllowMore(moreVal,showVal,id){
-        if(!moreVal) {
+      // 展开多选，并展示更多
+      isAllowMore: (moreVal, showVal, id) => {
+        if (!moreVal) {
           this.attributeList[id].isMore = true;
           this.attributeList[id].isShow = true;
         }
       },
 
-      //关闭多选
-      collapseMore(id){
-        this.attributeList[id].isMore=false;
-        this.attributeList[id].isShow=false;
-        //清除当前大类选项
+      // 关闭多选
+      collapseMore: (id) => {
+        this.attributeList[id].isMore = false;
+        this.attributeList[id].isShow = false;
+        // 清除当前大类选项
         var attributList = [];
-        for(var i in this.attributeList[id-1].attibutes){
-          for( var j in this.checkAttributeList){
-            if(this.attributeList[id-1].attibutes[i].attributeValueId != this.checkAttributeList[j].attributeValueId){
+        for (let i in this.attributeList[id - 1].attibutes) {
+          for (let j in this.checkAttributeList) {
+            if (this.attributeList[id - 1].attibutes[i].attributeValueId != this.checkAttributeList[j].attributeValueId) {
               attributList.push(this.checkAttributeList[j]);
             }
           }
-
         }
         this.checkAttributeList = attributList;
-
       },
 
-      //检查brandList中是否已有， -1为重复， 不重复返回brandList中的位置，从0开始
-      handelDuplicate(index, value){
-        if(index<1){  //品牌首字母
-          for(var i in this.brandList){
-            if(this.brandList[i].attributeName=='按品牌首字母'){
-              for(var j in this.brandList[i].attributes){
-                if(this.brandList[i].attributes[j]==value){
+      // 检查brandList中是否已有， -1为重复， 不重复返回brandList中的位置，从0开始
+      handelDuplicate: (index, value) => {
+        if (index < 1) {  // 品牌首字母
+          for (let i in this.brandList) {
+            if (this.brandList[i].attributeName == '按品牌首字母') {
+              for (var j in this.brandList[i].attributes) {
+                if (this.brandList[i].attributes[j] == value) {
                   return -1;
                 }
               }
@@ -380,94 +376,88 @@
           }
           // 未return ，不重复
           // 没有这个属性大类
-          var attribute = {attributeId: null, attributeName: '按品牌首字母', attributes: new Array()};
+          const attribute = {attributeId: null, attributeName: '按品牌首字母', attributes: new Array()};
           this.brandList.push(attribute);
-          return this.brandList.length-1;
-        } else{  //品牌或属性
-          for(var i in this.brandList){
-            //已有这一个属性大类
-            console.log(this.brandList[i].attributeId == this.attributeList[index - 1].attributeId)
-            if(this.brandList[i].attributeId == this.attributeList[index - 1].attributeId){
-              //遍历子属性中是否存在
-              for(var j in this.brandList[i].attributes.attributeValueItemVOList){
-                if(this.brandList[i].attributes.attributeValueItemVOList[j]==value){
+          return this.brandList.length - 1;
+        } else {  // 品牌或属性
+          for (let i in this.brandList) {
+            // 已有这一个属性大类
+            if (this.brandList[i].attributeId == this.attributeList[index - 1].attributeId) {
+              // 遍历子属性中是否存在
+              for (let j in this.brandList[i].attributes.attributeValueItemVOList) {
+                if (this.brandList[i].attributes.attributeValueItemVOList[j] == value) {
                   return -1;
                 }
               }
               return i;
             }
           }
-          //没有这个属性大类
-          var attribute = {
+          // 没有这个属性大类
+          const attribute = {
             attributeId: this.attributeList[index - 1].attributeId,
             attributeName: this.attributeList[index - 1].attributeName,
             attributes: new Array()
           };
           this.brandList.push(attribute);
-          return this.brandList.length-1;
+          return this.brandList.length - 1;
         }
       },
-      //查询
-      searchProductByCategory(index, flag, value){
-        console.log(value)
-        if(index<1) {  //品牌首字母
+      // 查询
+      searchProductByCategory: (index, flag, value) => {
+        if (index < 1) {  // 品牌首字母
           if (value && value != '') {
-            var i = this.handelDuplicate(index,value);
-            if(this.handelDuplicate(index,value)) {
+            var i = this.handelDuplicate(index, value);
+            if (this.handelDuplicate(index, value)) {
               this.brandList[i].attributes.push({attributeValueId: value, attributeValueName: value});
             }
           }
-        }else{
-          if(flag&&flag!=''&&flag>0){ //单选
-            var i = this.handelDuplicate(index,value);
-            if(i>-1){
+        } else {
+          if (flag && flag != '' && flag > 0) { // 单选
+            let i = this.handelDuplicate(index, value);
+            if (i > -1) {
               this.brandList[i].attributes.push(value);
             }
-          }else{  //多选
-            for(var i in this.checkAttributeList){
-              var k = this.handelDuplicate(index,this.checkAttributeList[i]);
-              console.log(k)
-              if(k>-1){
+          } else {  // 多选
+            for (let i in this.checkAttributeList) {
+              var k = this.handelDuplicate(index, this.checkAttributeList[i]);
+              if (k > -1) {
                 this.brandList[k].attributes.push(this.checkAttributeList[i]);
               }
             }
-
           }
         }
-        console.log(this.brandList);
         this.getProductList();
       },
-      handleCurrentChange(val) {
-        this.curPage =val;
+      handleCurrentChange: (val) => {
+        this.curPage = val;
       },
 
-      handleShowAll(){
+      handleShowAll: () => {
         this.isShowAll = !this.isShowAll;
-        if(this.isShowAll){
+        if (this.isShowAll) {
           this.more_button_message = '收 起';
-        }else{
+        } else {
           this.more_button_message = '更 多';
-
         }
       },
 
       // 获取省列表
-      getProvince() {
+      getProvince: () => {
         let param = {};
         getProvinceList(param).then((res) => {
           if (res.status == 200) {
             this.areaList = res.data;
-            for(var i in this.areaList){
-              this.$set(this.areaList[i],'cities',[]);
-              this.$set(this.areaList[i],'index',i);
+            for (var i in this.areaList) {
+              this.$set(this.areaList[i], 'cities', []);
+              this.$set(this.areaList[i], 'index', i);
             }
           }
-        })
+        });
       },
 
       // 获取市列表
-      handleChooseProvince(value) {
-        if(value && value!='') {
+      handleChooseProvince: (value) => {
+        if (value && value != '') {
           let param = {
             parentCode: this.areaList[value[0]].regionCode
           };
@@ -483,54 +473,45 @@
       },
 
       // 省市均选择后调用getProductList
-      changeArea(value){
-        console.log(value);
-        if(value&&value!=''){
-          this.area=value;
-          if(this.area.length>1){
+      changeArea: (value) => {
+        if (value && value != '') {
+          this.area = value;
+          if (this.area.length > 1) {
             this.city = this.areaList[this.area[0]].cities[this.area[1]].regionCode;
             this.getProductList();
           }
-        }else{
-          this.city=null;
+        } else {
+          this.city = null;
           this.getProductList();
-
         }
-
-
       },
 
-
       // 获取已代理品牌
-      getAgentBrand(){
+      getAgentBrand: () => {
         let param = {
           distributorId: this.user.distributorId,
           vendorId: this.user.vendorId
         };
-        console.log(param);
         getAgentBrand(param).then((res) => {
-          if(res.status ==200) {
+          if (res.status == 200) {
             this.agentBrandList = res.data;
-            for(var i in this.productList){
-              this.$set(this.productList[i],'isAgent',false);
-              for(var j in this.agentBrandList){
-                if(this.productList[i].brandIds[0]==this.agentBrandList[j].erpBrandId){
-                  this.$set(this.productList[i],'isAgent',true);
+            for (let i in this.productList) {
+              this.$set(this.productList[i], 'isAgent', false);
+              for (var j in this.agentBrandList) {
+                if (this.productList[i].brandIds[0] == this.agentBrandList[j].erpBrandId) {
+                  this.$set(this.productList[i], 'isAgent', true);
                   break;
                 }
               }
             }
           }
-        })
-
+        });
       },
 
     },
-    created() {
+    created () {
       this.getProductList();
       this.getProvince();
-
     }
-
-  }
+  };
 </script>

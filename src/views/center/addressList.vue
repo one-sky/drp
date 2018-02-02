@@ -108,45 +108,56 @@
 
 </style>
 <script>
-  import { getAddressList, getAddress, setIsDefault, modifyAddress, saveAddress, deleteAddress, getProvinceList, getCityListByProvince, getAreaListByCity} from '../../api/api';
+  import {
+    getAddressList,
+    getAddress,
+    setIsDefault,
+    modifyAddress,
+    saveAddress,
+    deleteAddress,
+    getProvinceList,
+    getCityListByProvince,
+    getAreaListByCity
+  } from '../../api/api';
+
+  import Common from '../../js/common';
 
   export default {
     data () {
-      var validatePhone = (rule, value, callback) => {
-        if(!value||value.length<=0){
+      const VALIDATEPHONE = (rule, value, callback) => {
+        if (!value || value.length <= 0) {
           return callback(new Error('请输入手机号码'));
-        }else{
+        } else {
           if (!(/^1\d{10}$/.test(value))) {
             return callback(new Error('请输入正确的手机号码'));
-          }else{
+          } else {
             callback();
           }
         }
-
       };
       return {
-        user:{
+        user: {
           id: 1,
-          userId:13,
-          vendorId:1
+          userId: 13,
+          vendorId: 1
         },
         city_disabled: true,
         area_disabled: true,
         addressList: [],
         add_addressForm: {
-          id:null,
+          id: null,
           distributorId: null,
           receiveName: null,
-          province:null,
+          province: null,
           city: null,
           area: null,
           detailAddress: null,
           phone: null,
-          isDefault: "N"
+          isDefault: 'N'
         },
         title: '',
-        provinceList:[],
-        cityList:[],
+        provinceList: [],
+        cityList: [],
         areaList: [],
         province: '',
 
@@ -156,99 +167,84 @@
 
         form_rules: {
           receiveName: [
-            {required: true, message:'请输入收件人姓名', trigger: 'blur'}
+            {required: true, message: '请输入收件人姓名', trigger: 'blur'}
           ],
           province: [
-            {required: true, message:'请输入所在地区', trigger: 'change'}
+            {required: true, message: '请输入所在地区', trigger: 'change'}
           ],
           detailAddress: [
-            {required: true, message:'请输入详细地址', trigger: 'blur'}
+            {required: true, message: '请输入详细地址', trigger: 'blur'}
           ],
           phone: [
-            {validator: validatePhone, trigger: 'blur'}
+            {validator: VALIDATEPHONE, trigger: 'blur'}
           ],
 
         },
-
-
-      }
+      };
     },
     methods: {
 
-      getAddressList: function() {
+      getAddressList: () => {
         this.addressDivLoading = true;
         let param = {
           distributorId: this.user.id
         };
         getAddressList(param).then((res) => {
-          if(res.status ==200) {
+          if (res.status == 200) {
             this.addressList = res.data;
             this.defaultAddress = this.addressList.length > 0 ? this.addressList[0].id : '';
             this.addressDivLoading = false;
           }
         });
       },
-
-      //获取省列表
-      getProvince() {
-        let param = {};
-        getProvinceList(param).then((res) => {
-          this.provinceList = res.data;
-        })
-
-      },
-
-      //获取市列表
-      handleChangeProvince(value) {
-        if(value && value!='') {
+      // 获取市列表
+      handleChangeProvince: function (value) {
+        this.cityList = Common.GetCityListByProvince(value);
+        if (value && value != '') {
           this.city_disabled = false;
           let param = {
             parentCode: value
           };
           getCityListByProvince(param).then((res) => {
             this.cityList = res.data;
-            if(this.cityList.length>0){
+            if (this.cityList.length > 0) {
               this.add_addressForm.city = this.cityList[0].regionCode;
-
             }
           });
-        }else{
-          this.add_addressForm.city=null;
+        } else {
+          this.add_addressForm.city = null;
         }
       },
 
-      //获取地区列表
-      handleChangeCity(value) {
-
-        if(value!=''&&value) {
+      // 获取地区列表
+      handleChangeCity (value) {
+        if (value != '' && value) {
           this.area_disabled = false;
           let param = {
             parentCode: value
           };
           getAreaListByCity(param).then((res) => {
-            if(res.status==200){
+            if (res.status == 200) {
               this.areaList = res.data;
-              if(this.areaList.length>0){
+              if (this.areaList.length > 0) {
                 this.add_addressForm.area = this.areaList[0].regionCode;
               }
             }
-
           });
-        }else{
-          this.add_addressForm.area=null;
+        } else {
+          this.add_addressForm.area = null;
         }
       },
 
-      //提交地址
-      submitAddress(formName) {
-        this.$refs[formName].validate((valid) =>{
-          if(valid){
+      // 提交地址
+      submitAddress (formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
             this.$set(this.add_addressForm,'distributorId', this.user.id);
-            if(this.title==='新增地址'){
+            if (this.title === '新增地址') {
               let param = this.add_addressForm;
-              console.log(param);
               saveAddress(param).then((res) => {
-                if(res.status==200) {
+                if (res.status == 200) {
                   this.$message({
                     message: '提交成功',
                     type: 'success'
@@ -257,10 +253,10 @@
                   this.getAddressList();
                 }
               });
-            }else{
+            } else {
               let param = this.add_addressForm;
               modifyAddress(param).then((res) => {
-                if(res.status==200) {
+                if (res.status == 200) {
                   this.$message({
                     message: '提交成功',
                     type: 'success'
@@ -268,45 +264,36 @@
                   this.dialogVisible = false;
                   this.getAddressList();
                 }
-
               });
-
             }
-
-          }else {
-            console.log('error');
+          } else {
             return false;
-
           }
-
-
         });
-
       },
 
-      //删除地址
-      handleDeleteAddress(val){
+      // 删除地址
+      handleDeleteAddress (val) {
         this.$confirm('确认删除该地址?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          let param ={
+          let param = {
             id: val.id,
             distributorId: this.user.id
           };
           deleteAddress(param).then((res) => {
-            if(res.status ==200){
+            if (res.status == 200) {
               this.$message({
                 message: '提交成功',
                 type: 'success'
               });
               this.dialogVisible = false;
               this.getAddressList();
-            }else{
+            } else {
               this.$message.error('提交失败');
             }
-
           });
         }).catch(() => {
           this.$message({
@@ -314,14 +301,13 @@
             message: '已取消删除'
           });
         });
-
       },
 
-      resetDialog(formName){
+      resetDialog (formName) {
         this.add_addressForm = {
           id: null,
           receiveName: null,
-          province:null,
+          province: null,
           city: null,
           area: null,
           detailAddress: null,
@@ -330,7 +316,7 @@
         this.$refs[formName].resetFields();
       },
 
-      handleChangeDefaultAddress(oldVal,val){
+      handleChangeDefaultAddress (oldVal, val) {
         let param = {
           id: val,
           distributorId: this.user.id,
@@ -340,47 +326,42 @@
         });
       },
 
-      openDialog(val){
-        if(val!=''&& val){
-          let param ={ id: val.id};
+      openDialog (val) {
+        if (val !='' && val) {
+          let param = {id: val.id};
           getAddress(param).then((res) => {
             this.add_addressForm = res.data;
             this.title = '修改地址';
           });
-
-        }else{
+        } else {
           this.title = '新增地址';
         }
         this.dialogVisible = true;
       },
 
     },
-    created() {
+    created () {
+      this.user = JSON.parse(sessionStorage.getItem('user'));
       this.getAddressList();
-      this.getProvince();
-
+      this.provinceList =   Common.GetProvinceList();
     },
     watch: {
-      defaultAddress:  function(val, oldVal ){
-        if(oldVal && oldVal !=''){
-          this.handleChangeDefaultAddress(oldVal,val);
+      defaultAddress: (val, oldVal) => {
+        if (oldVal && oldVal != '') {
+          this.handleChangeDefaultAddress(oldVal, val);
         }
-
       },
-      'add_addressForm.province': function(val,oldVal) {
-        if(val){
+      'add_addressForm.province': (val, oldVal) => {
+        if (val) {
           this.handleChangeProvince(val);
-
         }
       },
-      'add_addressForm.city': function(val,oldVal) {
-        if(val!=oldVal){
+      'add_addressForm.city': (val, oldVal) => {
+        if (val != oldVal) {
           this.handleChangeCity(val);
         }
-
       }
     }
 
   };
-
 </script>

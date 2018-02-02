@@ -77,71 +77,75 @@
   export default {
     name: 'mainPage',
     data () {
-      return{
-        user:{
-          userId:null,
-          vendorId:null
+      return {
+        user: {
+          userId: null,
+          vendorId: null
         },
-        brandItemCommon:[
-          {name:'最新品牌', categoryEgName:'NEW SETTLED BRAND',children:[]},
-          {name:'热门品牌', categoryEgName:'THE HOT',children:[]}
+        brandItemCommon: [
+          {
+            name: '最新品牌',
+            categoryEgName: 'NEW SETTLED BRAND',
+            children: []
+          },
+          {
+            name: '热门品牌',
+            categoryEgName: 'THE HOT',
+            children: []
+          }
         ],
-
-        categoryList:[]
-      }
+        categoryList: []
+      };
     },
-    methods:{
-      getNewstBrand(){
-        let param ={
+    methods: {
+      getNewstBrand () {
+        let param = {
           vendorId: 1,
         };
         getNewstBrand(param).then((res) => {
-          if(res.status ==200){
-            this.brandItemCommon[0].children=res.data;
+          if (res.status == 200) {
+            this.brandItemCommon[0].children = res.data;
           }
-
-        })
+        });
       },
-      getRecommendBrandList(){
-        let param ={
+      getRecommendBrandList () {
+        let param = {
           vendorId: 1,
         };
         getRecommendBrandList(param).then((res) => {
-          if(res.status ==200){
-            this.brandItemCommon[1].children=res.data;
+          if (res.status == 200) {
+            this.brandItemCommon[1].children = res.data;
           }
-
-        })
+        });
       },
-      getBrandListByCategoryId(){
+      getBrandListByCategoryId () {
         let param = {
-          vendorId:1,
+          vendorId: 1,
         };
-        getBrandListByCategoryId(param).then((res)=>{
-          if(res.status ==200){
-            this.categoryList=res.data;
-            for(var p in this.categoryList){
-              this.$set(this.categoryList[p],'isShow',false);
-              this.$set(this.categoryList[p],'more_button_message','查看更多');
+        getBrandListByCategoryId(param).then((res) => {
+          if (res.status == 200) {
+            this.categoryList = res.data;
+            for (var p in this.categoryList) {
+              this.$set(this.categoryList[p], 'isShow', false);
+              this.$set(this.categoryList[p], 'more_button_message', '查看更多');
             }
           }
-        })
+        });
       },
 
-      showMore(val){
-        this.categoryList[val].isShow=!this.categoryList[val].isShow;
-        if(this.categoryList[val].isShow){
-          this.$set(this.categoryList[val],'more_button_message','收起');
-        }else{
-          this.$set(this.categoryList[val],'more_button_message','查看更多>');
-
+      showMore (val) {
+        this.categoryList[val].isShow = !this.categoryList[val].isShow;
+        if (this.categoryList[val].isShow) {
+          this.$set(this.categoryList[val], 'more_button_message', '收起');
+        } else {
+          this.$set(this.categoryList[val], 'more_button_message', '查看更多>');
         }
       }
     },
-    created() {
+    created () {
       this.getNewstBrand();
       this.getRecommendBrandList();
       this.getBrandListByCategoryId();
     }
-  }
+  };
 </script>

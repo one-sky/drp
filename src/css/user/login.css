@@ -36,7 +36,7 @@
 .login .el-form .code .el-input, .login .el-form .code .el-input input{
   width: 200px !important;
 }
-.login .el-form .code .vertify .el-button{
+.login .el-form .code .vertify.el-button{
   width:100px;
   height: 40px;
 }

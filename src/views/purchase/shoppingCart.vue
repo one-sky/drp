@@ -114,155 +114,155 @@
 </style>
 
 <script>
-  import {getShoppingCart, addToShoppingCart, batchDeleteCollection, collectionProductToShoppingCart, batchMoveCollection,
-    getAddressList, getProvinceList, getCityListByProvince, getAreaListByCity, saveAddress, getAgentBrand, getProductPackingInfo, calculateShippingCost, generateOrder} from '../../api/api';
+  import {
+    getShoppingCart,
+    addToShoppingCart,
+    batchDeleteCollection,
+    collectionProductToShoppingCart,
+    batchMoveCollection,
+    getAddressList,
+    getProvinceList,
+    getCityListByProvince,
+    getAreaListByCity,
+    saveAddress,
+    getAgentBrand,
+    getProductPackingInfo,
+    calculateShippingCost,
+    generateOrder
+  } from '../../api/api';
   export default {
-    data() {
+    data () {
       var validatePhone = (rule, value, callback) => {
-        if(!value||value.length<=0){
+        if (!value || value.length <= 0) {
           return callback(new Error('请输入手机号码'));
-        }else{
+        } else {
           if (!(/^1\d{10}$/.test(value))) {
             return callback(new Error('请输入正确的手机号码'));
-          }else{
+          } else {
             callback();
           }
         }
-
       };
       return {
         // morePurchase-批发，onePurchase-一件代发
-        tabActive: 'onePurchase',  
-        user:{
-          userId:null,
-          distributorId:null,
-          vendorId:null,
-          vipId:null,
+        tabActive: 'onePurchase',
+        user: {
+          userId: null,
+          distributorId: null,
+          vendorId: null,
+          vipId: null,
         },
         checked: false,
 
-        shoppingCart:[],
+        shoppingCart: [],
 
-        handleShoppingCart:[],
-        agentBrandList:[], //已代理品牌列表
-        loading:false,
-        handleRow:{}, //记录计数器操作的当前行
-        isShowAlert:false,
+        handleShoppingCart: [],
+        agentBrandList: [], // 已代理品牌列表
+        loading: false,
+        handleRow: {}, // 记录计数器操作的当前行
+        isShowAlert: false,
 
-        //上架商品数量
+        // 上架商品数量
         productCount: 0,
-
-
-        shippingCost: null,//订单运费
-
-      }
+        shippingCost: null, // 订单运费
+      };
     },
 
     methods: {
-      //获取已代理品牌
-      getAgentBrand(){
+      // 获取已代理品牌
+      getAgentBrand: () => {
         let param = {
           distributorId: this.user.distributorId,
-          vendorId: this.user.vendorId
         };
         getAgentBrand(param).then((res) => {
-          if(res.status ==200) {
+          if (res.status == 200) {
             this.agentBrandList = res.data;
           }
-        })
-
+        });
       },
-      getShoppingCart(){
+      getShoppingCart: () => {
         this.loading = true;
         this.checked = false;
         let param = {
           distributorId: this.user.distributorId,
           vendorId: this.user.vendorId,
-          type: this.tabActive ==='onePurchase'?2:1
+          type: this.tabActive === 'onePurchase' ? 2 : 1
         };
         getShoppingCart(param).then((res) => {
-          if(res.status ==200) {
-            this.shoppingCart=res.data;
-            for(var i in this.shoppingCart){
-              //设置批发量
+          if (res.status == 200) {
+            this.shoppingCart = res.data;
+            for (var i in this.shoppingCart) {
+              // 设置批发量
               this.$set(this.shoppingCart[i], 'pricePiece', new Array());
-              //商品未下架加入时未代理，现在已代理品牌
-              if(this.shoppingCart[i].status=='Y'&&this.shoppingCart[i].type==2){
-                for(var k in this.agentBrandList){
-                  if(this.shoppingCart[i].brandId==this.agentBrandList[k].erpBrandId){
+              // 商品未下架加入时未代理，现在已代理品牌
+              if (this.shoppingCart[i].status == 'Y'&&this.shoppingCart[i].type == 2) {
+                for (var k in this.agentBrandList) {
+                  if (this.shoppingCart[i].brandId == this.agentBrandList[k].erpBrandId) {
                     this.$set(this.shoppingCart[i], 'needReAdd', true);
                     this.$set(this.shoppingCart[i], 'scope="scope"', true);
-                    this.isShowAlert =true;
-
+                    this.isShowAlert = true;
                     break;
                   }
                 }
-
-              }else{
+              } else {
                 this.$set(this.shoppingCart[i], 'needReAdd', false);
                 this.$set(this.shoppingCart[i], 'isChecked', false);
               }
-              //促销Id
+              // 促销Id
               this.$set(this.shoppingCart[i], 'promotionId', -1);
 
-              //price
-              for(var j in this.shoppingCart[i].productPriceList){
-                if(this.shoppingCart[i].productPriceList[j].levelId==this.user.vipId){
-                  //一件代发
-                  if(this.tabActive==2){
-                    if(this.shoppingCart[i].productPriceList[j].startPiece==1&&this.shoppingCart[i].productPriceList[j].endPiece==1){
-                      if(this.shoppingCart[i].productPriceList[j].promotionId>this.shoppingCart[i].promotionId){
-                        console.log(j);
-                        this.$set(this.shoppingCart[i],'unitPrice',this.shoppingCart[i].productPriceList[j].price);
-                        this.$set(this.shoppingCart[i],'promotionId',this.shoppingCart[i].productPriceList[j].promotionId);
+              // price
+              for (var j in this.shoppingCart[i].productPriceList) {
+                if (this.shoppingCart[i].productPriceList[j].levelId == this.user.vipId) {
+                  // 一件代发
+                  if (this.tabActive == 2) {
+                    if (this.shoppingCart[i].productPriceList[j].startPiece == 1 && this.shoppingCart[i].productPriceList[j].endPiece == 1) {
+                      if (this.shoppingCart[i].productPriceList[j].promotionId > this.shoppingCart[i].promotionId) {
+                        this.$set(this.shoppingCart[i], 'unitPrice', this.shoppingCart[i].productPriceList[j].price);
+                        this.$set(this.shoppingCart[i], 'promotionId', this.shoppingCart[i].productPriceList[j].promotionId);
                       }
                     }
-                  } else{  //批发
-
+                  } else { // 批发
                     this.shoppingCart[i].pricePiece.push(this.shoppingCart[i].productPriceList[j]);
-                    if(this.shoppingCart[i].quantity>=this.shoppingCart[i].productPriceList[j].startPiece &&
-                      this.shoppingCart[i].quantity<=this.shoppingCart[i].productPriceList[j].endPiece && this.shoppingCart[i].productPriceList[j].promotionId>this.shoppingCart[i].promotionId) {
-                      this.$set(this.shoppingCart[i],'unitPrice',this.shoppingCart[i].productPriceList[j].price);
-                      this.$set(this.shoppingCart[i],'promotionId',this.shoppingCart[i].productPriceList[j].promotionId);
+                    if (this.shoppingCart[i].quantity >= this.shoppingCart[i].productPriceList[j].startPiece &&
+                      this.shoppingCart[i].quantity <= this.shoppingCart[i].productPriceList[j].endPiece && this.shoppingCart[i].productPriceList[j].promotionId > this.shoppingCart[i].promotionId) {
+                      this.$set(this.shoppingCart[i], 'unitPrice', this.shoppingCart[i].productPriceList[j].price);
+                      this.$set(this.shoppingCart[i], 'promotionId', this.shoppingCart[i].productPriceList[j].promotionId);
                     }
-
-
                   }
                 }
               }
             }
-            if(this.tabActive==1){
-              for(var i in this.shoppingCart) {
-                this.$set(this.shoppingCart[i],'truePricePiece', new Array());
-                //单价从小到大排序,过滤促销时的非促销价
-                if(this.shoppingCart[i].pricePiece && this.shoppingCart[i].pricePiece.length>1){
-
-                  this.shoppingCart[i].pricePiece.sort(function(a,b){
-                    if(a.startPiece == b.startPiece){
-                      return a.endPiece > b.endPiece
-                    }else{
-                      return a.startPiece > b.startPiece
+            if (this.tabActive == 1) {
+              for (var i in this.shoppingCart) {
+                this.$set(this.shoppingCart[i], 'truePricePiece', new Array());
+                // 单价从小到大排序,过滤促销时的非促销价
+                if (this.shoppingCart[i].pricePiece && this.shoppingCart[i].pricePiece.length > 1) {
+                  this.shoppingCart[i].pricePiece.sort((a, b) => {
+                    if (a.startPiece == b.startPiece) {
+                      return a.endPiece > b.endPiece;
+                    } else {
+                      return a.startPiece > b.startPiece;
                     }
                   });
                   this.shoppingCart[i].truePricePiece.push(this.shoppingCart[i].pricePiece[0]);
-                  for(var j = 1; j< this.shoppingCart[i].pricePiece.length; j++){
+                  for (let j = 1; j < this.shoppingCart[i].pricePiece.length; j++) {
                     var price = this.shoppingCart[i].truePricePiece.pop();
-                    if(this.shoppingCart[i].pricePiece[j].startPiece==price.startPiece){ //2-10(促销) 2-20 10-20(促销) 则2-20不放入
-                      if(this.shoppingCart[i].pricePiece[j].promotionId>price.promotionId){
+                    if (this.shoppingCart[i].pricePiece[j].startPiece == price.startPiece) { // 2-10(促销) 2-20 10-20(促销) 则2-20不放入
+                      if (this.shoppingCart[i].pricePiece[j].promotionId > price.promotionId) {
                         this.shoppingCart[i].truePricePiece.push(this.shoppingCart[i].pricePiece[j]);
-                      }else{
+                      } else {
                         this.shoppingCart[i].truePricePiece.push(price);
                       }
-                    }else if(this.shoppingCart[i].pricePiece[j].endPiece==price.endPiece){ //2-10 2-999(促销) 10-999 则10-999不放入
-                      if(this.shoppingCart[i].pricePiece[j].promotionId>price.promotionId){
+                    } else if (this.shoppingCart[i].pricePiece[j].endPiece == price.endPiece) { // 2-10 2-999(促销) 10-999 则10-999不放入
+                      if (this.shoppingCart[i].pricePiece[j].promotionId > price.promotionId) {
                         this.shoppingCart[i].truePricePiece.push(this.shoppingCart[i].pricePiece[j]);
-                      }else{
+                      } else {
                         this.shoppingCart[i].truePricePiece.push(price);
                       }
-                    }else{
+                    } else {
                       this.shoppingCart[i].truePricePiece.push(price);
                       this.shoppingCart[i].truePricePiece.push(this.shoppingCart[i].pricePiece[j]);
-
                     }
                   }
                 }
@@ -270,72 +270,65 @@
             }
             var shoppingCart = new Array();
             var notShoppingCart = new Array();
-            for(var i in this.shoppingCart){
-              if(this.shoppingCart[i].status=='Y'){
+            for (let i in this.shoppingCart) {
+              if (this.shoppingCart[i].status == 'Y') {
                 shoppingCart.push(this.shoppingCart[i]);
-              }else{
+              } else {
                 notShoppingCart.push(this.shoppingCart[i]);
               }
             }
             this.shoppingCart = new Array();
-            if(shoppingCart&&shoppingCart!=''){
-              for(let i in shoppingCart){
+            if (shoppingCart && shoppingCart != '') {
+              for (let i in shoppingCart) {
                 this.shoppingCart.push(shoppingCart[i]);
               }
-
             }
-            this.productCount = this.shoppingCart.length||0;
-            if(notShoppingCart&&notShoppingCart!='') {
-              for(let i in notShoppingCart){
+            this.productCount = this.shoppingCart.length || 0;
+            if (notShoppingCart && notShoppingCart != '') {
+              for (let i in notShoppingCart) {
                 this.shoppingCart.push(notShoppingCart[i]);
               }
-
             }
             this.loading = false;
           }
-        })
-
+        });
       },
 
-      //设置已下架背景色
-      tableRowClassName(row) {
+      // 设置已下架背景色
+      tableRowClassName: (row) => {
         if (row.status == 'Y') {
           return 'can-row';
         } else {
           return 'cannot-row';
         }
-
       },
 
-
-      //tab_event
-      handleClick(tab, event) {
+      // tab_event
+      handleClick: (tab, event) => {
         this.checked = false;
         this.getShoppingCart();
       },
 
-
-      //全选按钮
-      toggleSelection() {
+      // 全选按钮
+      toggleSelectio: () => {
         if (this.checked) {
-          for(var i=0; i< this.productCount;i++){
+          for (let i = 0; i < this.productCount; i++) {
             this.shoppingCart[i].isChecked = true;
           }
         } else {
-          for(var i=0; i< this.productCount;i++){
+          for (let i = 0; i < this.productCount; i++) {
             this.shoppingCart[i].isChecked = false;
           }
         }
       },
-      handleSelectionChange(row) {
+      handleSelectionChange: (row) => {
         this.handleShoppingCart = row;
-        
       },
 
-      //加入购物车
-      addToShoppingCart(row,value){
-        if(!this.user.userId||this.user.userId==''){
-          this.$router.push({path:'/login'});
+      // 加入购物车
+      addToShoppingCart (row, value) {
+        if (!this.user.userId || this.user.userId == '') {
+          this.$router.push({path: '/login'});
           return;
         }
         let param = {
@@ -343,83 +336,74 @@
           userId: this.user.userId,
           skuId: row.productId,
           quantity: value,
-          isAgent:row.type==1?true:false
+          isAgent: row.type == 1
         };
-        console.log(param)
         addToShoppingCart(param).then((res) => {
-          if(res.status==200){
-            if(res.data>0){
-              this.getShoppingCart()
-            }else{
+          if (res.status == 200) {
+            if (res.data > 0) {
+              this.getShoppingCart();
+            } else {
               this.$message({
                 message: '加入进货单失败',
                 type: 'warning'
               });
             }
-
           }
-        })
+        });
       },
 
-
-      //批量删除
-      batchDeleteCollection:function(value){
+      // 批量删除
+      batchDeleteCollection: (value) => {
         var skuIdList = new Array();
-        console.log('value'+value);
-        if(value&&value!=''){
+        if (value && value != '') {
           skuIdList.push(value);
-        }else{
-          if(this.handleShoppingCart.length>0) {
-            var skuIdList = [];
+        } else {
+          if (this.handleShoppingCart.length > 0) {
+            let skuIdList = [];
             for (var i in this.handleShoppingCart) {
               skuIdList.push(this.handleShoppingCart[i].productId);
             }
-          }else {
+          } else {
             return;
           }
         }
-
-
         let param = {
-          skuIdList:skuIdList,
-          distributorId:this.user.distributorId,
-          type:parseInt(this.tabActive),
-        }
-        console.log(param);
-        batchDeleteCollection(param).then((res)=>{
-          if(res.status == 200){
+          skuIdList: skuIdList,
+          distributorId: this.user.distributorId,
+          type: parseInt(this.tabActive),
+        };
+        batchDeleteCollection(param).then((res) => {
+          if (res.status == 200) {
             this.getShoppingCart();
           }
-        })
-
+        });
       },
 
-      //添加收藏
-      collectionProductToShoppingCart:function(spuId){
-
+      // 添加收藏
+      collectionProductToShoppingCart: (spuId) => {
         let param = {
-          distributorId:this.user.distributorId,
-          spuId:spuId,
-          levelId:this.user.vipId,
+          distributorId: this.user.distributorId,
+          spuId: spuId,
+          levelId: this.user.vipId,
           vendorId: this.user.vendorId
-        }
+        };
 
-        collectionProductToShoppingCart(param).then((res)=>{
-          if(res.status == 200){
+        collectionProductToShoppingCart(param).then((res) => {
+          if (res.status == 200) {
             this.$message({
               message: '收藏成功',
               type: 'success'
             });
           }
-        })
+        });
       },
 
-      //批量移动到收藏夹
-      batchMoveCollection(){
+      // 批量移动到收藏夹
+      batchMoveCollection: () => {
         var spuIdList = new Array();
         var skuIdList = new Array();
-        if(this.handleShoppingCart&&this.handleShoppingCart.length>0){
-          for(var i in this.handleShoppingCart){
+        if (this.handleShoppingCart && this.handleShoppingCart.length > 0) {
+          for (var i in this.handleShoppingCart) {
             spuIdList.push(this.handleShoppingCart[i].spuId);
             skuIdList.push(this.handleShoppingCart[i].productId);
           }
@@ -437,135 +421,122 @@
           };
 
           batchMoveCollection(param).then((res) => {
-            if(res.status == 200){
+            if (res.status == 200) {
               this.getShoppingCart();
             }
-          })
-
-
+          });
         }
       },
 
-
-      toOrder(){
-        if(!this.handleShoppingCart||this.handleShoppingCart==''){
+      toOrder: () => {
+        if (!this.handleShoppingCart || this.handleShoppingCart == '') {
           this.$message({
             message: '请选择待结算商品',
             type: 'warning'
           });
-          return;
-        }else{
+        } else {
           this.$router.push({path: '/generateOrder', query: {shoppingCart: this.handleShoppingCart}});
         }
       },
 
-      //获取商品包裹信息
-      getProductPackingInfo(){
-        if(this.addressList&&this.addressList!=''){
+      // 获取商品包裹信息
+      getProductPackingInfo: () => {
+        if (this.addressList && this.addressList != '') {
           var skuCodeList = new Array();
           var packingList = new Array();
-          for(var i in this.handleShoppingCart){
+          for (var i in this.handleShoppingCart) {
             skuCodeList.push(this.handleShoppingCart[i].skuCode);
           }
           let param = {
-            skuCodeList:skuCodeList,
+            skuCodeList: skuCodeList,
             vendorId: this.user.vendorId
           };
           getProductPackingInfo(param).then((res) => {
             if (res.status == 200) {
               packingList = res.data;
-              for(var i in this.handleShoppingCart){
-                for(var j in packingList){
-                  if(this.handleShoppingCart[i].skuCode==packingList[j].skuCode){
-                    this.$set(this.handleShoppingCart[i],'templeateId',packingList[j].templeateId);
-                    this.$set(this.handleShoppingCart[i],'packLength',packingList[j].packLength);
-                    this.$set(this.handleShoppingCart[i],'packWidth',packingList[j].packWidth);
-                    this.$set(this.handleShoppingCart[i],'packHeight',packingList[j].packHeight);
-                    this.$set(this.handleShoppingCart[i],'packGrossWeight',packingList[j].packGrossWeight);
+              for (var i in this.handleShoppingCart) {
+                for (var j in packingList) {
+                  if (this.handleShoppingCart[i].skuCode == packingList[j].skuCode) {
+                    this.$set(this.handleShoppingCart[i], 'templeateId', packingList[j].templeateId);
+                    this.$set(this.handleShoppingCart[i], 'packLength', packingList[j].packLength);
+                    this.$set(this.handleShoppingCart[i], 'packWidth', packingList[j].packWidth);
+                    this.$set(this.handleShoppingCart[i], 'packHeight', packingList[j].packHeight);
+                    this.$set(this.handleShoppingCart[i], 'packGrossWeight', packingList[j].packGrossWeight);
                     break;
                   }
                 }
               }
-              console.log(this.handleShoppingCart);
               this.calculateShippingCost();
             }
-          })
-        }else{
-          return;
+          });
         }
-
-
       },
     },
 
-    created() {
+    created () {
       this.user.userId = 1;
       this.user.distributorId = 1;
       this.user.vendorId = 1;
       this.user.vipId = 1;
       this.getAgentBrand();
       this.getShoppingCart();
-      this.$store.commit('updateStepType', 'purchase')
-      this.$store.commit('updateStep', 0)
-
+      this.$store.commit('updateStepType', 'purchase');
+      this.$store.commit('updateStep', 0);
     },
     watch: {
-      'add_addressForm.province': function(val,oldVal) {
-        if(val){
+      'add_addressForm.province': (val, oldVal) => {
+        if (val) {
           this.handleChangeProvince(val);
-
         }
       },
-      'add_addressForm.city': function(val,oldVal) {
-        if(val!=oldVal){
+      'add_addressForm.city': (val, oldVal) => {
+        if (val != oldVal) {
           this.handleChangeCity(val);
         }
-
       }
 
     },
-    computed:{
+    computed: {
       // step==1
-      totalCount: function(){
+      totalCount: () => {
         var a = 0;
-        for(var i in this.handleShoppingCart){
+        for (var i in this.handleShoppingCart) {
           a += parseInt(this.handleShoppingCart[i].quantity);
         }
         return a;
       },
 
-      totalAmount: function(){
+      totalAmount: () => {
         var a = 0.00;
-        for(var i in this.handleShoppingCart){
-          a += parseFloat(this.handleShoppingCart[i].unitPrice)*parseFloat(this.handleShoppingCart[i].quantity);
+        for (var i in this.handleShoppingCart) {
+          a += parseFloat(this.handleShoppingCart[i].unitPrice) * parseFloat(this.handleShoppingCart[i].quantity);
         }
         return a.toFixed(2);
       },
 
       // step==2
-      realTotalCount: function(){
+      realTotalCount: () => {
         var a = 0;
-        for(var i in this.handleShoppingCart){
+        for (var i in this.handleShoppingCart) {
           a += parseInt(this.handleShoppingCart[i].quantity);
         }
         return a;
       },
 
-      realTotalAmount: function(){
+      realTotalAmount: () => {
         var a = 0.00;
-        for(var i in this.handleShoppingCart){
-          a += parseFloat(this.handleShoppingCart[i].unitPrice)*parseFloat(this.handleShoppingCart[i].quantity);
+        for (var i in this.handleShoppingCart) {
+          a += parseFloat(this.handleShoppingCart[i].unitPrice) * parseFloat(this.handleShoppingCart[i].quantity);
         }
         return a;
       },
 
-      realTrueAmount: function(){
+      realTrueAmount: () => {
         var a = 0.00;
-        for(var i in this.handleShoppingCart){
-          a += parseFloat(this.handleShoppingCart[i].unitPrice)*parseFloat(this.handleShoppingCart[i].quantity);
+        for (var i in this.handleShoppingCart) {
+          a += parseFloat(this.handleShoppingCart[i].unitPrice) * parseFloat(this.handleShoppingCart[i].quantity);
         }
-        a = a+this.shippingCost;
-        console.log(a)
+        a = a + this.shippingCost;
         return a;
       },
     }

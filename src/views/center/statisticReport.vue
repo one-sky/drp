@@ -53,24 +53,27 @@
 </style>
 
 <script>
-  import { getOrderStatistics, getOrderList} from '../../api/api';
+  import {
+    getOrderStatistics,
+    getOrderList
+  } from '../../api/api';
   export default {
-    data() {
+    data () {
       return {
         user: null,
-        years:['2016', '2017'],
-        year: '2017',  //年统计的年份
-        month_year:'2017',  //月统计的年
-        months: ['1','2','3','4','5','6','7','8','9','10','11','12'],
-        month:'7',
+        years: ['2016', '2017'],
+        year: '2017',  // 年统计的年份
+        month_year: '2017',  // 月统计的年
+        months: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+        month: '7',
         date: '',
-        yearStatistic:[],
-        monthStatistic:[],
+        yearStatistic: [],
+        monthStatistic: [],
         index: [
-          {label:'订单量', value:'orderNum'},
-          {label:'交易额', value:'orderAmount'},
-          {label:'利润', value:'orderProfit'},
-          {label:'运费', value:'freight'}
+          {label: '订单量', value: 'orderNum'},
+          {label: '交易额', value: 'orderAmount'},
+          {label: '利润', value: 'orderProfit'},
+          {label: '运费', value: 'freight'}
         ],
         yearIndex: 'orderNum',
         monthIndex: 'orderNum',
@@ -81,73 +84,69 @@
 
       // report_event
 
-      getYearStatistic(){
+      getYearStatistic: () => {
         this.yearStatistic = new Array();
         let param = {
           distributorId: this.user.distributorId,
-          startDate: this.year+"-01",
-          endDate:this.year+"-12",
+          startDate: this.year + '-01',
+          endDate: this.year + '-12',
           type: 1,
 
         };
         getOrderStatistics(param).then((res) => {
-          if(res.status==200){
-            var statistic =res.data;
-            for(var i in statistic){
+          if (res.status == 200) {
+            var statistic = res.data;
+            for (var i in statistic) {
               this.yearStatistic.push(statistic[i]);
-              this.$set(this.yearStatistic[i], 'date',parseInt(statistic[i].dateStr.split("-")[1]));
+              this.$set(this.yearStatistic[i], 'date', parseInt(statistic[i].dateStr.split('-')[1]));
             }
             this.getYearChart();
-
           }
-
-        })
+        });
       },
 
-      getMonthStatistic(){
+      getMonthStatistic: () => {
         this.monthStatistic = new Array();
-        var date = new Date(this.month_year+"-"+(parseInt(this.month)+1)+"-01").getTime()-10;
-        var yesterday=new Date();
+        var date = new Date(this.month_year + '-' + (parseInt(this.month) + 1) + '-01').getTime() - 10;
+        var yesterday = new Date();
         yesterday.setTime(date);
         this.date = yesterday.getDate();
         let param = {
           distributorId: this.user.distributorId,
-          startDate: this.month_year+"-"+this.month+"-01",
-          endDate: this.month_year+"-"+this.month+'-'+this.date,
+          startDate: this.month_year + '-' + this.month + '-01',
+          endDate: this.month_year + '-' + this.month + '-' + this.date,
           type: 2,
 
         };
         getOrderStatistics(param).then((res) => {
-          if(res.status==200){
-            var statistic =res.data;
-            for(var i in statistic){
+          if (res.status == 200) {
+            var statistic = res.data;
+            for (var i in statistic) {
               this.monthStatistic.push(statistic[i]);
-              this.$set(this.monthStatistic[i], 'date',parseInt(statistic[i].dateStr.split("-")[2]));
+              this.$set(this.monthStatistic[i], 'date', parseInt(statistic[i].dateStr.split('-')[2]));
             }
             this.getMonthChart();
-
           }
-
-        })
+        });
       },
 
-      getYearChart() {
+      getYearChart: () => {
         var months = new Array();
         var data = new Array();
-        for(var i=0; i<12;i++){
-          months.push((i+1)+'月');
-          for(var j=0; j< this.yearStatistic.length; j++){
-            if(this.yearStatistic[j].date==i+1){
+        for (var i = 0; i < 12; i++) {
+          months.push((i + 1) + '月');
+          for (var j = 0; j < this.yearStatistic.length; j++) {
+            if (this.yearStatistic[j].date == i+1) {
               data.push(this.yearStatistic[j][this.yearIndex]);
               break;
             }
           }
-          if(j>=this.yearStatistic.length){
+          if (j >= this.yearStatistic.length) {
             data.push(0);
           }
         }
-        var label = this.index.find((item)=>{
-          return item.value==this.yearIndex;
+        var label = this.index.find((item) => {
+          return item.value == this.yearIndex;
         }).label;
         var myChart = this.echarts.init(this.$refs.yearChart);
         myChart.setOption({
@@ -155,7 +154,7 @@
             trigger: 'axis'
           },
           xAxis: {
-            type:'category',
+            type: 'category',
             data: months
           },
           yAxis: {
@@ -167,27 +166,27 @@
             smooth: true,
             data: data
           }],
-          color:['#c0e42e'],
+          color: ['#c0e42e'],
         });
       },
 
-      getMonthChart() {
+      getMonthChart: () => {
         var days = new Array();
         var data = new Array();
-        for(var i=0; i<parseInt(this.date);i++){
-          for(var j=0; j< this.monthStatistic.length; j++){
-            days.push((i+1)+'日');
-            if(this.monthStatistic[j].date==i+1){
-              data.push(this.monthStatistic[j][this.monthIndex]&&this.monthStatistic[j][this.monthIndex]!=''?this.monthStatistic[j][this.monthIndex]:0);
+        for (var i = 0; i < parseInt(this.date); i++) {
+          for (var j = 0; j< this.monthStatistic.length; j++) {
+            days.push((i + 1) + '日');
+            if (this.monthStatistic[j].date == i + 1) {
+              data.push(this.monthStatistic[j][this.monthIndex] && this.monthStatistic[j][this.monthIndex] != '' ? this.monthStatistic[j][this.monthIndex] : 0);
               break;
             }
           }
-          if(j>=this.monthStatistic.length){
+          if (j >= this.monthStatistic.length) {
             data.push(0);
           }
         }
-        var label = this.index.find((item)=>{
-          return item.value==this.monthIndex;
+        var label = this.index.find((item) => {
+          return item.value == this.monthIndex;
         }).label;
         var myChart = this.echarts.init(this.$refs.monthChart);
         myChart.setOption({
@@ -196,7 +195,7 @@
           },
 
           xAxis: {
-            type:'category',
+            type: 'category',
             data: days
 
           },
@@ -209,12 +208,12 @@
             smooth: true,
             data: data
           }],
-          color:['#c0e42e']
+          color: ['#c0e42e']
         });
       },
 
       // 获取订单统计量
-      getTotalOrder(type, property){
+      getTotalOrder: (type, property) => {
         // type: year/month  property: orderNum, orderAmmount, orderProfit, frieight
         var a = 0;
         if (type == 'year') {
@@ -229,61 +228,57 @@
         return a;
       },
       // update year
-      handleChangeYear(){
+      handleChangeYear: () => {
         this.getYearStatistic();
         this.getYearChart();
       },
       // update year or month
-      handleChangeMonth(){
+      handleChangeMonth: () => {
         this.getMonthStatistic();
         this.getMonthChart();
       },
-
-
       // report_event end
 
       // detail_event
-      getOrderList() {
+      getOrderList: () => {
         let param = Object.assign({}, this.searchForm, {distributorId: this.user.distributorId, vendorId: this.user.vendorId, pageNum: this.currentPage});
         getOrderList(param).then((res) => {
-          if(res.status==200){
+          if (res.status == 200) {
             this.totalCount = res.page.totalNum;
             var orderList = res.data;
-            for(var i =0; i<orderList.length; i++){
-              for(var j=0; j<orderList[i].oOrderItems.length;j++){
-                this.orderList.push( Object.assign({}, orderList[i].oOrderItems[j], {orderCode: orderList[i].orderCode, orderTime: orderList[i].orderTime}));
+            for (var i = 0; i < orderList.length; i++) {
+              for (var j = 0; j < orderList[i].oOrderItems.length; j++) {
+                this.orderList.push(Object.assign({}, orderList[i].oOrderItems[j], {orderCode: orderList[i].orderCode, orderTime: orderList[i].orderTime}));
               }
-
             }
           }
-          console.log(this.orderList)
-
-
-        })
+        });
       },
 
-
       // statistic_event
-      getStatisticList() {
-        this.statisticList = [{
-          orderID: '1558990000112256',
-          contact: 'crystal',
-          sumAmount: '210.00',
-          isRefund: '是',
-          payChannel: '支付宝',
-          orderStatus: '退款成功',
-          orderTime: '2017/1/1 0:00:00',
-          payTime: '2017/1/1 0:00:00',
-        },{
-          orderID: '1558990000112256',
-          contact: 'crystal',
-          sumAmount: '210.00',
-          isRefund: '是',
-          payChannel: '支付宝',
-          orderStatus: '退款成功',
-          orderTime: '2017/1/1 0:00:00',
-          payTime: '2017/1/1 0:00:00',
-        }];
+      getStatisticList: () => {
+        this.statisticList = [
+          {
+            orderID: '1558990000112256',
+            contact: 'crystal',
+            sumAmount: '210.00',
+            isRefund: '是',
+            payChannel: '支付宝',
+            orderStatus: '退款成功',
+            orderTime: '2017/1/1 0:00:00',
+            payTime: '2017/1/1 0:00:00',
+          },
+          {
+            orderID: '1558990000112256',
+            contact: 'crystal',
+            sumAmount: '210.00',
+            isRefund: '是',
+            payChannel: '支付宝',
+            orderStatus: '退款成功',
+            orderTime: '2017/1/1 0:00:00',
+            payTime: '2017/1/1 0:00:00',
+          }
+        ];
         this.totalOrders = {
           totalOrderAmount: '0.00',
           totalProductAmount: '0.00',
@@ -305,23 +300,23 @@
       },
 
       // form_button_event
-      handleSearch() {
-        for ( var p in this.searchGroup ){
-          this.searchForm[ p ]=  this.searchGroup[ p ];
+      handleSearch: () => {
+        for (var p in this.searchGroup) {
+          this.searchForm[p] = this.searchGroup[p];
         }
         this.searchForm.startDate = (!this.searchForm.startDate || this.searchForm.startDate == '') ? '' : date.formatDate.format(new Date(this.searchForm.startDate), 'yyyy-MM-dd');
         this.searchForm.endDate = (!this.searchForm.endDate || this.searchForm.endDate == '') ? '' : date.formatDate.format(new Date(this.searchForm.endDate), 'yyyy-MM-dd');
-        if(this.activeName==='detail'){
+        if (this.activeName === 'detail') {
           this.getOrderList();
-        }else if(this.activeName==='statistic'){
+        } else if (this.activeName === 'statistic') {
           this.getStatisticList();
-        }else{
+        } else {
           this.handleChangeYear();
           this.handleChangeMonth();
         }
       },
     },
-    created()  {
+    created () {
       this.handleChangeYear();
       this.handleChangeMonth();
     }

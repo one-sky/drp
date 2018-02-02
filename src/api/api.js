@@ -3,35 +3,119 @@
  */
 import axios from 'axios';
 
-let base = 'http://106.12.21.230:8484/inheater-distribution';
+// let base = 'http://106.12.21.230:8484/inheater-distribution';
 
-// let base = 'http://localhost:8282/drp';
+let base = 'http://localhost:8282/drp';
 
 axios.defaults.headers.get['Content-Type'] = 'application/json';
 
-export const login = params => { return axios.post(`${base}/user/login`, params).then(res => res.data); };
+// 用户登陆
+export const login = params => {
+    return axios.post(`${base}/user/login`, params).then(res => res.data);
+};
 
-export const sendsms = params => { return axios.post(`${base}/user/sendsms`, params).then(res => res.data); };
+// 用户注册
+export const register = params => {
+    return axios.post(`${base}/user/register`, params).then(res => res.data);
+};
 
-export const checkVerfiyCode = params => { return axios.post(`${base}/user/checkVerfiyCode`, params).then(res => res.data); };
+// 完善用户信息
+export const completeDistributor = params => {
+    return axios.post(`${base}/user/completeDistributor`, params).then(res => res.data);
+};
 
-export const register = params => { return axios.post(`${base}/user/register`, params).then(res => res.data); };
+// 获取分销商详细信息
+export const getDistributorDetail = params => {
+    return axios.post(`${base}/distributor/getDistributorDetail`, params).then(res => res.data);
+};
 
-export const completeDistributor = params => { return axios.post(`${base}/user/completeDistributor`, params).then(res => res.data); };
+// 获取分销商代理渠道列表
+export const getChannelList = params => {
+    return axios.post(`${base}/distributor/getChannelList`, params).then(res => res.data);
+};
 
-export const checkMobileRegister = params => { return axios.post(`${base}/user/checkMobileRegister`, params).then(res => res.data); };
+// 获取banner列表
+export const getBannerList = params => {
+    return axios.post(`${base}/resource/getBannerList`, params).then(res => res.data);
+};
 
-export const getUserByPhone = params => { return axios.post(`${base}/user/getUserByPhone`, params).then(res => res.data); };
+// 获取评测、行业资讯
+export const getArticleList = params => {
+    return axios.post(`${base}/resource/getArticleList`, params).then(res => res.data);
+};
 
-export const forgetPassword = params => { return axios.post(`${base}/user/forgetPassword`, params).then(res => res.data); };
+// 获取公告列表
+export const getNoticeList = params => {
+    return axios.post(`${base}/resource/getNoticeList`, params).then(res => res.data);
+};
 
-export const modifyPassword = params => { return axios.post(`${base}/user/modifyPassword`, params).then(res => res.data); };
+// 促销列表
+export const getPromotionList = params => {
+    return axios.post(`${base}/resource/getPromotionList`, params).then(res => res.data);
+};
 
-export const getCenter = params => { return axios.post(`${base}/center/getCenter`, params).then(res => res.data); };
+// 获取渠道列表
+export const getChannelOptionList = params => {
+    return axios.post(`${base}/resource/getChannelOptionList`, params).then(res => res.data);
+};
 
-export const getAddressList = params => { return axios.post(`${base}/center/getAddressList`, params).then(res => res.data); };
+// 获取省列表
+export const getProvinceList = params => {
+    return axios.get(`${base}/resource/getProvinceList`, params).then(res => res.data);
+};
 
-export const getAddress = params => { return axios.post(`${base}/center/getAddress`, params).then(res => res.data); };
+// 根据省获取市列表
+export const getCityListByProvince = params => {
+    return axios.post(`${base}/resource/getCityByProvince`, params).then(res => res.data);
+};
+
+// 根据市获取区列表
+export const getAreaListByCity = params => {
+    return axios.post(`${base}/resource/getAreaByCity`, params).then(res => res.data);
+};
+
+// 获取类目
+export const getCategoryList = params => {
+    return axios.post(`${base}/category/getCategoryList`, params).then(res => res.data);
+};
+
+// 获取最新品牌
+export const getNewBrandList = params => {
+    return axios.post(`${base}/brand/getNewBrandList`, params).then(res => res.data);
+};
+
+// 根据一级类目获取品牌列表
+export const getBrandListByCategoryId = params => {
+    return axios.post(`${base}/brand/getBrandListByCategoryId`, params).then(res => res.data);
+};
+
+export const checkVerfiyCode = params => {
+    return axios.post(`${base}/user/checkVerfiyCode`, params).then(res => res.data);
+};
+
+export const checkMobileRegister = params => {
+    return axios.post(`${base}/user/checkMobileRegister`, params).then(res => res.data);
+};
+
+export const getUserByPhone = params => {
+    return axios.post(`${base}/user/getUserByPhone`, params).then(res => res.data);
+};
+
+export const forgetPassword = params => {
+    return axios.post(`${base}/user/forgetPassword`, params).then(res => res.data);
+};
+
+export const modifyPassword = params => {
+    return axios.post(`${base}/user/modifyPassword`, params).then(res => res.data);
+};
+
+export const getAddressList = params => {
+    return axios.post(`${base}/center/getAddressList`, params).then(res => res.data);
+};
+
+export const getAddress = params => {
+    return axios.post(`${base}/center/getAddress`, params).then(res => res.data);
+};
 
 export const setIsDefault = params => { return axios.post(`${base}/center/setIdDefault`, params).then(res => res.data); };
 
@@ -50,14 +134,6 @@ export const getMessageList = params => { return axios.post(`${base}/center/getM
 export const getMessagebyId = params => { return axios.post(`${base}/center/getMessagebyId`, params).then(res => res.data); };
 
 export const getOrderStatus = params => { return axios.post(`${base}/common/getOrderStatus`, params).then(res => res.data); };
-
-export const getProvinceList = params => { return axios.post(`${base}/common/getProviceList`, params).then(res => res.data); };
-
-export const getCityListByProvince = params => { return axios.post(`${base}/common/getCityByProvice`, params).then(res => res.data); };
-
-export const getAreaListByCity = params => { return axios.post(`${base}/common/getAreaByCity`, params).then(res => res.data); };
-
-export const getChannelList = params => { return axios.post(`${base}/channel/getChannel`, params).then(res => res.data); };
 
 export const getChannelOption = params => { return axios.post(`${base}/channel/getChannelOption`, params).then(res => res.data); };
 
@@ -86,12 +162,6 @@ export const getStatisticOrderList = params => { return axios.post(`${base}/orde
 export const getOrderDetailByOrderCode = params => { return axios.post(`${base}/order/getOrderDetailByOrderCode`, params).then(res => res.data); };
 
 // brand
-// 获取类目
-export const getCategoryList = params => { return axios.post(`${base}/brand/getCategoryList`, params).then(res => res.data); };
-// 根据一级类目获取品牌列表
-export const getBrandListByCategoryId = params => { return axios.post(`${base}/brand/getBrandListByCategoryId`, params).then(res => res.data); };
-// 获取最新品牌
-export const getNewstBrand = params => { return axios.post(`${base}/brand/getNewstBrand`, params).then(res => res.data); };
 // 获取热门品牌
 export const getRecommendBrandList = params => { return axios.post(`${base}/brand/getRecommendBrandList`, params).then(res => res.data); };
 // 获取品牌详情(增加一个根据erpBrandId查询)
@@ -102,12 +172,9 @@ export const getDAgentBrand = params => { return axios.post(`${base}/brand/getDA
 export const insertDAgentBrand = params => { return axios.post(`${base}/brand/insertDAgentBrand`, params).then(res => res.data); };
 // 获取个人中心已代理品牌
 export const getBrandListByAgentBrand = params => { return axios.post(`${base}/brand/getBrandListByAgentBrand`, params).then(res => res.data); };
-// 获取公告列表
-export const getNotices = params => { return axios.post(`${base}/brand/getNotices`, params).then(res => res.data); };
 // 获取公告详情
 export const getNoticebyId = params => { return axios.post(`${base}/brand/getNoticebyId`, params).then(res => res.data); };
-// 获取banner列表
-export const getBannerList = params => { return axios.post(`${base}/resource/getBannerList`, params).then(res => res.data); };
+
 // 获取一级类目下的商品
 export const getCategorySpuList = params => { return axios.post(`${base}/brand/getCategorySpuList`, params).then(res => res.data); };
 // 获取erp中的资料包
@@ -181,15 +248,9 @@ export const saveRefund = params => { return axios.post(`${base}/refund/saveRefu
 export const getAgentBrand = params => { return axios.post(`${base}/manageDistributor/getAgentBrand`, params).then(res => res.data); };
 
 // 显示区域：1:banner下方；2:讨论区-评测；3:讨论区-行业资讯
-export const getArticleList = params => { return axios.post(`${base}/manageArticle/getArticleList`, params).then(res => res.data); };
-
-// 显示区域：1:banner下方；2:讨论区-评测；3:讨论区-行业资讯
 export const getArticleDetail = params => { return axios.post(`${base}/manageArticle/getArticleDetail`, params).then(res => res.data); };
 // 显示区域：1:banner下方；2:讨论区-评测；3:讨论区-行业资讯
 export const getArticleDetailById = params => { return axios.post(`${base}/manageArticle/getArticleDetailById`, params).then(res => res.data); };
-
-// 促销列表
-export const getPromotionList = params => { return axios.post(`${base}/managePromotion/getPromotionList`, params).then(res => res.data); };
 
 // 促销详情
 export const getPromotionDetail = params => { return axios.post(`${base}/managePromotion/getPromotionDetail`, params).then(res => res.data); };

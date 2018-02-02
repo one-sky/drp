@@ -5,9 +5,9 @@
     <!--banner-->
     <div class="banner">
       <el-carousel height="460px" indicator-position="none" arrow="hover">
-        <el-carousel-item v-for="item in banners" :key="item.id">
+        <el-carousel-item v-for="item in bannerList" :key="item.id">
           <router-link :to="item.bannerPath" style="width:100%; height:460px;">
-            <div :style="{backgroundImage: 'url('+item.bannerImg+')', width:'100%', height:'460px'}"></div>
+            <div :style="{backgroundImage: `url(${item.bannerImg})`, width:'100%', height:'460px'}"></div>
             <!--<img v-bind:src="item.bannerImg" width="100%" height="460"/>-->
           </router-link>
 
@@ -15,7 +15,7 @@
       </el-carousel>
 
       <!--menu -->
-      <div class="menu ver-between" :style="{left:(screenWidth>1200?(screenWidth-1200)/2:0)+'px'} ">
+      <div class="menu" :style="{left:(screenWidth>1200?(screenWidth-1200)/2:0)+'px'} ">
         <el-button v-for="(item,index) in categoryList" type="text" @click="searchProduct(index,-1)" :key="index">
           <div class="second-font-color flex-row hor-between">
             <div>{{item.categoryName}}</div>
@@ -29,7 +29,7 @@
       <!--info-->
       <div class="info ver-between" :style="{left:(screenWidth>1200?(screenWidth/2+410):screenWidth-190)+'px'}">
         <div class="top flex-col ver-center" >
-          <div v-if="!user.userId||user.userId==''">
+          <div v-if="!user.userId">
             <div class="hor-center">
               <img src="../imgs/home/header_icon.png" height="41" width="41"/>
             </div>
@@ -123,14 +123,14 @@
         </div>
 
         <div class="bottom">
-          <el-tabs class="flex-col" v-model="activeName" @tab-click="handleClick">
+          <el-tabs class="flex-col" v-model="activeName" >
             <el-tab-pane label="公告" name="notice">
-              <div v-for="(item,index) in notices" :key="index">
+              <div v-for="(item,index) in noticeList" :key="index">
                 <router-link :to="{path:'/noticesDetail',query:{name: 'notice', id:item.id}}">【公告】{{item.title}}</router-link>
               </div>
             </el-tab-pane>
             <el-tab-pane label="促销" name="promotion">
-              <div  v-for="(item,index) in promotions" :key="index">
+              <div  v-for="(item,index) in promotionList" :key="index">
                 <router-link :to="{path:'/noticesDetail',query:{name: 'promotion', id:item.id}}">【促销】{{item.promotionName}}</router-link>
               </div>
             </el-tab-pane>
@@ -156,13 +156,13 @@
             <div class="box">一站式的销售解决方案，轻松批发和分销</div>
           </div>
           <el-carousel>
-            <el-carousel-item v-for="i in (promotions.length%2==0?(promotions.length/2):(parseInt(promotions.length/2)+1))" height="277px" :key="i">
+            <el-carousel-item v-for="i in (promotionList.length%2==0?(promotionList.length/2):(parseInt(promotionList.length/2)+1))" height="277px" :key="i">
               <div class="flex-row">
                 <router-link to="/">
-                  <img v-bind:src="promotions[2*(i-1)].coverImg" height="277" width="248"/>
+                  <img v-bind:src="promotionList[2*(i-1)].coverImg" height="277" width="248"/>
                 </router-link>
                 <router-link to="/" style="margin-left:4px;">
-                  <img v-if="(2*(i-1)+1<promotions.length-1)" v-bind:src="promotions[2*(i-1)+1].coverImg" height="277" width="248"/>
+                  <img v-if="(2*(i-1)+1<promotionList.length-1)" v-bind:src="promotionList[2*(i-1)+1].coverImg" height="277" width="248"/>
                 </router-link>
               </div>
 
@@ -229,7 +229,7 @@
                 <img v-bind:src="item.logo" height="100" width="155" style=""/>
               </div>
 
-              <div v-if="item.isShowActive" class="flex-col hor-ver-center hover"  >
+              <div v-if="!!item.isShowActive" class="flex-col hor-ver-center hover"  >
                 <div class="long-title">{{item.brandName}}</div>
                 <div class="hor-center">
                   <el-button type="primary" @click="$router.push({path: '/brandDetail', query:{ brand: item.brandId }});">CHECK</el-button>
@@ -274,24 +274,6 @@
             </template>
           </div>
         </div>
-        <el-row>
-          <template v-for="(recommend,index) in item.recommendProductList">
-            <el-col :span="4" class="recommend-list flex-col" :style="{'margin-left':(index>0?0.4:0)+'%'}" :key="index">
-              <router-link :to="{path: '/productDetail', query: {product: recommend.productId}}">
-                <img v-bind:src="recommend.thumbnailImage" width="232" height="234" />
-              </router-link>
-              <div class="flex-col" style="flex:1;">
-                <router-link class="long-title product-name" :to="{path: '/productDetail', query: {product: recommend.productId}}">
-                  {{recommend.productName}}
-                </router-link>
-                <router-link  class="ver-end third-font-color" style="flex:1;" :to="{path: '/productDetail', query: {product: recommend.productId}}">
-                  <span class="info-size">¥</span>{{recommend.priceRange.split("~")[1]}}
-                </router-link>
-              </div>
-            </el-col>
-
-          </template>
-        </el-row>
       </div>
     </div>
 
@@ -308,7 +290,7 @@
         <div class="content flex-row hor-between">
           <!--test-swiper-->
           <swiper :options="swiperTests">
-            <swiper-slide v-for="(item, index) in tests" :key="index">
+            <swiper-slide v-for="(item, index) in testList" :key="index">
               <el-card :body-style="{ padding: '0px 0px 36px 0px' }">
                 <router-link :to="{path: '/noticesDetail', query:{name:'test', id: item.id }}">
                   <img v-bind:src="item.articleImg" height="180" width="295"/>
@@ -335,7 +317,7 @@
               <router-link class="hor-end" style="flex:1;" :to="{path:'industryList', query:{name:'industry'}}">更多></router-link>
             </div>
 
-            <template v-for="(item,index) in industries">
+            <template v-for="(item,index) in industryList">
               <div class="flex-row hor-around" style="margin-top:10px;" :key="index">
                 <router-link :to="{path: '/noticesDetail', query:{name:'industry', id: item.id }}">
                   <img v-bind:src="item.articleImg" height="34" width="64"/>
@@ -362,7 +344,7 @@
         <div class="content">
           <swiper :options="swiperOffline" >
             <!-- 这部分放你要渲染的那些内容 -->
-            <swiper-slide v-for="(item, index) in stores" :key="index">
+            <swiper-slide v-for="(item, index) in storeList" :key="index">
               <img v-bind:src="item.pic" width="355" height="355"/>
               <div class="hor-around ver-center" style="width:355px;">
                 <div>
@@ -389,8 +371,24 @@
   @import "../../node_modules/swiper/dist/css/swiper.css";
 </style>
 <script>
-  import { getCategoryList, getBannerList, getNotices, getPromotionList, getBrandListByCategoryId, getCategorySpuList, getArticleList} from "../api/api";
+  import {
+    getBannerList,
+    getCategoryList,
+    getNoticeList,
+    getPromotionList,
+    getNewBrandList,
+    getArticleList
+  } from '../api/api';
+  const COLOR = [ '#5ecfbe', '#ffdb15', '#f1bc5b', '#b8b8b8', '#e74574' ];
+  const ICON = [
+    require('@/imgs/home/home_1_icon.png'),
+    require('@/imgs/home/home_2_icon.png'),
+    require('@/imgs/home/home_3_icon.png'),
+    require('@/imgs/home/home_4_icon.png'),
+    require('@/imgs/home/home_5_icon.png')
+  ];
   export default {
+    
     data () {
       return {
         // 评测专区
@@ -412,28 +410,27 @@
         },
         screenWidth: null,
         activeName: 'notice',
-        banners: [],
+        bannerList: [],
         // 活动
         activity: [],
         // 公告
-        notices: [],
+        noticeList: [],
         // 促销
-        promotions: [],
+        promotionList: [],
         // 品牌馆
-        brandList:[],
+        brandList: [],
         // 类目与二级类目
         categoryList: [],
         // 评测专区
-        tests: [],
+        testList: [],
         // 行业资讯
-        industries: [],
-        //线下门店
-        stores: [],
+        industryList: [],
+        // 线下门店
+        storeList: [],
         leftMenu: false,
         // 当前用户
         user: {
           userId: null,
-          vendorId: null,
           headUrl: null,
           nickname: null
         },
@@ -441,216 +438,166 @@
         activeLeftMenu: '#home',
         // 头条menu
         isActive: false,
-      }
+      };
     },
     methods: {
+
       // 获取banner列表
-      getBanners: function () {
+      getBannerList: function () {
         const param = {
-          status: 1
+          status: 1,
+          pageNum: 1,
+          pageSize: 1000
         };
         getBannerList(param).then((res) => {
-          console.log(res);
-          this.banners = res.data;
+          if (res.status == 200) {
+            this.bannerList = res.data;
+          }
         });
       },
 
       // 获取公告详情
-      getNotices: function () {
-        this.notices = [
-          { id: 1, title: '福建部分地区因台风配送问题' },
-          { id: 2, title: '福建部分地区因台风配送问题' },
-          { id: 3, title: '福建部分地区因台风配送问题' }
-        ];
-
-        /*
-        let param={
-          vendorId: this.user.vendorId,
-          userId: 1,
-          isIndexPage: 'Y',
-          pageNum: 1
-
+      getNoticeList: function () {
+        const param = {
+          isIndex: true
         };
-        getNotices(param).then((res) => {
-          if(res.status == 200){
-            this.notices = res.data;
-            console.log(res.data)
+        getNoticeList(param).then((res) => {
+          if (res.status == 200) {
+            this.noticeList = res.data;
           }
-        })
-        */
+        });
       },
 
       // 获取促销
-      getPromotionList() {
-        this. promotions = [
-          { id: 22, coverImg: 'http://inheater-dis.oss-cn-shenzhen.aliyuncs.com/6/1207111507860022719_火狐浏览器.png', promotionName: '大促销1' },
-          { id: 20, coverImg: 'http://inheater-dis.oss-cn-shenzhen.aliyuncs.com/6/9765911507614124826_bed4e8c6d8f3fb3f676aabf5ad07976a_TB2zuOqkamWQ1JjSZPhXXXCJFXa_!!765956727.jpg_60x60q90.jpg', promotionName: '大促销2' },
-          { id: 21, coverImg: 'http://inheater-dis.oss-cn-shenzhen.aliyuncs.com/6/1817771504834209177_c77ce30f33ff515946f1922df42b350c_u=1828701617,1640957097&fm=27&gp=0.jpg', promotionName: '双十大促' }
-        ]
-//        let param = {
-//          vendorId: 1,
-//          pageNum: 1,
-//          pageSize: 1000,
-//          isValid: 3
-//
-//        };
-//        getPromotionList(param).then((res) => {
-//          if(res.status == 200) {
-//            this.promotions = res.data;
-//            console.log(this.promotions)
-//
-//          }
-//        })
+      getPromotionList: function () {
+        const param = {
+          isIndex: true
+        };
+        getPromotionList(param).then((res) => {
+          if (res.status == 200) {
+            this.promotionList = res.data;
+          }
+        });
       },
-//
+
       // 类目
-      getCategoryList() {
-        let param = {
-          vendorId: 1,
+      getCategoryList: function () {
+        const param = {
+          userType: 1
         };
         getCategoryList(param).then((res) => {
           if (res.status == 200) {
-            const category = res.data;
-
+            const categoryList = res.data && res.data != '' ? res.data : {};
             // 获得一级类目
-            this.categoryList = category.filter((item) => {
-              return item.level == '1';
+            this.categoryList = categoryList.filter((item, index) => {
+              if (item.level == 1) {
+                item.color = COLOR[index % 5];
+                item.icon = ICON[index % 5];
+                item.childCategoryList = categoryList.filter(child => child.level == 2 && child.parentId == item.id);
+                return true;
+              }
+              return false;
             });
-            const color = [ '#5ecfbe','#ffdb15','#f1bc5b', '#b8b8b8', '#e74574' ];
-            const icon = [ require('@/imgs/home/home_1_icon.png'), require('@/imgs/home/home_2_icon.png'),
-              require('@/imgs/home/home_3_icon.png'),require('@/imgs/home/home_4_icon.png'),require('@/imgs/home/home_5_icon.png') ];
-            
-            const cCategory = this.categoryList.map( (item, index) => {
-              this.$set( item, 'isActive', false );
-              this.$set( item, 'color', color[ index % 5 ] );
-              this.$set( item, 'icon', icon[ index % 5 ] );
-              this.$set( item, 'childCategoryList', [] );
-              category.filter( child => {
-                if ( child.level == '2' && item.id == child.parentId) {
-                  item.childCategoryList.push( child );
-                }
-              });
-              return item;
-            })
-            this.categoryList = cCategory;
-            // 获取一级类目下的推荐商品
-            this.getCategorySpuList();
-          }
-
-        });
-      },
-
-      // 获取一级类目下的推荐商品
-      getCategorySpuList(){
-        let param = {
-          pageSize: 5,
-          page: 1
-        };
-        getCategorySpuList(param).then((res) => {
-          if(res.status == 200){
-            console.log(res.data)
-            const products = res.data;
-            for (var i in this.categoryList) {
-              for (var j in products) {
-                if (this.categoryList[i].id == products[j].id){
-                  this.$set(this.categoryList[i], 'recommendProductList', products[j].products);
-                  break;
-                }
-              }
-            }
           }
         });
       },
-      getBrandListByCategoryId(){
-        let param = {
-          vendorId: 1
+
+      getNewBrandList: function () {
+        const param = {
+          num: 30
         };
-        getBrandListByCategoryId(param).then((res) => {
-          if(res.status ==200){
-            if(res.data&&res.data!=''){
-              var brandList = res.data;
-              for(var i in brandList){
-                for(var j in brandList[i].rBrands){
-                  this.brandList.push(brandList[i].rBrands[j]);
-                  this.$set(this.brandList,'isShowActive', false);
-                }
-              }
-            }
+        getNewBrandList(param).then((res) => {
+          if (res.status == 200) {
+            this.brandList = res.data && res.data != '' ? res.data : {};
           }
         });
       },
       // 评测专区
-      getTests() {
-        let param = {
-          vendorId: 1,
-          displayArea: 2,
-          pageSize:10000,
-          pageNum:1,
-          status: 1
+      getTestList: function () {
+        const param = {
+          displayArea: 1,
+          status: 1,
+          pageNum: 1,
+          pageSize: 10000
         };
         getArticleList(param).then((res) => {
-          if(res.status ==200){
-            if(res.data && res.data != '') {
-              this.tests = res.data
-            }
+          if (res.status == 200) {
+              this.testList = res.data && res.data != '' ? res.data : {};
           }
         });
       },
 
       // 行业资讯专区
-      getIndustries() {
-        let param = {
-          vendorId: 1,
-          displayArea:3,
-          pageSize: 10000,
-          pageNum:1,
-          status: 1
+      getIndustryList: function () {
+        const param = {
+          displayArea: 2,
+          status: 1,
+          pageNum: 1,
+          pageSize: 10000
         };
         getArticleList(param).then((res) => {
-          if(res.status == 200){
-            if(res.data&&res.data != '') {
-              this.industries = res.data
-            }
+          if (res.status == 200) {
+            this.industryList = res.data && res.data != '' ? res.data : {};
           }
         });
       },
-      getStores() {
-        this.stores = [
-          {id:1, pic: require('@/imgs/home/home_offline_shunpic.png'), brand: require('@/imgs/home/home_offline_shunicon.png'), title:'顺店商城'},
-          {id:2, pic: require('@/imgs/home/home_offline_zhipic.png'), brand: require('@/imgs/home/home_offline_zhiicon.png'), title:'dc.space智慧生活馆'},
-          {id:3, pic: require('@/imgs/home/home_offline_qipic.png'), brand: require('@/imgs/home/home_offline_qiicon.png'), title:'奇客巴士'},
-          {id:3, pic: require('@/imgs/home/home_offline_qipic.png'), brand: require('@/imgs/home/home_offline_qiicon.png'), title:'奇客巴士'},
-          {id:4, pic: require('@/imgs/home/home_offline_shunpic.png'), brand: require('@/imgs/home/home_offline_shunicon.png'), title:'顺店商城'}
+      getStores: () => {
+        this.storeList = [
+          {
+            id: 1,
+            pic: require('@/imgs/home/home_offline_shunpic.png'),
+            brand: require('@/imgs/home/home_offline_shunicon.png'),
+            title: '顺店商城'
+          },
+          {
+            id: 2,
+            pic: require('@/imgs/home/home_offline_zhipic.png'),
+            brand: require('@/imgs/home/home_offline_zhiicon.png'),
+            title: 'dc.space智慧生活馆'
+          },
+          {
+            id: 3,
+            pic: require('@/imgs/home/home_offline_qipic.png'),
+            brand: require('@/imgs/home/home_offline_qiicon.png'),
+            title: '奇客巴士'
+          },
+          {
+            id: 3,
+            pic: require('@/imgs/home/home_offline_qipic.png'),
+            brand: require('@/imgs/home/home_offline_qiicon.png'),
+            title: '奇客巴士'
+          },
+          {
+            id: 4,
+            pic: require('@/imgs/home/home_offline_shunpic.png'),
+            brand: require('@/imgs/home/home_offline_shunicon.png'),
+            title: '顺店商城'
+          }
         ];
       },
-      showActive(key, prop, value) {
-        this.$set(this.brandList[key],prop,value);
-      },
-      handleClick(tab, event) {
-        console.log(tab, event);
-      },
-      logout(){
-        sessionStorage.removeItem("user");
-        this.$set(this.user,'userId',null);
-        this.$set(this.user,'vendorId',1);
 
+      showActive: (key, prop, value) => {
+        this.$set(this.brandList[key], prop, value);
+      },
+
+      logout: () => {
+        sessionStorage.removeItem('user');
+        this.$set(this.user, 'userId', null);
       },
 //
-      searchProduct(index,flag){
-        var category = new Array();
-        if(flag< 0){
-          for(var i in this.categoryList[index].childCategoryList){
-            category.push(this.categoryList[index].childCategoryList[i].id)
+      searchProduct: (index, flag) => {
+        var category = [];
+        if (flag < 0) {
+          for (var i in this.categoryList[index].childCategoryList) {
+            category.push(this.categoryList[index].childCategoryList[i].id);
           }
-        }else {
+        } else {
           category.push(this.categoryList[index].childCategoryList[flag].id);
         }
 
 //        this.$store.state.category = category;
-        this.$router.push({path:'/productList'});
+        this.$router.push({path: '/productList'});
         this.$on('getProductList');
-
-
       },
 //      currentHeightListener() {
 //        this.currentHeight = document.body.scrollTop;
@@ -703,53 +650,48 @@
 //          this.currentHeightListener();
 //        }
 //      },
-
-
     },
     created () {
-      var sessionUser = sessionStorage.getItem('user');
-      if(sessionUser) {
-
-        sessionUser = JSON.parse(sessionUser);
-        this.$set(this.user, 'userId', sessionUser.userId);
-        this.$set(this.user, 'vendorId', 1);
-        this.$set(this.user, 'headUrl', sessionUser.headUrl);
-        this.$set(this.user, 'nickname', sessionUser.nickname);
+      const user = JSON.parse(sessionStorage.getItem('user'));
+      if (user && user.userId > 0) {
+        this.$set(this, 'user', user);
       }
 
-      // 获取导航的banner
-      this.getBanners();
+      // 获取导航条
+      this.getBannerList();
+
       // 获取公告详情
-      this.getNotices();
+      this.getNoticeList();
+
       // 获取促销
       this.getPromotionList();
 
       // 品牌馆
-      this.getBrandListByCategoryId();
+      this.getNewBrandList();
+
       // 品牌馆与类目
       this.getCategoryList();
+
       // 评测专区
-      this.getTests();
+      this.getTestList();
+
       // 行业资讯专区
-      this.getIndustries();
+      this.getIndustryList();
+
       // 线下门店
       this.getStores();
 //      window.addEventListener('resize', this.onReSize)
 //      window.addEventListener('scroll', this.currentHeightListener)
-
-
-
     },
-    mounted() {
-      this.screenWidth = this.$refs.index.offsetWidth
+    mounted () {
+      this.screenWidth = this.$refs.index.offsetWidth;
     },
 
-    destroyed() {
+    destroyed () {
       window.removeEventListener('scroll', this.currentHeightListener);
       window.removeEventListener('resize', this.onReSize);
     },
-
-  }
+  };
 </script>
 
 

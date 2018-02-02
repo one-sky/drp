@@ -71,32 +71,32 @@
 </style>
 
 <script>
-  import { getCollectionProductList, cancelAttentionProduct, batchCancelAttentionProduct, stickyProduct } from '../../api/api';
-  import ElCheckbox from "../../../node_modules/element-ui/packages/checkbox/src/checkbox";
+  import {
+    getCollectionProductList,
+    cancelAttentionProduct,
+    batchCancelAttentionProduct,
+    stickyProduct
+  } from '../../api/api';
   export default {
-    components: {ElCheckbox},
-    data() {
+    data () {
       return {
-        loading:false,
-        user:{},
+        loading: false,
+        user: {},
         productList: [],
-        handleProductList:[],
-        currentPage:1,
+        handleProductList: [],
+        currentPage: 1,
         pageSize: 5,
-        totalCount:40,
+        totalCount: 40,
         multipleOption: false,
         checked: false,
         multipleSelection: [],
 
         isAgent: false,
-
-
-      }
-
+      };
     },
     methods: {
-      //获取已关注商品
-      getCollectionProductList: function() {
+      // 获取已关注商品
+      getCollectionProductList: () => {
         this.noneOption = true;
         this.checked = false;
         let param = {
@@ -117,60 +117,57 @@
 //        })
         this.productList = [{
           productName: '美国ROCKETBOOK创意云笔记本美国ROCKETBOOK创意云笔'
-        }]
+        }];
       },
 
-      //取消已关注商品
-      cancelAttentionProduct: function(row) {
+      // 取消已关注商品
+      cancelAttentionProduct: (row) => {
         let param = {
           distributorId: this.user.distributorId,
           productId: row.productId
 
         };
         cancelAttentionProduct(param).then((res) => {
-          if(res.status==200){
+          if (res.status == 200) {
             this.$message({
               message: '取关成功',
               type: 'success'
             });
             this.getCollectionProductList();
           }
-
-        })
+        });
       },
 
-      //批量处理取消关注
-      batchCancelAttentionProduct(){
-        if(!this.handleProductList||this.handleProductList ==''){
-          return;
-        }else{
+      // 批量处理取消关注
+      batchCancelAttentionProduct: () => {
+        if (!this.handleProductList || this.handleProductList == '') {
+          return false;
+        } else {
           var productIds = new Array();
-          for(var i in this.handleProductList){
-            productIds.push(this.handleProductList[i].productId)
+          for (var i in this.handleProductList) {
+            productIds.push(this.handleProductList[i].productId);
           }
           let param = {
             productIds: productIds,
             distributorId: this.user.distributorId
           };
           batchCancelAttentionProduct(param).then((res) => {
-            if(res.status == 200){
+            if (res.status == 200) {
               this.getCollectionProductList();
-
             }
-          })
-
+          });
         }
       },
 
-      //批量置顶商品
-      stickyProduct(value){
+      // 批量置顶商品
+      stickyProduct: (value) => {
         var listId = new Array();
-        if(value&&value!=''){
+        if (value && value != '') {
           listId.push(value);
-        }else{
-          if(!this.handleProductList||this.handleProductList ==''){
-            return;
-          }else {
+        } else {
+          if (!this.handleProductList || this.handleProductList == '') {
+            return false;
+          } else {
             for (var i in this.handleProductList) {
               listId.push(this.handleProductList[i].id)
             }
@@ -181,22 +178,17 @@
           listId: listId,
           distributorId: this.user.distributorId
         };
-        console.log(param)
         stickyProduct(param).then((res) => {
-          if(res.status == 200){
-            console.log(res)
+          if (res.status == 200) {
             this.currentPage = 1;
             this.getCollectionProductList();
-
           }
-        })
+        });
       },
 
-
-
-      //降价通知
-      handlePriceRemind(val){
-        if(val){
+      // 降价通知
+      handlePriceRemind: (val) => {
+        if (val) {
           this.handleProductList = val;
         }
 
@@ -213,47 +205,41 @@
          */
       },
 
-      //页码变更
-      handleCurrentChange: function(val) {
+      // 页码变更
+      handleCurrentChange: (val) => {
         this.currentPage = val;
         this.getCollectionProduct();
-
       },
 
-      //批量操作取消操作
-      handleSelection() {
+      // 批量操作取消操作
+      handleSelection () {
         this.noneOption = !this.noneOption;
         this.checked = false;
       },
 
-      //全选按钮
-      toggleSelection() {
+      // 全选按钮
+      toggleSelection: () => {
         if (this.checked) {
           this.productList.forEach(row => {
-            this.$refs.product_table.toggleRowSelection(row,true);
+            this.$refs.product_table.toggleRowSelection(row, true);
           });
         } else {
           this.$refs.product_table.clearSelection();
         }
       },
 
-      handleSelectionChange(val) {
+      handleSelectionChange: (val) => {
         this.handleProductList = val;
-        if(this.handleProductList.length<this.productList.length){
+        if (this.handleProductList.length < this.productList.length) {
           this.checked = false;
-        }else{
+        } else {
           this.checked = true;
         }
       },
-
-
     },
-    created() {
-      this.$set(this.user, 'userId', 107);
-      this.$set(this.user, 'distributorId', 35);
-      this.$set(this.user, 'vendorId', 1);
+    created () {
+      this.user = JSON.parse(sessionStorage.getItem('user'));
       this.getCollectionProductList();
     }
-
   };
 </script>

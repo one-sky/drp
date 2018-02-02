@@ -49,78 +49,64 @@
 </style>
 
 <script>
-  import { getNotices} from '../../api/api';
+  import { getNoticeList } from '../../api/api';
   export default{
-    data() {
+    data () {
       return {
-        user:{
+        user: {
           userId: 1,
           vendorId: 1,
           distributorId: 13
         },
-        messageList:[],
-        pageSize:null,
-        totalCount:null,
-        currentPage:1
-      }
+        messageList: [],
+        pageSize: null,
+        totalCount: null,
+        currentPage: 1
+      };
     },
     methods: {
-      //获取消息详情
-      getMessageList(){
-        let param ={
+      // 获取消息详情
+      getNoticeList: () => {
+        let param = {
           vendorId: this.user.vendorId,
           userId: '',
           isIndexPage: 'Y',
           distributorId: '',
-          pageNum:this.currentPage
+          pageNum: this.currentPage
         };
-//        getNotices(param).then((res) => {
-//          console.log(res)
-//          if(res.status ==200){
-//            if(res.data&&res.data.length>0){
-//              this.messageList=res.data;
-//              this.pageSize = res.page.pageSize;
-//              this.totalCount = res.page.totalNum;
-//            }
-//          }
-//
-//        })
-        this.messageList = [{
-          receiverType: 1,
-          title: 'aaas2wadasdadqweqeedsdqwewewe',
-          detail: 'aaaaaaas2wadasdadqweqeedsdaaas2wadasdadqweqeedsdaaas2wadasdadqweqeedsdaaas2wadasdadqweqeedsd',
-          haveRead: 'Y'
-        },{
-          receiverType: 2,
-          title: 'aaas2wadasdadqweqeedsdqwewewe',
-          detail: 'aaaaaaas2wadasdadqweqeedsdaaas2wadasdadqweqeedsdaaas2wadasdadqweqeedsdaaas2wadasdadqweqeedsd',
-          haveRead: 'N'
-        }]
+       getNoticeList(param).then((res) => {
+         if (res.status == 200) {
+           if (res.data && res.data.length > 0) {
+             this.messageList = res.data;
+             this.pageSize = res.page.pageSize;
+             this.totalCount = res.page.totalNum;
+           }
+         }
+       });
       },
 
-
-      //页码变更
-      handleCurrentChange: function(val) {
+      // 页码变更
+      handleCurrentChange: (val) => {
         this.currentPage = val;
         this.getMessageList();
-
       },
-      click(row){
-        this.$router.push({ path: '/center/messageDetail', query:{ message: row.id } });
+
+      click: (row) => {
+        this.$router.push({ path: '/center/messageDetail', query: {message: row.id} });
       }
 
     },
     created () {
-      this.getMessageList();
+      this.getNoticeList();
     },
     filters: {
-      formateReceiverType(value){
-        if(!value||value==''||value==1){
-          return '平台公告'
-        }else{
-          return '用户公告'
+      formateReceiverType: (value) => {
+        if (!value || value == '' || value == 1) {
+          return '平台公告';
+        } else {
+          return '用户公告';
         }
       }
     }
-  }
+  };
 </script>

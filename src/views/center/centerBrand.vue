@@ -72,10 +72,10 @@
 <script>
   import {getBrandListByAgentBrand, getChannelOption} from '../../api/api';
   export default {
-    data() {
+    data () {
       return {
         activeName: 'Y',
-        user:{
+        user: {
           userId: 101,
           vendorId: 1,
           distributorId: 29
@@ -91,8 +91,10 @@
         brandList: [],
 
         channelOption: [],
-        channel:{channel: null},
-        currBrand: null, //下载授权书时标记品牌下标
+        channel: {
+          channel: null
+        },
+        currBrand: null, // 下载授权书时标记品牌下标
 
         pageSize: 10,
         totalCount: 40,
@@ -102,83 +104,83 @@
 
         dialog_rules: {
           channel: [
-            {type: "number", required: true, message:'请选择分销渠道', trigger: 'change'}
+            {
+              type: 'number',
+              required: true,
+              message: '请选择分销渠道',
+              trigger: 'change'
+            }
           ],
         },
-      }
+      };
     },
 
     methods: {
-      getBrandListByAgentBrand(){
+      getBrandListByAgentBrand: () => {
         this.loading = true;
         let param = {
           distributorId: this.user.distributorId,
           vendorId: this.user.vendorId,
-          brandName:this.searchForm.name,
-          status:this.activeName=='N'?'':this.activeName,
+          brandName: this.searchForm.name,
+          status: this.activeName == 'N' ? '' : this.activeName,
           pageNum: this.currentPage
         };
         getBrandListByAgentBrand(param).then((res) => {
-          if(res.status ==200) {
+          if (res.status == 200) {
             this.totalCount = res.page.totalNum;
             this.brandList = res.data;
-            for(var i in this.brandList.rBrands){
+            for (var i in this.brandList.rBrands) {
               this.$set(this.brandList.rBrands[i], 'packageActive', false);
               this.$set(this.brandList.rBrands[i], 'authorActive', false);
             }
             this.loading = false;
-            console.log(this.brandList)
-          }
-        })
-
-      },
-
-      //获取渠道列表
-      getChannelOption() {
-        let param = {};
-        this.channelOption = new Array();
-        getChannelOption(param).then((res) => {
-          if(res.status ==200) {
-            var channelOption = res.data;
-            for(var i in channelOption){
-              if(channelOption[i].status==1){
-                this.channelOption.push(channelOption[i]);
-              }
-            }
-            console.log(channelOption)
           }
         });
       },
 
-      //tab_event
-      handleClick(tab, event) {
-        //reset
+      // 获取渠道列表
+      getChannelOption: () => {
+        let param = {};
+        this.channelOption = new Array();
+        getChannelOption(param).then((res) => {
+          if (res.status == 200) {
+            var channelOption = res.data;
+            for (var i in channelOption) {
+              if (channelOption[i].status == 1) {
+                this.channelOption.push(channelOption[i]);
+              }
+            }
+          }
+        });
+      },
+
+      // tab_event
+      handleClick: (tab, event) => {
+        // reset
         this.searchGroup = {
-          name:''
+          name: ''
         };
         this.searchForm = {
-          name:''
+          name: ''
         };
         this.currentPage = 1;
         this.getBrandListByAgentBrand();
       },
 
-      handleSearch() {
-
+      handleSearch: () => {
         this.searchForm.name = this.searchGroup.name;
         this.currentPage = 1;
         this.getBrandListByAgentBrand();
       },
 
-      showActive(key, prop, value) {
-          console.log(key)
-        this.$set(this.brandList.rBrands[key],prop,value);
+      showActive: (key, prop, value) => {
+        this.$set(this.brandList.rBrands[key], prop, value);
       },
 
-      fileDownload(id) {
-        for(var i in this.brandList.agentBrandVOS){
-          if(this.brandList.agentBrandVOS[i].id==this.brandList.rBrands[id].id){
-            window.open(this.brandList.agentBrandVOS[i].brandCertificate,"_blank");
+      fileDownload: (id) => {
+        for (var i in this.brandList.agentBrandVOS) {
+          if (this.brandList.agentBrandVOS[i].id == this.brandList.rBrands[id].id) {
+            window.open(this.brandList.agentBrandVOS[i].brandCertificate, '_blank');
             return;
           }
         }
@@ -186,14 +188,13 @@
           message: '下载失败，请重试',
           type: 'error'
         });
-        return;
       },
 
-      authorFileDownload() {
-        for(var i in this.brandList.agentBrandVOS){
-          //key
-          if(this.brandList.agentBrandVOS.channelId==this.channel.channel){
-            window.open(this.brandList.agentBrandVOS[i].brandCertificate,"_blank")
+      authorFileDownload: () => {
+        for (var i in this.brandList.agentBrandVOS) {
+          // key
+          if (this.brandList.agentBrandVOS.channelId == this.channel.channel) {
+            window.open(this.brandList.agentBrandVOS[i].brandCertificate, '_blank');
             return;
           }
         }
@@ -202,29 +203,26 @@
           type: 'error'
         });
         this.dialogFormVisible = false;
-        return;
-
-
       },
 
       // 页码变更
-      handleCurrentChange: function(val) {
+      handleCurrentChange: (val) => {
         this.currentPage = val;
         this.getBrandList(this.searchForm, this.currentPage);
       },
 
-      openDialog(key){
+      openDialog: (key) => {
         this.dialogFormVisible = true;
         this.currBrand = key;
       },
 
-      resetDialog(formName){
+      resetDialog: (formName) => {
         this.$refs[formName].resetFields();
-
-      },
+      }
     },
 
-    created() {
+    created () {
+      this.user = JSON.parse(sessionStorage.getItem('user'));
       this.getBrandListByAgentBrand();
     }
 

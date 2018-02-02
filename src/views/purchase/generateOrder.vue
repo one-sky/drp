@@ -111,9 +111,19 @@
 </style>
 
 <script>
-  import { getAddressList, getProvinceList, getCityListByProvince, getAreaListByCity, saveAddress, getAgentBrand, getProductPackingInfo, calculateShippingCost, generateOrder} from '../../api/api';
+  import {
+    getAddressList,
+    getProvinceList,
+    getCityListByProvince,
+    getAreaListByCity,
+    saveAddress,
+    getAgentBrand,
+    getProductPackingInfo,
+    calculateShippingCost,
+    generateOrder
+    } from '../../api/api';
   export default {
-    data() {
+    data () {
       return {
         user: {
           userId: null,
@@ -122,130 +132,120 @@
           vipId: null,
         },
         shoppingCart: [],
-        loading:false,
-        //地址列表
+        loading: false,
+        // 地址列表
         addressList: [],
 
-        //默认地址，初始默认第一个
+        // 默认地址，初始默认第一个
         defaultAddress: 0,
-        //选择地址时所选的id
+        // 选择地址时所选的id
         tmpDefaultAddress: 0,
-        //备注
-        buyerMessage:null,
+        // 备注
+        buyerMessage: null,
 
-        //数量总计
+        // 数量总计
         realTotalCount: 0,
-        //总金额
+        // 总金额
         realTotalAmount: 0,
-        //应付总额
+        // 应付总额
         realTrueAmount: 0,
 
-        //订单运费
+        // 订单运费
         shippingCost: null
-      }
+      };
     },
 
     methods: {
 
-      getAddressList: function() {
+      getAddressList: () => {
         let param = {
           distributorId: this.user.distributorId
         };
         getAddressList(param).then((res) => {
-          if(res.status ==200) {
-            if(res.data){
+          if (res.status == 200) {
+            if (res.data) {
               this.addressList = res.data;
-              this.defaultAddress=0;
+              this.defaultAddress = 0;
               this.tmpDefaultAddress = 0;
-              //this.getProductPackingInfo();
+              // this.getProductPackingInfo();
             }
           }
         });
       },
-
-
-      //获取省列表
-      getProvince() {
+      // 获取省列表
+      getProvince: () => {
         let param = {};
         getProvinceList(param).then((res) => {
           this.provinceList = res.data;
-        })
-
+        });
       },
 
-      //获取市列表
-      handleChangeProvince(value) {
-        if(value && value!='') {
+      // 获取市列表
+      handleChangeProvince: (value) => {
+        if (value && value != '') {
           this.city_disabled = false;
           let param = {
             parentCode: value
           };
           getCityListByProvince(param).then((res) => {
             this.cityList = res.data;
-            if(this.cityList){
+            if (this.cityList) {
               this.$set(this.add_addressForm.city, this.cityList[0].regionCode);
             }
           });
-        }else{
+        } else {
           this.$set(this.add_addressForm.city, null);
         }
       },
 
-      //获取地区列表
-      handleChangeCity(value) {
-
-        if(value!=''&&value) {
+      // 获取地区列表
+      handleChangeCity: (value) => {
+        if (value != '' && value) {
           this.area_disabled = false;
           let param = {
             parentCode: value
           };
           getAreaListByCity(param).then((res) => {
             this.areaList = res.data;
-            if(this.areaList){
+            if (this.areaList) {
               this.$set(this.add_addressForm.area, this.areaList[0].regionCode);
             }
           });
-        }else{
+        } else {
           this.$set(this.add_addressForm.area, null);
         }
       },
 
-      //提交地址
-      submitAddress(formName) {
-        this.$refs[formName].validate((valid) =>{
-          if(valid){
-            this.$set(this.add_addressForm,'distributorId',this.user.distributorId);
+      // 提交地址
+      submitAddress: (formName) => {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.$set(this.add_addressForm, 'distributorId', this.user.distributorId);
             let param = this.add_addressForm;
             saveAddress(param).then((res) => {
-              if(res.status==200){
+              if (res.status == 200) {
                 this.$message({
                   message: '提交成功',
                   type: 'success'
                 });
                 this.addressDialogVisible = false;
-                if(!this.addressList||this.addressList==''){
-                  this.defaultAddress=0;
-                }else{
-                  this.defaultAddress=1;
+                if (!this.addressList || this.addressList == '') {
+                  this.defaultAddress = 0;
+                } else {
+                  this.defaultAddress = 1;
                 }
                 this.getAddressList();
               }
-
             });
-
-          }else {
+          } else {
             return false;
-
           }
-
-
         });
-
       },
-      resetDialog(formName){
+      resetDialog: (formName) => {
         this.add_addressForm = {
           receiveName: null,
-          province:null,
+          province: null,
           city: null,
           area: null,
           detailAddress: null,
@@ -254,11 +254,11 @@
         this.$refs[formName].resetFields();
       },
 
-      //生成订单，进入支付
-      generateOrder(){
+      // 生成订单，进入支付
+      generateOrder: () => {
         var shopCartItem = new Array();
-        for(var i in this.shoppingCart){
-          this.$set(this.shoppingCart[i],'price', this.shoppingCart[i].unitPrice)
+        for (var i in this.shoppingCart) {
+          this.$set(this.shoppingCart[i], 'price', this.shoppingCart[i].unitPrice);
           shopCartItem.push(this.shoppingCart[i]);
         }
         let param = {
@@ -268,31 +268,31 @@
           userId: this.user.userId,
           levelId: this.user.vipId,
           buyerMessage: this.buyerMessage,
-          address:Object.assign({}, this.addressList[this.defaultAddress]),
-          clientIP: "192.168.3.139",
+          address: Object.assign({}, this.addressList[this.defaultAddress]),
           shopCartItems: shopCartItem,
         };
-        console.log(param);
         generateOrder(param).then((res) => {
-          if(res.status==200){
+          if (res.status == 200) {
             this.orderCode = res.data;
-            this.$router.push({ path: '/toPay', query:{orderCode:this.orderCode }});
+            this.$router.push({
+              path: '/toPay',
+              query: {
+                orderCode: this.orderCode
+              }
+            });
           }
-
         });
-
-
       },
-      //返回进货单
-      backShoppingCart(){
-        //初始化步骤条、勾选商品信息
+      // 返回进货单
+      backShoppingCart: () => {
+        // 初始化步骤条、勾选商品信息
         this.$store.state.step = 0;
         this.$store.state.shoppingCart = null;
         this.$router.push({ path: '/shoppingCart' });
       },
 
-      //获取商品包裹信息
-      getProductPackingInfo(){
+      // 获取商品包裹信息
+      getProductPackingInfo: () => {
         // if(this.addressList && this.addressList!=''){
         //   var skuCodeList = new Array();
         //   var packingList = new Array();
@@ -325,84 +325,77 @@
         // }else{
         //   return;
         // }
-
-
       },
 
 
-      //收获地址确认后计算运费
-      calculateShippingCost(){
-        var packingList=new Array();
-        for(var i in this.shoppingCart){
-          packingList.push({templateId: this.shoppingCart[i].templeateId, packLength: this.shoppingCart[i].packLength,
-            packWidth: this.shoppingCart[i].packWidth, packHeight: this.shoppingCart[i].packHeight,
-            packGrossWeight: this.shoppingCart[i].packGrossWeight, totalNumber: this.shoppingCart[i].quantity })
+      // 收获地址确认后计算运费
+      calculateShippingCost: () => {
+        var packingList = new Array();
+        for (var i in this.shoppingCart) {
+          packingList.push({
+            templateId: this.shoppingCart[i].templeateId,
+            packLength: this.shoppingCart[i].packLength,
+            packWidth: this.shoppingCart[i].packWidth,
+            packHeight: this.shoppingCart[i].packHeight,
+            packGrossWeight: this.shoppingCart[i].packGrossWeight,
+            totalNumber: this.shoppingCart[i].quantity
+          });
         }
         let param = {
           provinceCode: this.addressList[this.defaultAddress].province,
           cityCode: this.addressList[this.defaultAddress].city,
           packingList: packingList
-        }
-        console.log(param);
+        };
         calculateShippingCost(param).then((res) => {
           if (res.status == 200) {
             this.shippingCost = res.data[0].shippingCost;
-
           }
-        })
+        });
       },
-
-
-
     },
 
-    created() {
+    created () {
       this.user.userId = 1;
       this.user.distributorId = 1;
       this.user.vendorId = 1;
       this.user.vipId = 1;
-      console.log(this.$route.query)
       this.shoppingCart = this.$route.query.shoppingCart;
       this.getAddressList();
       this.getProvince();
       this.$store.commit('updateStepType', 'purchase');
       this.$store.commit('updateStep', '1');
-
     },
     watch: {
-      'add_addressForm.province': function(val,oldVal) {
-        if(val){
+      'add_addressForm.province': (val, oldVal) => {
+        if (val) {
           this.handleChangeProvince(val);
-
         }
       },
-      'add_addressForm.city': function(val,oldVal) {
-        if(val!=oldVal){
+      'add_addressForm.city': (val, oldVal) => {
+        if (val != oldVal) {
           this.handleChangeCity(val);
         }
-
       }
 
     },
-    computed:{
+    computed: {
       // step==1
-      totalCount: function(){
+      totalCount: () => {
         var a = 0;
-        for(var i in this.shoppingCart){
+        for (var i in this.shoppingCart) {
           a += parseInt(this.shoppingCart[i].quantity);
         }
         return a;
       },
 
-      totalAmount: function(){
+      totalAmount: () => {
         var a = 0.00;
-        for(var i in this.shoppingCart){
-          a += parseFloat(this.shoppingCart[i].unitPrice)*parseFloat(this.shoppingCart[i].quantity);
+        for (var i in this.shoppingCart) {
+          a += parseFloat(this.shoppingCart[i].unitPrice) * parseFloat(this.shoppingCart[i].quantity);
         }
         return a.toFixed(2);
       }
     }
-
   };
 </script>
 

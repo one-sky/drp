@@ -93,36 +93,41 @@
 </style>
 
 <script>
-  import { getBrandByBrandId, getDAgentBrand, getBrandDetail,  insertDAgentBrand, getChannelOption, getProductList } from "../../api/api.js";
+  import { getBrandByBrandId, getDAgentBrand, getBrandDetail, insertDAgentBrand, getChannelOption, getProductList } from "../../api/api.js";
   export default {
     name: 'mainPage',
     data () {
       return {
-        user:{
-          userId:null,
-          vendorId:null,
+        user: {
+          userId: null,
+          vendorId: null,
         },
 
-        status:{
-          status:null,
-          statusDesc:null
+        status: {
+          status: null,
+          statusDesc: null
         },
-        brand:{
-          statusDesc:null,
+        brand: {
+          statusDesc: null,
         },
-        //erp中的资料包
-        brandDetail:{},
-        productList:[],
+        // erp中的资料包
+        brandDetail: {},
+        productList: [],
 
-        //申请代理
-        dialogStoreData:{
-          channelId:null
+        // 申请代理
+        dialogStoreData: {
+          channelId: null
         },
         storeDialog: false,
 
         dialog_rules: {
           channelId: [
-            {type: "number", required: true, message:'请选择分销渠道', trigger: 'change'}
+            {
+              type: 'number',
+              required: true,
+              message: '请选择分销渠道',
+              trigger: 'change'
+            }
           ]
         },
         channelOption: [{
@@ -130,99 +135,91 @@
           channelName: null
         }],
 
-        trueBrandId:null,
+        trueBrandId: null,
 
-        currentPage:1,
-        pageSize:20,
+        currentPage: 1,
+        pageSize: 20,
         totalCount: null,
 
-        //商品tab
+        // 商品tab
         brandDetail_tab: '商品',
-      }
+      };
     },
-    methods:{
-      //获取品牌详情
-      getBrandByBrandId(){
+    methods: {
+      // 获取品牌详情
+      getBrandByBrandId () {
 
-        let param ={
+        let param = {
           erpBrandId: this.$route.query.brand,
           vendorId: this.user.vendorId
         };
         getBrandByBrandId(param).then((res) => {
-
-          if(res.status ==200){
-            var category= res.data;
-            for(var p in category.rBrandAtts){
-              if(category.rBrandAtts[p].type==1){
-                this.$set(category,'brandPic',category.rBrandAtts[p].attachmentUrl);
-              }else if(category.rBrandAtts[p].type==3){
-                this.$set(category,'paper',category.rBrandAtts[p].attachmentUrl);
+          if (res.status == 200) {
+            var category = res.data;
+            for (var p in category.rBrandAtts) {
+              if (category.rBrandAtts[p].type == 1) {
+                this.$set(category, 'brandPic', category.rBrandAtts[p].attachmentUrl);
+              } else if (category.rBrandAtts[p].type == 3) {
+                this.$set(category, 'paper', category.rBrandAtts[p].attachmentUrl);
               }
-
             }
-            this.brand=category;
-            this.trueBrandId=res.data.id;
-            if(this.user.userId &&this.user.userId!=''){
+            this.brand = category;
+            this.trueBrandId = res.data.id;
+            if (this.user.userId && this.user.userId != '') {
               this.getDAgentBrand();
             }
             this.getBrandDetail();
             this.getProductList();
           }
-
-        })
+        });
       },
 
-      //获取erp中的资料包
-      getBrandDetail:function(){
-        let param={
-          vendorId:this.user.vendorId,
-          brandId:this.brand.brandId
+      // 获取erp中的资料包
+      getBrandDetail: () => {
+        let param = {
+          vendorId: this.user.vendorId,
+          brandId: this.brand.brandId
         };
         getBrandDetail(param).then((res) => {
-          if(res.status==200){
-            this.brandDetail =  res.data;
-            console.log(this.brandDetail)
+          if (res.status == 200) {
+            this.brandDetail = res.data;
           }
-
-        })
+        });
       },
-      //获取代理品牌
-      getDAgentBrand:function(){
-        let param={
-          vendorId:this.user.vendorId,
+      // 获取代理品牌
+      getDAgentBrand: () => {
+        let param = {
+          vendorId: this.user.vendorId,
           distributorId: this.user.distributorId,
-          brandId:this.trueBrandId
+          brandId: this.trueBrandId
         };
-        console.log(param)
         getDAgentBrand(param).then((res) => {
-          if(res.status==200){
-            console.log(res);
-            if(!res.data||res.data==''){
+          if (res.status == 200) {
+            if (!res.data || res.data == '') {
               this.$set(this.status, 'status', null);
-              this.$set(this.status,'statusDesc',"申请代理");
-            }else if(res.data.status == "R"){
-              this.$set(this.status, 'status',"R");
-              this.$set(this.status, 'statusDesc',"申请代理");
-            }else if(res.data.status == "W"){
-              this.$set(this.status,'status',"W");
-              this.$set(this.status,'statusDesc',"等待审核");
-            }else if(res.data.status == "Y"){
-              this.$set(this.status,'status',"Y");
-              this.$set(this.status,'statusDesc',"已代理");
+              this.$set(this.status, 'statusDesc', '申请代理');
+            } else if (res.data.status == 'R') {
+              this.$set(this.status, 'status', 'R');
+              this.$set(this.status, 'statusDesc', '申请代理');
+            } else if (res.data.status == 'W') {
+              this.$set(this.status, 'status', 'W');
+              this.$set(this.status, 'statusDesc', '等待审核');
+            } else if (res.data.status == 'Y') {
+              this.$set(this.status, 'status', 'Y');
+              this.$set(this.status, 'statusDesc', '已代理');
             }
           }
-
-        })
+        });
       },
-      //获取渠道列表
-      getChannelOption() {
+      // 获取渠道列表
+      getChannelOption: () => {
         let param = {};
         this.channelOption = new Array();
         getChannelOption(param).then((res) => {
-          if(res.status ==200) {
+          if (res.status == 200) {
             var channelOption = res.data;
-            for(var i in channelOption){
-              if(channelOption[i].status==1){
+            for (var i in channelOption) {
+              if (channelOption[i].status == 1) {
                 this.channelOption.push(channelOption[i]);
               }
             }
@@ -230,12 +227,8 @@
         });
       },
 
-
-
-
-
-      //申请代理
-      insertDAgentBrand(formName){
+      // 申请代理
+      insertDAgentBrand (formName) {
         this.$refs[formName].validate((valid) => {
           let param = {
             brandId: this.trueBrandId,
@@ -247,45 +240,40 @@
               this.storeDialog = false;
               this.getDAgentBrand();
             }
-
           });
         });
       },
-      getProductList(){
+      getProductList () {
         let param = {
           brandIds: [this.brand.brandId],
-          vendorId:this.user.vendorId,
-          page:this.currentPage
+          vendorId: this.user.vendorId,
+          page: this.currentPage
         };
         getProductList(param).then((res) => {
           if (res.status == 200) {
-            this.productList=res.data.productList;
+            this.productList = res.data.productList;
             this.totalCount = res.data.count;
-            console.log(this.productList)
           }
-
         });
       },
-      resetDialog(formName){
+      resetDialog (formName) {
         this.channelId = '';
         this.$refs[formName].resetFields();
-
       },
-      //页码变更
-      handleCurrentChange: function(val) {
+      // 页码变更
+      handleCurrentChange: function (val) {
         this.currentPage = val;
         this.getProductList();
       },
 
     },
-    created(){
-      this.$set(this.user,'vendorId',1);
-      if(!this.$route.query.brand||this.$route.query.brand==''){
+    created () {
+      this.$set(this.user, 'vendorId', 1);
+      if (!this.$route.query.brand || this.$route.query.brand == '') {
         this.$router.push({ path: '/brandList' });
       }
       this.getBrandByBrandId();
-
     }
-  }
+  };
 </script>
 

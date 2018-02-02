@@ -139,12 +139,15 @@
 </style>
 
 <script>
-  import { getRefundList, getOrderStatus} from '../../api/api';
+  import {
+    getRefundList,
+    getOrderStatus
+  } from '../../api/api';
 
   export default {
-    data() {
+    data () {
       return {
-        user:{
+        user: {
           userId: 1,
           vendorId: 1,
           distributorId: 13
@@ -164,7 +167,7 @@
           receiveParam: ''
         },
         orderList: [],
-        orderItem:[],
+        orderItem: [],
         collapseName: '',
         currentPage: 1,
         pageSize: 4,
@@ -176,12 +179,10 @@
       };
     },
     methods: {
-      getRefundList() {
-        let param = Object.assign({}, this.searchForm, {distributorId: this.user.distributorId, vendorId: this.user.vendorId, pageNum: this.currentPage, pageSize:this.pageSize });
-        console.log(param)
+      getRefundList: () => {
+        let param = Object.assign({}, this.searchForm, { distributorId: this.user.distributorId, vendorId: this.user.vendorId, pageNum: this.currentPage, pageSize: this.pageSize });
         getRefundList(param).then((res) => {
-          if(res.status == 200){
-            console.log(res)
+          if (res.status == 200) {
             this.totalCount = res.page.totalNum;
             this.orderList = res.data;
 
@@ -205,92 +206,87 @@
               status: 'a',
               reviewStatus: 'a'
 
-            }]
+            }];
           }
-
-        })
-
+        });
       },
 
-      //form_button_event
-      handleSearch() {
-        for ( var p in this.searchGroup ){
-          this.searchForm[ p ]=  this.searchGroup[ p ];
+      // form_button_event
+      handleSearch () {
+        for (var p in this.searchGroup) {
+          this.searchForm[p] = this.searchGroup[ p ];
         }
         this.searchForm.startDate = (!this.searchForm.startDate || this.searchForm.startDate == '') ? '' : date.formatDate.format(new Date(this.searchForm.startDate), 'yyyy-MM-dd');
         this.searchForm.endDate = (!this.searchForm.endDate || this.searchForm.endDate == '') ? '' : date.formatDate.format(new Date(this.searchForm.endDate), 'yyyy-MM-dd');
-        if(this.searchGroup.orderStatus){
+        if (this.searchGroup.orderStatus) {
           this.currentPage = 1;
         }
         this.getRefundList();
       },
 
-      handleExport() {
-        console.log(orderList);
+      handleExport: () => {
       },
 
 
 
 
 
-      //页码变更
-      handleCurrentChange: function(val) {
-        for ( var p in this.searchForm ){
-          this.searchGroup[ p ]=  this.searchForm[ p ];
+      // 页码变更
+      handleCurrentChange: (val) => {
+        for (var p in this.searchForm) {
+          this.searchGroup[ p ] = this.searchForm[ p ];
         }
         this.currentPage = val;
         this.getRefundList();
-
       },
 
-      handleShowAll(){
+      handleShowAll: () => {
         this.isShowAll = !this.isShowAll;
-        if(this.isShowAll){
+        if (this.isShowAll) {
           this.more_button_message = '收起';
-        }else{
+        } else {
           this.more_button_message = '更多';
-
         }
       },
 
     },
-    mounted()  {
+    mounted () {
       this.getRefundList();
     },
     filters: {
 
-      //过滤支付方式
-      filterPayChannel(value){
-        if(value=='alipay_pc_direct'){
-          return '支付宝'
-        }else if(value=='wx_pub_qr'){
-          return '微信'
-        }else if( value =='upacp_pc'){
-          return '银联'
-        }else{
-          return '支付宝'
+      // 过滤支付方式
+      filterPayChannel: (value) => {
+        if (value == 'alipay_pc_direct') {
+          return '支付宝';
+        } else if(value == 'wx_pub_qr') {
+          return '微信';
+        } else if ( value == 'upacp_pc') {
+          return '银联';
+        } else {
+          return '支付宝';
         }
       },
-      //过滤订单状态
-      filterOrderStatus(value){
-        if(value==1){
-          return '待退款'
-        }else if(value==2){
-          return '已退款'
-        }else if( value ==3){
-          return '已关闭'
-        }else{
-          return '已取消'
+      // 过滤订单状态
+      filterOrderStatus: (value) => {
+        if (value == 1) {
+          return '待退款';
+        } else if (value == 2) {
+          return '已退款';
+        } else if (value == 3) {
+          return '已关闭';
+        } else {
+          return '已取消';
         }
       },
-      //过滤退款审核状态
-      filterRefundStatus(value){
-        if(value==1){
-          return '审批中'
-        }else if(value==2){
-          return '审批通过'
-        }else if( value ==3){
-          return '审批未通过'
+      // 过滤退款审核状态
+      filterRefundStatus: (value) => {
+        if (value == 1) {
+          return '审批中';
+        } else if (value == 2) {
+          return '审批通过';
+        } else if (value == 3) {
+          return '审批未通过';
         }
       }
     }

@@ -45,74 +45,81 @@
   import {searchCharge, getOrderDetailByOrderCode} from '../../api/api';
   export default {
 
-    data() {
+    data () {
       return {
 
-        orderCode:null,
-        user:{},
-        orderDetail:{},
-        orderResult:null,
-        flag:false,
-        loading:false,
-
-      }
-
+        orderCode: null,
+        user: {},
+        orderDetail: {},
+        orderResult: null,
+        flag: false,
+        loading: false,
+      };
     },
-    methods:{
+    methods: {
 
-      searchCharge(){
-        let param ={
+      searchCharge () {
+        let param = {
           orderNumber: this.orderCode,
           vendorId: 1,
-        }
-        console.log(param)
-        searchCharge(param).then((res)=>{
-            console.log(res)
-          if(res.data ==1){//表示回调成功
-
-            this.getOrderDetailByOrderCode()
-
-          }else{
-
+        };
+        searchCharge(param).then((res) => {
+          if (res.data == 1) {
+            this.getOrderDetailByOrderCode();
           }
-        })
+        });
       },
-      getOrderDetailByOrderCode(){
-        var param={
-          orderCode:this.orderCode,
-          vendorId: this.user.vendorId
-        }
-        getOrderDetailByOrderCode(param).then((res)=>{
-          if(res.status == 200){
+      getOrderDetailByOrderCode: () => {
+        var param = {
+          orderCode: this.orderCode,
+        };
+        getOrderDetailByOrderCode(param).then((res) => {
+          if (res.status == 200) {
             this.orderDetail = res.data;
-            this.flag =true;//支付成功
+            this.flag = true; // 支付成功
             this.loading = false;
           }
-        })
+        });
       },
-        toOrder(id){
-          this.$router.push({ path: '/center/orderDetail', query:{order:id} });
-        },
-        toShoppingCart(){
-          this.$router.push({ path: '/shoppingCart'  });
-        },
-        toProductList(){
-          this.$router.push({ path: '/productList'  });
-        },
-        toPayPage(){
-          this.$router.push({ path: '/toPay' , query:{orderCode: this.orderCode }});
-        }
-
-
+      toOrder (id) {
+        this.$router.push(
+          {
+            path: '/center/orderDetail',
+            query: {
+              order: id
+            }
+          }
+        );
       },
-
-
-    created(){
+      toShoppingCart () {
+        this.$router.push(
+          {
+            path: '/shoppingCart'
+          }
+        );
+      },
+      toProductList () {
+        this.$router.push(
+          {
+            path: '/productList'
+          }
+        );
+      },
+      toPayPage () {
+        this.$router.push(
+          {
+            path: '/toPay',
+            query: {
+              orderCode: this.orderCode
+            }
+          }
+        );
+      }
+      },
+    created () {
       this.orderCode = this.$route.query.orderCode;
 
       this.searchCharge();
-
-
     },
   };
 </script>

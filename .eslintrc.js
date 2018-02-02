@@ -70,7 +70,8 @@ module.exports = {
     "comma-dangle": [
       2,
       "only-multiline"
-    ]
+    ],
+    "indent":[0,14],
     
   }
 }

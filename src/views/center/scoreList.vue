@@ -54,7 +54,7 @@
 <script>
   import { getPoints } from '../../api/api';
   export default {
-    data() {
+    data () {
       return {
         user: {
           userId: 1,
@@ -76,48 +76,42 @@
         pageSize: 10,
         totalCount: 40,
         loading: false,
-
-      }
-
+      };
     },
     methods: {
-      getPoints: function() {
+      getPoints: () => {
         this.loading = true;
-        let param = Object.assign({}, this.searchForm, {distributorId: this.user.distributorId,vendorId:this.user.vendorId, pageNum: this.currentPage});
+        let param = Object.assign({}, this.searchForm, {distributorId: this.user.distributorId, vendorId:this.user.vendorId, pageNum: this.currentPage});
         getPoints(param).then((res) => {
           this.loading = false;
           this.totalCount = res.page.totalNum;
           this.scoreList = res.data;
-          console.log(this.scoreList)
-
-        })
+        });
       },
       formatDate (row, column, cellValue) {
         var time = row[column.property];
         return (!time || time == '') ? '' : date.formatDate.format(new Date(time), 'yyyy-MM-dd hh:mm:ss');
       },
 
-      handleSearch() {
+      handleSearch: () => {
         this.searchForm.orderCode = this.searchGroup.orderCode;
         this.searchForm.startDate = (!this.searchGroup.startDate || this.searchGroup.startDate === '') ? '' : date.formatDate.format(new Date(this.searchGroup.startDate), 'yyyy-MM-dd hh:mm:ss');
         this.searchForm.endDate = (!this.searchGroup.endDate || this.searchGroup.endDate === '') ? '' : date.formatDate.format(new Date(this.searchGroup.endDate), 'yyyy-MM-dd hh:mm:ss');
         this.currentPage = 1;
         this.getPoints();
-
       },
 
-      //页码变更
-      handleCurrentChange: function(val) {
-        for ( var p in this.searchForm ){
-          console.log(p);
-          this.searchGroup[ p ]=  this.searchForm[ p ];
+      // 页码变更
+      handleCurrentChange: (val) => {
+        for (var p in this.searchForm) {
+          this.searchGroup[p] = this.searchForm[p];
         }
         this.currentPage = val;
         this.getPoints();
-
       }
     },
-    created() {
+    created () {
+      this.user = JSON.parse(sessionStorage.getItem('user'));
       this.getPoints();
     }
 
