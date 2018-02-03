@@ -86,6 +86,14 @@
   padding: 6px 12px !important;
 }
 
+.el-message-box__btns .el-button {
+  padding: 6px 12px !important;
+}
+
+.el-message-box__btns .el-button {
+  margin-right: 5px;
+}
+
 
 
 

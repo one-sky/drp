@@ -224,7 +224,7 @@
         <div class="content flex-row">
           <img src="../imgs/home/home_brand_title.png"/>
           <div class="flex-row-col">
-            <div v-for="(item,index) in brandList" :key="item.id" style="margin-left:4px;position:relative" @mouseenter="showActive(index, 'isShowActive', true)" @mouseleave="showActive(index,'isShowActive', false)">
+            <div v-for="(item,index) in brandList" :key="item.id" style="margin-left:4px;position:relative" @mouseenter="showActive(index-1, 'isShowActive', true)" @mouseleave="showActive(index-1,'isShowActive', false)">
               <div>
                 <img v-bind:src="item.logo" height="100" width="155" style=""/>
               </div>
@@ -451,7 +451,7 @@
         };
         getBannerList(param).then((res) => {
           if (res.status == 200) {
-            this.bannerList = res.data;
+            this.$set(this, 'bannerList', res.data);
           }
         });
       },
@@ -463,7 +463,7 @@
         };
         getNoticeList(param).then((res) => {
           if (res.status == 200) {
-            this.noticeList = res.data;
+            this.$set(this, 'noticeList', res.data);
           }
         });
       },
@@ -475,7 +475,7 @@
         };
         getPromotionList(param).then((res) => {
           if (res.status == 200) {
-            this.promotionList = res.data;
+            this.$set(this, 'promotionList', res.data);
           }
         });
       },
@@ -582,7 +582,12 @@
 
       logout: () => {
         sessionStorage.removeItem('user');
-        this.$set(this.user, 'userId', null);
+        // 当前用户
+        this.user = {
+          userId: null,
+          headUrl: null,
+          nickname: null
+        };
       },
 //
       searchProduct: (index, flag) => {

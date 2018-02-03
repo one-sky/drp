@@ -11,14 +11,14 @@
       <template v-for="(item, index) in addressList">
         <div :class="{'address': true, 'flex-col': true, 'hor-ver-center':true, 'address-margin': index%4!=0 } ">
           <div class="flex-row option">
-            <el-radio v-if="item.id === defaultAddress" v-model="defaultAddress" :label="item.id">默认地址</el-radio>
+            <el-radio v-if="item.id == defaultAddress" v-model="defaultAddress" :label="item.id">默认地址</el-radio>
             <el-radio v-else  v-model="defaultAddress" :label="item.id">设为默认</el-radio>
             <div class="flex-row hor-end flex-normal">
-              <el-button type="text" @click="openDialog(address)">
+              <el-button type="text" @click="openDialog(item.id)">
                 <i class="el-icon-edit" ></i>
               </el-button>
               <el-button type="text">
-                <i class="el-icon-delete" @click="handleDeleteAddress(item)"></i>
+                <i class="el-icon-delete" @click="deleteAddress(item)"></i>
               </el-button>
             </div>
 
@@ -28,7 +28,7 @@
             <div class="icon">
               <img src="../../imgs/center/name.png" height="15" width="14"/>
             </div>
-            {{item.receiveName}}
+            {{item.receiverName}}
           </div>
           <div class="separator"></div>
           <div class="flex-row long-title">
@@ -57,13 +57,13 @@
         </div>
       </template>
     </div>
-    <el-dialog :title=title :visible.sync="dialogVisible" @close="resetDialog('addressDialogForm')" class="dialog">
-      <el-form :model="add_addressForm" ref="addressDialogForm" :rules="form_rules" class="form" labelWidth="100px">
-        <el-form-item label="收件人：" prop="receiveName">
-          <el-input v-model="add_addressForm.receiveName" auto-complete="off"></el-input>
+    <el-dialog :title=title :visible.sync="dialogVisible" @close="resetDialog('addressDialogForm')" class="dialog" custom-class="center-dialog-bottom">
+      <el-form :model="updateAddress" ref="addressDialogForm" :rules="form_rules" class="form" labelWidth="100px">
+        <el-form-item label="收件人：" prop="receiverName">
+          <el-input v-model="updateAddress.receiverName" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="所在地区：">
-          <el-select v-model="add_addressForm.province" placeholder="省">
+          <el-select v-model="updateAddress.province" ref="province" placeholder="省" @change="getCityListByProvince">
             <el-option
               v-for="province in provinceList"
               :key="province.regionCode"
@@ -71,7 +71,7 @@
               :value="province.regionCode">
             </el-option>
           </el-select>
-          <el-select v-model="add_addressForm.city" :disabled="city_disabled" placeholder="市">
+          <el-select v-model="updateAddress.city" ref="city" placeholder="市" @change="getAreaListByCity">
             <el-option
               v-for="city in cityList"
               :key="city.regionCode"
@@ -79,7 +79,7 @@
               :value="city.regionCode">
             </el-option>
           </el-select>
-          <el-select v-model="add_addressForm.area" :disabled="area_disabled" placeholder="区">
+          <el-select v-model="updateAddress.area" ref="area" placeholder="区">
             <el-option
               v-for="area in areaList"
               :key="area.regionCode"
@@ -89,10 +89,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="详细地址：" prop="detailAddress">
-          <el-input v-model="add_addressForm.detailAddress" auto-complete="off"></el-input>
+          <el-input v-model="updateAddress.detailAddress" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="联系电话：" prop="phone">
-          <el-input v-model="add_addressForm.phone" auto-complete="off"></el-input>
+          <el-input v-model="updateAddress.phone" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="center-dialog-bottom">
@@ -111,16 +111,16 @@
   import {
     getAddressList,
     getAddress,
-    setIsDefault,
-    modifyAddress,
     saveAddress,
+    setAddressDefault,
     deleteAddress,
-    getProvinceList,
-    getCityListByProvince,
-    getAreaListByCity
   } from '../../api/api';
 
-  import Common from '../../js/common';
+  import {
+    GetProvinceList,
+    GetCityListByProvince,
+    GetAreaListByCity
+  } from '../../js/common';
 
   export default {
     data () {
@@ -136,37 +136,28 @@
         }
       };
       return {
-        user: {
-          id: 1,
-          userId: 13,
-          vendorId: 1
-        },
-        city_disabled: true,
-        area_disabled: true,
+        user: {},
         addressList: [],
-        add_addressForm: {
-          id: null,
+        updateAddress: {
+          id: 0,
           distributorId: null,
-          receiveName: null,
+          receiverName: null,
           province: null,
           city: null,
           area: null,
           detailAddress: null,
           phone: null,
-          isDefault: 'N'
         },
         title: '',
         provinceList: [],
         cityList: [],
         areaList: [],
-        province: '',
 
         defaultAddress: '',
         dialogVisible: false,
-        addressDivLoading: false,
 
         form_rules: {
-          receiveName: [
+          receiverName: [
             {required: true, message: '请输入收件人姓名', trigger: 'blur'}
           ],
           province: [
@@ -184,96 +175,70 @@
     },
     methods: {
 
-      getAddressList: () => {
-        this.addressDivLoading = true;
-        let param = {
-          distributorId: this.user.id
+      getAddressList: function () {
+        const param = {
+          id: this.user.id
         };
         getAddressList(param).then((res) => {
           if (res.status == 200) {
             this.addressList = res.data;
             this.defaultAddress = this.addressList.length > 0 ? this.addressList[0].id : '';
-            this.addressDivLoading = false;
           }
         });
       },
+
+      // 获取省列表
+      getProvinceList: function () {
+        GetProvinceList((provinceList) => this.$set(this, 'provinceList', provinceList));
+      },
+
       // 获取市列表
-      handleChangeProvince: function (value) {
-        this.cityList = Common.GetCityListByProvince(value);
-        if (value && value != '') {
-          this.city_disabled = false;
-          let param = {
-            parentCode: value
-          };
-          getCityListByProvince(param).then((res) => {
-            this.cityList = res.data;
-            if (this.cityList.length > 0) {
-              this.add_addressForm.city = this.cityList[0].regionCode;
-            }
-          });
-        } else {
-          this.add_addressForm.city = null;
-        }
+      getCityListByProvince: function (value) {
+        GetCityListByProvince(value, (cityList) => {
+          this.$set(this, 'cityList', cityList);
+          this.$set(this.updateAddress, 'city', this.cityList[0].regionCode);
+        });
       },
 
       // 获取地区列表
-      handleChangeCity (value) {
-        if (value != '' && value) {
-          this.area_disabled = false;
-          let param = {
-            parentCode: value
-          };
-          getAreaListByCity(param).then((res) => {
-            if (res.status == 200) {
-              this.areaList = res.data;
-              if (this.areaList.length > 0) {
-                this.add_addressForm.area = this.areaList[0].regionCode;
-              }
-            }
-          });
-        } else {
-          this.add_addressForm.area = null;
-        }
+      getAreaListByCity: function (value) {
+        GetAreaListByCity(value, (areaList) => {
+          this.$set(this, 'areaList', areaList);
+          this.$set(this.updateAddress, 'area', this.areaList[0].regionCode);
+          this.user.area = this.areaList[0].regionCode;
+        });
       },
 
       // 提交地址
       submitAddress (formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.$set(this.add_addressForm,'distributorId', this.user.id);
-            if (this.title === '新增地址') {
-              let param = this.add_addressForm;
-              saveAddress(param).then((res) => {
-                if (res.status == 200) {
-                  this.$message({
-                    message: '提交成功',
-                    type: 'success'
-                  });
-                  this.dialogVisible = false;
-                  this.getAddressList();
-                }
-              });
-            } else {
-              let param = this.add_addressForm;
-              modifyAddress(param).then((res) => {
-                if (res.status == 200) {
-                  this.$message({
-                    message: '提交成功',
-                    type: 'success'
-                  });
-                  this.dialogVisible = false;
-                  this.getAddressList();
-                }
-              });
-            }
-          } else {
-            return false;
+            const param = {
+              ...this.updateAddress,
+              distributorId: this.user.id,
+              provinceDesc: this.$refs.province.selectedLabel,
+              cityDesc: this.$refs.city.selectedLabel,
+              areaDesc: this.$refs.area.selectedLabel
+            };
+            saveAddress(param).then((res) => {
+              if (res.status == 200) {
+                this.$message({
+                  message: '提交成功',
+                  type: 'success',
+                  duration: 2000,
+                  onClose: () => {
+                    this.dialogVisible = false;
+                    this.getAddressList();
+                  }
+                });
+              }
+            });
           }
         });
       },
 
       // 删除地址
-      handleDeleteAddress (val) {
+      deleteAddress (val) {
         this.$confirm('确认删除该地址?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -304,9 +269,9 @@
       },
 
       resetDialog (formName) {
-        this.add_addressForm = {
+        this.updateAddress = {
           id: null,
-          receiveName: null,
+          receiverName: null,
           province: null,
           city: null,
           area: null,
@@ -316,50 +281,39 @@
         this.$refs[formName].resetFields();
       },
 
-      handleChangeDefaultAddress (oldVal, val) {
+      setAddressDefault: function (val) {
         let param = {
           id: val,
           distributorId: this.user.id,
         };
-        setIsDefault(param).then((res) => {
-          this.defaultAddress = val;
+        setAddressDefault(param).then((res) => {
+          if (res.status == 200 && res.data > 0) {
+            this.defaultAddress = val;
+          }
         });
       },
 
-      openDialog (val) {
-        if (val !='' && val) {
-          let param = {id: val.id};
-          getAddress(param).then((res) => {
-            this.add_addressForm = res.data;
+      openDialog: function (id) {
+        this.dialogVisible = true;
+        if (id) {
+          getAddress({id}).then((res) => {
+            this.$set(this, 'updateAddress', res.data);
             this.title = '修改地址';
           });
         } else {
+          this.$set(this.updateAddress, 'id', 0);
           this.title = '新增地址';
         }
-        this.dialogVisible = true;
       },
-
     },
     created () {
-      this.user = JSON.parse(sessionStorage.getItem('user'));
+      this.$set(this, 'user', JSON.parse(sessionStorage.getItem('user')));
       this.getAddressList();
-      this.provinceList =   Common.GetProvinceList();
+      this.getProvinceList();
     },
     watch: {
-      defaultAddress: (val, oldVal) => {
-        if (oldVal && oldVal != '') {
-          this.handleChangeDefaultAddress(oldVal, val);
-        }
-      },
-      'add_addressForm.province': (val, oldVal) => {
-        if (val) {
-          this.handleChangeProvince(val);
-        }
-      },
-      'add_addressForm.city': (val, oldVal) => {
-        if (val != oldVal) {
-          this.handleChangeCity(val);
-        }
+      'defaultAddress': function (val, oldVal) {
+          val && this.setAddressDefault(val);
       }
     }
 

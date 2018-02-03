@@ -19,6 +19,11 @@ export const register = params => {
     return axios.post(`${base}/user/register`, params).then(res => res.data);
 };
 
+// 修改密码
+export const updatePassword = params => {
+    return axios.post(`${base}/user/updatePassword`, params).then(res => res.data);
+};
+
 // 完善用户信息
 export const completeDistributor = params => {
     return axios.post(`${base}/user/completeDistributor`, params).then(res => res.data);
@@ -32,6 +37,36 @@ export const getDistributorDetail = params => {
 // 获取分销商代理渠道列表
 export const getChannelList = params => {
     return axios.post(`${base}/distributor/getChannelList`, params).then(res => res.data);
+};
+
+// 保存分销商代理渠道
+export const saveChannel = params => {
+    return axios.post(`${base}/distributor/saveChannel`, params).then(res => res.data);
+};
+
+// 获取地址列表
+export const getAddressList = params => {
+    return axios.post(`${base}/distributor/getAddressList`, params).then(res => res.data);
+};
+
+// 获取地址详情
+export const getAddress = params => {
+    return axios.post(`${base}/distributor/getAddress`, params).then(res => res.data);
+};
+
+// 修改或新增地址
+export const saveAddress = params => {
+    return axios.post(`${base}/distributor/saveAddress`, params).then(res => res.data);
+};
+
+// 设置默认地址
+export const setAddressDefault = params => {
+    return axios.post(`${base}/distributor/setAddressDefault`, params).then(res => res.data);
+};
+
+// 删除地址
+export const deleteAddress = params => {
+    return axios.post(`${base}/distributor/deleteAddress`, params).then(res => res.data);
 };
 
 // 获取banner列表
@@ -109,22 +144,6 @@ export const modifyPassword = params => {
     return axios.post(`${base}/user/modifyPassword`, params).then(res => res.data);
 };
 
-export const getAddressList = params => {
-    return axios.post(`${base}/center/getAddressList`, params).then(res => res.data);
-};
-
-export const getAddress = params => {
-    return axios.post(`${base}/center/getAddress`, params).then(res => res.data);
-};
-
-export const setIsDefault = params => { return axios.post(`${base}/center/setIdDefault`, params).then(res => res.data); };
-
-export const saveAddress = params => { return axios.post(`${base}/center/saveAddress`, params).then(res => res.data); };
-
-export const modifyAddress = params => { return axios.post(`${base}/center/modifyAddress`, params).then(res => res.data); };
-
-export const deleteAddress = params => { return axios.post(`${base}/center/deteleAddress`, params).then(res => res.data); };
-
 export const saveInformation = params => { return axios.post(`${base}/center/saveDistributorInfo`, params).then(res => res.data); };
 
 // 获取用户公告
@@ -136,8 +155,6 @@ export const getMessagebyId = params => { return axios.post(`${base}/center/getM
 export const getOrderStatus = params => { return axios.post(`${base}/common/getOrderStatus`, params).then(res => res.data); };
 
 export const getChannelOption = params => { return axios.post(`${base}/channel/getChannelOption`, params).then(res => res.data); };
-
-export const saveChannel = params => { return axios.post(`${base}/channel/saveChannel`, params).then(res => res.data); };
 
 // order
 export const getPoints = params => { return axios.post(`${base}/order/getPoints`, params).then(res => res.data); };
