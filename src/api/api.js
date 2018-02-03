@@ -124,6 +124,21 @@ export const getBrandListByCategoryId = params => {
     return axios.post(`${base}/brand/getBrandListByCategoryId`, params).then(res => res.data);
 };
 
+// 获取订单列表
+export const getOrderList = params => {
+    return axios.post(`${base}/order/getOrderList`, params).then(res => res.data);
+};
+
+// 获取订单详情
+export const getOrderDetail = params => {
+    return axios.post(`${base}/order/getOrderDetail`, params).then(res => res.data);
+};
+
+// 取消订单
+export const cancelOrder = params => {
+    return axios.post(`${base}/order/cancelOrder`, params).then(res => res.data);
+};
+
 export const checkVerfiyCode = params => {
     return axios.post(`${base}/user/checkVerfiyCode`, params).then(res => res.data);
 };
@@ -156,20 +171,11 @@ export const getOrderStatus = params => { return axios.post(`${base}/common/getO
 
 export const getChannelOption = params => { return axios.post(`${base}/channel/getChannelOption`, params).then(res => res.data); };
 
-// order
-export const getPoints = params => { return axios.post(`${base}/order/getPoints`, params).then(res => res.data); };
-
-export const getOrderList = params => { return axios.post(`${base}/order/getOrderList`, params).then(res => res.data); };
-
-export const getOrderDetail = params => { return axios.post(`${base}/order/getOrderDetail`, params).then(res => res.data); };
-
 export const orderAmount = params => { return axios.post(`${base}/order/orderAmount`, params).then(res => res.data); };
 
 export const getAftermarkets = params => { return axios.post(`${base}/order/getAftermarkets`, params).then(res => res.data); };
 
 export const generateOrder = params => { return axios.post(`${base}/order/generateOrder`, params).then(res => res.data); };
-
-export const cancelOrder = params => { return axios.post(`${base}/order/cancelOrder`, params).then(res => res.data); };
 
 export const getOrderStatistics = params => { return axios.post(`${base}/order/getOrderStatistics`, params).then(res => res.data); };
 

@@ -1,0 +1,71 @@
+.order-detail {
+    background-color: #fff;
+}
+.order-detail .statusBox {
+    padding: 20px 0 40px 0;
+    width: 100%;
+    margin-top: 3px;
+}
+
+.order-detail .statusBox .statusDesc {
+    width: 176px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-right: 20px;
+
+}
+
+.order-detail .statusBox .statusDesc.reachStatus {
+    background-image: url('../../imgs/center/status_reach.png');
+    margin-top: 15px;
+}
+
+.order-detail .statusBox .statusDesc.notReachStatus {
+    background-image: url('../../imgs/center/status_not_reach.png');
+}
+
+.order-detail .statusBox .time {
+    color:#a9a9a9;
+    font-size:15px;
+    margin-left: -20px;
+}
+
+.order-detail .buyerInfo {
+    margin-top:30px;
+}
+
+.order-detail .buyerInfo .buyer_title {
+    height:40px;
+    border:1px solid #eeeeee;
+    border-left:0px;
+    border-right:0px;
+}
+.order-detail .buyerInfo .buyer_title div{
+    width: 120px;
+    height:40px;
+    background-color:#eeeeee;
+    font-size:18px;
+}
+
+.order-detail .buyerInfo .infoItem {
+    margin-top:16px;
+    margin-left:22px;
+}
+.order-detail .buyerInfo .infoItem:first-child{
+    margin-top: 22px;
+}
+
+.order-detail .buyerInfo .infoItem .infoItemDesc {
+    margin-left:20px;
+}
+
+.order-detail .buyerInfo .infoItem .infoItemDesc textarea {
+    width: 300px;
+}
+
+.order-detail .productInfo {
+    height: 30px;
+    margin-top: 10px;
+    background-color: #ffdb15;
+}

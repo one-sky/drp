@@ -26,5 +26,8 @@
 .order-list .table .more .el-button{
   margin-left: 10px;
   border: none;
+}
 
+.order-list .detailBtn.el-button {
+  width: 80px;
 }

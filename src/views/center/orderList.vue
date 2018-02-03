@@ -1,7 +1,7 @@
 <template>
   <div class="order-list">
-    <el-tabs class="center-tab" v-model="activeName" @tab-click="handleClick" >
-      <el-tab-pane v-for="status in orderStatus" :key="status.key" :label="status.value" :name="status.key+''">
+    <el-tabs class="center-tab" v-model="orderStatus" @tab-click="handleClick" >
+      <el-tab-pane v-for="item in status" :key="item.key" :label="item.value" :name="item.key">
       </el-tab-pane>
     </el-tabs>
     <div class="search">
@@ -20,18 +20,13 @@
           </el-form-item>
         </el-row>
         <el-row>
-          <el-form-item label="订单状态：">
-            <el-select v-model="searchGroup.orderStatus">
-              <el-option v-for="status in orderStatus" :key="status.key" :label="status.value" :value="status.key"></el-option>
-            </el-select>
-          </el-form-item>
           <el-form-item label="支付状态：" class="order_search_select" >
             <el-select v-model="searchGroup.payStatus">
               <el-option v-for="status in payStatus" :key="status.value" :label="status.label" :value="status.value"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item class="receiver" label="收货人／电话：">
-            <el-input v-model="searchGroup.reveivePhone"></el-input>
+          <el-form-item class="receiver" label="收货人电话：">
+            <el-input v-model="searchGroup.receivePhone"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button @click="handleSearch" type="primary">查询</el-button>
@@ -42,35 +37,35 @@
     </div>
 
     <div class="table">
-      <el-table :data="orderList">
-        <el-table-column type="expand">
+      <el-table :data="orderList" >
+        <el-table-column type="expand" >
           <template scope="props">
             <el-row class="flex-row ver-center">
               <el-col :span="14">
-                <template v-for="n in (props.row.orderItem.length>3 ? 3:props.row.orderItem.length)">
+                <template v-for="n in (props.row.orderItemVOList.length>3 ? 3:props.row.orderItemVOList.length)">
                   <div class="flex-row">
                     <div class="flex-row" style="width:43%;">
-                      <router-link :to="{path: '/productDetail', query: {product: props.row.orderItem[n-1].productId}}">
-                        <img v-bind:src="props.row.orderItem[n-1].skuImg" width="51" height="51">
+                      <router-link :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n-1].spuId}}">
+                        <img v-bind:src="props.row.orderItemVOList[n-1].skuImg" width="51" height="51">
                       </router-link>
                       <div class="flex-col">
-                        <router-link class="link a4_link" :to="{path: '/productDetail', query: {product: props.row.orderItem[n-1].productId}}">
-                          {{props.row.productName}}
+                        <router-link class="link a4_link" :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n-1].spuId}}">
+                          {{props.row.orderItemVOList[n-1].spuName}}
                         </router-link>
-                        {{props.row.orderItem[n-1].skuAttributes|formatAttribute}}
-                        <el-button :disabled="props.row.orderItem[n-1].status<11" @click="handleRefund(props.row.id,props.row.orderItem[n-1].orderId)" type="primary">申请售后</el-button>
+                        {{props.row.orderItemVOList[n-1].skuAttr|formatAttribute}}
+                        <el-button class="detailBtn" :disabled="props.row.orderItemVOList[n-1].status<11" @click="handleRefund(props.row.id,props.row.orderItemVOList[n-1].orderId)" type="primary">申请售后</el-button>
                       </div>
                     </div>
 
                     <div class="hor-center" style="width:24%;">
-                      ￥{{props.row.orderItem[n-1].skuPrice|formatMoney}}*{{props.row.orderItem[n-1].skuQuantity}}
+                      ￥{{props.row.orderItemVOList[n-1].skuPrice|formatMoney}}*{{props.row.orderItemVOList[n-1].skuQuantity}}
                     </div>
                     <div class="flex-col hor-ver-center long-title" style="width:30%;">
                       <div>
                         {{props.row.receiveName}}
                       </div>
                       <div>
-                        {{props.row.reveivePhone}}
+                        {{props.row.receivePhone}}
                       </div>
                       <div class="text-center">
                         {{props.row.provinceDesc}}{{props.row.cityDesc}}{{props.row.areaDesc}} {{props.row.detailAddress}}
@@ -79,31 +74,31 @@
 
                   </div>
                 </template>
-                <template v-if="props.row.orderItem.length>3">
-                  <template v-for="n in props.row.orderItem.length-3 ">
+                <template v-if="props.row.orderItemVOList.length>3">
+                  <template v-for="n in props.row.orderItemVOList.length-3 ">
                     <div class="flex-row">
                       <div class="flex-row" style="width:42%;">
-                        <router-link :to="{path: '/productDetail', query: {product: props.row.orderItem[n+2].productId}}">
-                          <img v-bind:src="props.row.orderItem[n+2].skuImg" width="51" height="51">
+                        <router-link :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n+2].spuId}}">
+                          <img v-bind:src="props.row.orderItemVOList[n+2].skuImg" width="51" height="51">
                         </router-link>
                         <div class="flex-col">
-                          <router-link class="link a4_link" :to="{path: '/productDetail', query: {product: props.row.orderItem[n+2].productId}}">
-                            {{props.row.productName}}
+                          <router-link class="link a4_link" :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n+2].spuId}}">
+                            {{props.row.orderItemVOList[n+2].spuName}}
                           </router-link>
-                          {{props.row.orderItem[n+2].skuAttributes|formatAttribute}}
-                          <el-button :disabled="props.row.orderItem[n-1].status<11" @click="handleRefund(props.row.id,props.row.orderItem[n+2].orderId)" type="primary">申请售后</el-button>
+                          {{props.row.orderItemVOList[n+2].skuAttr|formatAttribute}}
+                          <el-button class="detailBtn" :disabled="props.row.orderItemVOList[n-1].status<11" @click="handleRefund(props.row.id,props.row.orderItemVOList[n+2].orderId)" type="primary">申请售后</el-button>
                         </div>
 
                       </div>
                       <div class="hor-center" style="width:22%;">
-                        ￥{{props.row.orderItem[n+2].skuPrice|formatMoney}}*{{props.row.orderItem[n+2].skuQuantity}}
+                        ￥{{props.row.orderItemVOList[n+2].skuPrice|formatMoney}}*{{props.row.orderItemVOList[n+2].skuQuantity}}
                       </div>
                       <div class="flex-col hor-ver-center long-title" style="width:30%;">
                         <div>
                           {{props.row.receiveName}}
                         </div>
                         <div>
-                          {{props.row.reveivePhone}}
+                          {{props.row.receivePhone}}
                         </div>
                         <div class="text-center">
                           {{props.row.provinceDesc}}{{props.row.cityDesc}}{{props.row.areaDesc}} {{props.row.detailAddress}}
@@ -114,14 +109,14 @@
                   </template>
                 </template>
               </el-col>
-              <el-col :span="10" :key="isShowAll" class="hor-ver-center">
+              <el-col :span="10" :key="props.row.isShowAll" class="hor-ver-center">
                 <el-col :span="7">
                   ￥{{props.row.shippingCost|formatMoney}}{{props.row.shippingCost==0?'（包邮）':''}}
                 </el-col>
                 <el-col :span="6">
                   ￥{{props.row.paidAmount|formatMoney}}
                   <p v-if="props.row.status>10" class="third-font-color">
-                    （ 支付方式：{{props.row.payChannel}}）
+                    （ 支付方式：{{props.row.paymentChannel}}）
                   </p>
                   <div v-else-if="props.row.status==9">
                     <el-button  @click="$router.push({path:'/toPay', query:{ orderCode: props.row.orderCode }}); ">去支付</el-button>
@@ -129,17 +124,17 @@
                 </el-col>
                 <el-col :span="10" class="flex-col hor-ver-center">
                   {{props.row.statusDesc}}
-                  <router-link :to="{path: '/center/orderDetail', query:{ order: props.row.id }}">
+                  <router-link class="detailBtn" :to="{path: '/center/orderDetail', query:{ order: props.row.id }}">
                     订单详情
                   </router-link>
-                  <el-button v-if="props.row.status==10"  @click="cancelOrder(props.row)">取消订单</el-button>
+                  <el-button type="text" v-if="props.row.status==10" class="detailBtn" @click="cancelOrder(props.row)">取消订单</el-button>
                 </el-col>
               </el-col>
             </el-row>
 
             <div class="hor-center text-center more">
-              共{{props.row.orderItem.length}}件商品
-              <el-button type="primary" v-if="props.row.orderItem.length>3"  ref="more_button" @click="handleShowAll">{{more_button_message}}</el-button>
+              共{{props.row.orderItemVOList.length}}件商品
+              <el-button type="primary" v-if="props.row.orderItemVOList.length>3"  ref="more_button" @click="handleShowAll(props.row)">{{props.row.moreDesc}}</el-button>
             </div>
           </template>
         </el-table-column>
@@ -153,8 +148,8 @@
 
     </div>
     <div class="pagination">
-      <el-pagination layout="prev, pager, next" :page-size="pageSize" :total="totalCount"
-                     :current-page="currentPage" @current-change="handleCurrentChange">
+      <el-pagination layout="prev, pager, next" :page-size="page.pageSize" :total="page.totalCount"
+                     :current-page="page.pageNum" @current-change="handleCurrentChange">
       </el-pagination>
     </div>
 
@@ -247,51 +242,39 @@
     saveRefund,
     getRefundNum
   } from '../../api/api';
+
+  import * as formatDate from '../../js/date';
   export default {
     data () {
       return {
-        activeName: '100',
-        collapseName: '',
-        user: {
-          userId: 147,
-          vendorId: 2,
-          distributorId: 64
-        },
+        user: {},
         searchGroup: {
           orderCode: '',
           startDate: '',
           endDate: '',
           spuName: '',
-          orderStatus: 100,
           payStatus: '',
-          reveivePhone: ''
+          receivePhone: ''
         },
-        searchForm: {
-          orderCode: '',
-          startDate: '',
-          endDate: '',
-          spuName: '',
-          orderStatus: 100,
-          payStatus: '',
-          reveivePhone: ''
-        },
+        // 真正的查询条件
+        searchForm: {},
+        orderStatus: '100',
         orderList: [],
         orderItem: [],
 
         // 订单状态
-        orderStatus: [
-          {key: 100, value: '全部订单'},
-          {key: 10, value: '待付款'},
-          {key: 20, value: '待发货'},
-          {key: 30, value: '待收货'},
-          {key: 40, value: '已完成'},
-          {key: 0, value: '已取消'},
+        status: [
+          {key: '100', value: '全部订单'},
+          {key: '10', value: '待付款'},
+          {key: '20', value: '待发货'},
+          {key: '30', value: '待收货'},
+          {key: '40', value: '已完成'},
+          {key: '0', value: '已取消'},
         ],
 
         payStatus: [
           {value: '', label: '全部状态'},
           {value: 2, label: '已付款'},
-          {value: 1, label: '部分付款'},
           {value: 0, label: '未付款'},
         ],
 
@@ -307,7 +290,8 @@
         },
 
         // 退款原因
-        refundReason: [],
+        refundReason: [
+        ],
         refundDialogVisible: false,
         form_rules: {
           reason: [
@@ -322,50 +306,45 @@
         },
 
         n: 0,
-        currentPage: 1,
-        pageSize: 4,
-        totalCount: 0,
-        isShowAll: false,
-        more_button_message: '展开',
+        page: {
+          pageNum: 1,
+          pageSize: 4,
+          totalCount: 0,
+        },
         loading: false,
 
       };
     },
     methods: {
-      getOrderList: () => {
-        let param = {};
-        if (this.searchForm.orderStatus == 100) {
-          param = Object.assign({}, this.searchForm, {distributorId: this.user.distributorId, vendorId: this.user.vendorId, pageNum: this.currentPage});
-          param.orderStatus = '';
-        } else {
-          param = Object.assign({}, this.searchForm, {distributorId: this.user.distributorId, vendorId: this.user.vendorId, pageNum: this.currentPage});
-        }
-//        getOrderList(param).then((res) => {
-//          this.loading = false;
-//          if(res.status==200){
-//            this.totalCount = res.page.totalNum;
-//            this.orderList = res.data;
-//            //展开此页的第一个订单明细
-//            if(this.orderList.length>0){
-//              this.collapseName  = this.orderList[0].id;
-//              this.handleChangeCollapse(this.collapseName);
-//            }
-//          }
-
-//          console.log(this.totalCount)
-//
-//
-//        })
+      getOrderList: function () {
+        let param = {
+          ...this.searchForm,
+          ...this.page,
+          distributorId: this.user.id,
+          orderStatus: parseInt(this.orderStatus)
+        };
+        param.orderStatus = param.orderStatus === 100 ? null : param.orderStatus;
+        
+       getOrderList(param).then((res) => {
+         this.loading = false;
+         if (res.status == 200) {
+           this.page.totalCount = res.page.totalNum;
+           this.orderList = res.data;
+           this.expand = [];
+           this.expand.push(this.orderList && this.orderList[0].id);
+           this.orderList.map(item => {
+             this.$set(item, 'moreDesc', '更多');
+           });
+         }
+       });
       },
 
-      cancelOrder: (order) => {
+      cancelOrder: function (order) {
         this.loading = true;
-        let param = {
+        let param = [{
           orderId: order.id,
-          userId: this.user.userId,
-          vendorId: this.user.vendorId,
-          orderCode: order.orderCode
-        };
+          distributorId: this.user.id
+        }];
         cancelOrder(param).then((res) => {
           if (res.status == 200) {
             this.getOrderList();
@@ -373,28 +352,36 @@
         });
       },
 
-      getOrderDetail: (activeName) => {
-        this.orderItem = this.orderList.find((item) => {
-          return item.id === activeName;
-        }).oOrderItems;
-        this.isShowAll = false;
-        this.more_button_message = '更多';
+      // form_button_event
+      handleSearch: function () {
+        this.searchForm = {
+          ...this.searchGroup,
+        };
+        this.searchForm.startDate = this.searchForm.startDate && formatDate.formatDate.format(new Date(this.searchForm.startDate), 'yyyy-MM-dd');
+        this.searchForm.endDate = this.searchForm.endDate && formatDate.formatDate.format(new Date(this.searchForm.endDate), 'yyyy-MM-dd');
+        this.page.pageNum = 1;
+        this.getOrderList();
       },
 
-      // form_button_event
-      handleSearch: () => {
-        for (var p in this.searchGroup) {
-          this.searchForm[ p ] = this.searchGroup[ p ];
-        }
-        this.searchForm.startDate = (!this.searchForm.startDate || this.searchForm.startDate == '') ? '' : date.formatDate.format(new Date(this.searchForm.startDate), 'yyyy-MM-dd');
-        this.searchForm.endDate = (!this.searchForm.endDate || this.searchForm.endDate == '') ? '' : date.formatDate.format(new Date(this.searchForm.endDate), 'yyyy-MM-dd');
-        this.activeName = this.searchGroup.orderStatus + '';
-        this.currentPage = 1;
+      // 页码变更
+      handleCurrentChange: function (val) {
+        this.searchGroup = {
+          ...this.searchForm
+        };
+        this.page.pageNum = parseInt(val);
+        this.getOrderList();
+      },
+
+      // tab_event
+      handleClick: (tab, event) => {
+        this.searchGroup = {};
+        this.searchForm = {};
+        this.page.pageNum = 1;
         this.getOrderList();
       },
 
       // list_button_event
-      handleRefund (orderId, orderItemId) {
+      handleRefund: function (orderId, orderItemId) {
         this.$set(this.refund, 'orderItemId', orderItemId);
         this.$set(this.refund, 'orderId', orderId);
         this.$set(this.refund, 'type', 1);
@@ -413,45 +400,14 @@
         this.$refs[formName].resetFields();
       },
 
-      handleShowAll: () => {
-        this.isShowAll = !this.isShowAll;
-        if (this.isShowAll) {
-          this.more_button_message = '收起';
-        } else {
-          this.more_button_message = '更多';
-        }
-      },
-
-      // 页码变更
-      handleCurrentChange: (val) => {
-        for (var p in this.searchForm) {
-          this.searchGroup[p] = this.searchForm[p];
-        }
-        this.currentPage = val;
-        this.getOrderList();
-      },
-
-      // tab_event
-      handleClick: (tab, event) => {
-        // reset
-
-        this.searchGroup = {};
-        this.searchForm = {};
-        this.$set(this.searchGroup, 'orderStatus', parseInt(tab.name));
-        this.$set(this.searchForm, 'orderStatus', parseInt(tab.name));
-        this.currentPage = 1;
-        this.getOrderList();
-      },
-
-      // collapse_event
-      handleChangeCollapse: (activeName) => {
-        if (activeName != '') {
-          this.getOrderDetail(activeName);
-        }
+      handleShowAll: function (order) {
+        this.$set(order, 'isShowAll', !order.isShowAll);
+        const desc = order.isShowAll && '收起' || '更多';
+        this.$set(order, 'moreDesc', desc);
       },
 
       // 获取售后原因
-      getRefundReasons: () => {
+      getRefundReasons: function () {
         let param = {};
         getRefundReasons(param).then((res) => {
           if (res.status == 200) {
@@ -461,7 +417,7 @@
       },
 
       // 获取可退款数量
-      getRefundNum: () => {
+      getRefundNum: function () {
         let param = {
           orderItemId: this.refund.orderItemId
         };
@@ -474,7 +430,7 @@
       },
 
       // 申请售后提交
-      submitRefund: (formName) => {
+      submitRefund: function (formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
             let param = {
@@ -505,9 +461,10 @@
 
     },
     created () {
-      this.user = JSON.parse(sessionStorage.getItem('user'));
+      this.$set(this, 'user', JSON.parse(sessionStorage.getItem('user')));
       this.getOrderList();
     }
+    
   };
 </script>
 
