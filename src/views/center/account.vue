@@ -264,15 +264,20 @@
     getDistributorDetail,
     saveInformation,
     getChannelList,
-    getChannelOptionList,
     saveChannel,
     updatePassword
   } from '../../api/api';
+
   import {
     GetProvinceList,
     GetCityListByProvince,
-    GetAreaListByCity
+    GetAreaListByCity,
+    GetChannelOptionList
   } from '../../js/common';
+
+  import {
+    GetChannelList
+  } from '../../js/distributor';
 
   export default{
     data () {
@@ -338,10 +343,7 @@
         cityList: [],
         areaList: [],
 
-        channelOptionList: [{
-          id: '',
-          channelName: null
-        }],
+        channelOptionList: [],
         addStore: {
           channelId: null,
           storeName: null,
@@ -446,12 +448,7 @@
 
       // 获取店铺信息
       getChannelList: function () {
-        const param = {
-          distributorId: this.user.distributorId
-        };
-        getChannelList(param).then((res) => {
-          this.$set(this, 'storeDataList', res.data);
-        });
+        GetChannelList((storeDataList) => this.$set(this, 'storeDataList', storeDataList));
       },
 
       // 获取省列表
@@ -477,14 +474,7 @@
 
       // 获取渠道列表
       getChannelOptionList: function () {
-        const param = {
-          userType: 1
-        };
-        getChannelOptionList(param).then((res) => {
-          if (res.status == 200) {
-            this.channelOptionList = res.data;
-          }
-        });
+        GetChannelOptionList((channelOptionList) => this.$set(this, 'channelOptionList', channelOptionList));
       },
       // 提交修改申请
       submitUserInfo: function (formName) {

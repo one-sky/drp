@@ -1,7 +1,8 @@
 import {
     getProvinceList,
     getCityListByProvince,
-    getAreaListByCity
+    getAreaListByCity,
+    getChannelOptionList,
 } from '../api/api';
 
 // 获取省列表
@@ -39,8 +40,23 @@ function GetAreaListByCity (value, callback) {
   }
   return false;
 };
+
+// 获取渠道列表
+function GetChannelOptionList (callback) {
+  const param = {
+    userType: 1
+  };
+  getChannelOptionList(param).then((res) => {
+    if (res.status == 200) {
+      callback(res.data);
+    }
+  });
+  return false;
+};
+
 export {
   GetProvinceList,
   GetCityListByProvince,
-  GetAreaListByCity
+  GetAreaListByCity,
+  GetChannelOptionList
 };

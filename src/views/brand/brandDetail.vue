@@ -2,35 +2,31 @@
   <div class="brand-detail flex-col ver-center">
     <div class="top flex-row">
       <!--left pic-->
-      <img v-bind:src="brand.brandPic" height="270" width="720"/>
+      <img v-bind:src="brandDetail.brandPic" height="270" width="720"/>
       <!--right info-->
       <div class="right flex-col">
         <div class="flex-row">
-          <img v-bind:src="brand.logo" height="61" width="113"/>
+          <img v-bind:src="brandDetail.logo" height="61" width="113"/>
           <img class="seperate" src="../../imgs/brand/split.png" height="80" width="1"/>
           <div class="flex-col hor-center">
-            <h1 class="stress-size fz_font">{{brand.brandName}}</h1>
-            <template v-if="status.status==null||status.status=='R'">
-              <el-button class="agent" type="text" v-if="!user.userId||user.userId==''" @click="$router.push({ path: '/login' });">
+            <h1 class="stress-size fz_font">{{brandDetail.brandName}}</h1>
+            <template v-if="!brandAgent || brandAgent.status=='R'">
+              <el-button class="agent" type="text" @click="handleAgentBrand">
                 <img src="../../imgs/brand/agent.png" height="11" width="11"/>申请代理
               </el-button>
-              <el-button class="agent" type="text" v-else @click="storeDialog = true">
-                <img src="../../imgs/brand/agent.png" height="11" width="11"/>
-                申请代理
-              </el-button>
             </template>
-            <div v-else class="agented">
-              {{status.statusDesc}}
+            <div v-else class="agented hor-ver-center">
+              {{brandAgent.status|formateStatusDesc(brandAgent.status)}}
             </div>
           </div>
 
         </div>
-        <p v-html="brand.description"></p>
+        <p v-html="brandDetail.description"></p>
 
       </div>
     </div>
 
-    <el-tabs class="middle" type="border-card" v-model="brandDetail_tab">
+    <el-tabs class="middle" type="border-card">
       <el-tab-pane label="商品" name="商品" class="flex-row-col">
         <div class="product" v-for="item in productList" >
           <router-link class="flex-row hor-ver-center":to="{path: '/productDetail', query:{ product: item.productId }}" >
@@ -44,45 +40,39 @@
           </div>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="品牌故事" name="品牌故事">
+      <!-- <el-tab-pane label="品牌故事" name="品牌故事">
         <p v-html="brandDetail.brandDiary"></p>
-      </el-tab-pane>
+      </el-tab-pane> -->
       <el-tab-pane label="招募书" name="招募书">
         <p v-html="brandDetail.recruitment"></p>
       </el-tab-pane>
     </el-tabs>
     <!--分页-->
-    <div v-if="brandDetail_tab=='商品'" class="pagination flex-row hor-center">
+    <div v-if="brandDetail_tab == '商品'" class="pagination flex-row hor-center">
       <el-pagination
         @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-size="pageSize"
+        :current-page="page.currentPage"
+        :page-size="page.pageSize"
         layout="prev, pager, next"
-        :total="totalCount">
+        :total="page.totalCount">
       </el-pagination>
     </div>
-
-    <el-dialog title="申请代理" :visible.sync="storeDialog" @open="getChannelOption()" @close="resetDialog('storeForm')">
-      <el-form :model="dialogStoreData" :rules="dialog_rules" ref="storeForm" class="detail_shop_form">
-        <el-form-item class="add_input add_select" style="margin-left:10px; margin-top:-10px;" prop="channelId" >
-          <div class="ub" style="font-size:13px;">
-            <div style="width:90px;">
-              分销渠道：
-            </div>
-            <div class="ub">
-              <el-select class="channel_select" v-model="dialogStoreData.channelId" >
-                <el-option v-for="channel in channelOption" :key="channel.id" :label="channel.channelName" :value="channel.id"></el-option>
-              </el-select>
-            </div>
-            <div style="padding-top:4px;">
-              <span style="color:red;margin-left:5px;">*</span>
-            </div>
-          </div>
+    <el-dialog title="申请代理" :visible.sync="storeDialog" @close="resetDialog('storeForm')" class="dialog" >
+      <el-form ref="storeForm"  class="form" label-width="100px">
+        <el-form-item label="分销渠道：">
+            <el-select v-model="channelId" ref="channel">
+              <el-option
+                v-for="channel in channelList"
+                :key="channel.id"
+                :label="channel.name"
+                :value="channel.id"
+              ></el-option>
+            </el-select>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer" style="margin-top:-30px;margin-bottom:10px;">
+      <div slot="footer" class="center-dialog-bottom">
         <el-button @click="storeDialog = false">取 消</el-button>
-        <el-button type="primary"  @click="insertDAgentBrand('storeForm')">确 定</el-button>
+        <el-button type="primary" :disabled="!channelId" @click="insertAgentBrand()">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -93,53 +83,42 @@
 </style>
 
 <script>
-  import { getBrandByBrandId, getDAgentBrand, getBrandDetail, insertDAgentBrand, getChannelOption, getProductList } from "../../api/api.js";
+  import {
+    getBrandById,
+    getProductList
+  } from '../../api/api.js';
+
+  import {
+    GetChannelList,
+    GetAgentBrand,
+    InsertAgentBrand
+  } from '../../js/distributor';
+
   export default {
-    name: 'mainPage',
     data () {
       return {
-        user: {
-          userId: null,
-          vendorId: null,
-        },
-
+        user: {},
         status: {
           status: null,
           statusDesc: null
         },
-        brand: {
-          statusDesc: null,
-        },
-        // erp中的资料包
+        // 品牌详情
         brandDetail: {},
+        // 品牌代理情况
+        brandAgent: {},
         productList: [],
 
         // 申请代理
-        dialogStoreData: {
-          channelId: null
-        },
+        channelId: null,
         storeDialog: false,
 
-        dialog_rules: {
-          channelId: [
-            {
-              type: 'number',
-              required: true,
-              message: '请选择分销渠道',
-              trigger: 'change'
-            }
-          ]
+        channelList: [],
+        page: {
+          currentPage: 1,
+          pageSize: 20,
+          totalCount: null,
         },
-        channelOption: [{
-          id: null,
-          channelName: null
-        }],
-
-        trueBrandId: null,
-
-        currentPage: 1,
-        pageSize: 20,
-        totalCount: null,
+        
 
         // 商品tab
         brandDetail_tab: '商品',
@@ -147,112 +126,83 @@
     },
     methods: {
       // 获取品牌详情
-      getBrandByBrandId () {
-
-        let param = {
-          erpBrandId: this.$route.query.brand,
-          vendorId: this.user.vendorId
+      getBrandById: function () {
+        const param = {
+          id: this.brandDetail.id,
         };
-        getBrandByBrandId(param).then((res) => {
+        getBrandById(param).then((res) => {
           if (res.status == 200) {
-            var category = res.data;
-            for (var p in category.rBrandAtts) {
-              if (category.rBrandAtts[p].type == 1) {
-                this.$set(category, 'brandPic', category.rBrandAtts[p].attachmentUrl);
-              } else if (category.rBrandAtts[p].type == 3) {
-                this.$set(category, 'paper', category.rBrandAtts[p].attachmentUrl);
-              }
-            }
-            this.brand = category;
-            this.trueBrandId = res.data.id;
-            if (this.user.userId && this.user.userId != '') {
-              this.getDAgentBrand();
-            }
-            this.getBrandDetail();
-            this.getProductList();
-          }
-        });
-      },
-
-      // 获取erp中的资料包
-      getBrandDetail: () => {
-        let param = {
-          vendorId: this.user.vendorId,
-          brandId: this.brand.brandId
-        };
-        getBrandDetail(param).then((res) => {
-          if (res.status == 200) {
-            this.brandDetail = res.data;
-          }
-        });
-      },
-      // 获取代理品牌
-      getDAgentBrand: () => {
-        let param = {
-          vendorId: this.user.vendorId,
-          distributorId: this.user.distributorId,
-          brandId: this.trueBrandId
-        };
-        getDAgentBrand(param).then((res) => {
-          if (res.status == 200) {
-            if (!res.data || res.data == '') {
-              this.$set(this.status, 'status', null);
-              this.$set(this.status, 'statusDesc', '申请代理');
-            } else if (res.data.status == 'R') {
-              this.$set(this.status, 'status', 'R');
-              this.$set(this.status, 'statusDesc', '申请代理');
-            } else if (res.data.status == 'W') {
-              this.$set(this.status, 'status', 'W');
-              this.$set(this.status, 'statusDesc', '等待审核');
-            } else if (res.data.status == 'Y') {
-              this.$set(this.status, 'status', 'Y');
-              this.$set(this.status, 'statusDesc', '已代理');
+            if(res.data) {
+              this.$set(this, 'brandDetail', res.data);
+              this.brandDetail.brandAttachmentEntityList.map(item => {
+                switch(item.type) {
+                  case '1': 
+                    this.$set(this.brandDetail, 'brandPic', item);
+                    return true;
+                  case '3':
+                    this.$set(this.brandDetail, 'recruitment', item);
+                    return true;
+                  default:
+                    return false;
+                }
+              });
+              return true;
             }
           }
-        });
-      },
-      // 获取渠道列表
-      getChannelOption: () => {
-        let param = {};
-        this.channelOption = new Array();
-        getChannelOption(param).then((res) => {
-          if (res.status == 200) {
-            var channelOption = res.data;
-            for (var i in channelOption) {
-              if (channelOption[i].status == 1) {
-                this.channelOption.push(channelOption[i]);
-              }
-            }
-          }
-        });
-      },
-
-      // 申请代理
-      insertDAgentBrand (formName) {
-        this.$refs[formName].validate((valid) => {
-          let param = {
-            brandId: this.trueBrandId,
-            distributorId: this.user.distributorId,
-            channelId: this.dialogStoreData.channelId
-          };
-          insertDAgentBrand(param).then((res) => {
-            if (res.status == 200) {
-              this.storeDialog = false;
-              this.getDAgentBrand();
+          this.$message({
+            message: '找不到该品牌',
+            type: 'warning',
+            duration: 2000,
+            onClose: () => {
+              this.$router.push({ path: '/brandList' });
             }
           });
         });
       },
-      getProductList () {
-        let param = {
-          brandIds: [this.brand.brandId],
-          vendorId: this.user.vendorId,
-          page: this.currentPage
+
+      // 获取代理品牌
+      getAgentBrand: function () {
+        GetAgentBrand(
+          this.brandDetail.id,
+          (brand) => {
+            this.$set(this, 'brandAgent', brand);
+          }
+        );
+      },
+
+      // 获取分销商已代理渠道
+      getChannelList: function () {
+        GetChannelList((channelList) => this.$set(this, 'channelList', channelList));
+      },
+
+      // 点击申请代理btn
+      handleAgentBrand: function () {
+        this.user.distributorId && (this.storeDialog = true) || $router.push({ path: '/login' })
+      },
+
+      // 申请代理
+      insertAgentBrand: function () {
+        InsertAgentBrand(
+          this.brandDetail.id,
+          this.channelId,
+          (result) => {
+            if (result) {
+              this.storeDialog = false;
+              this.getAgentBrand();
+            }
+          }
+        );
+      },
+      getProductList: function () {
+        const param = {
+          brandId: this.brandDetail.id,
+          page: this.page.currentPage,
+          pageSize: this.page.pageSize
         };
         getProductList(param).then((res) => {
           if (res.status == 200) {
-            this.productList = res.data.productList;
-            this.totalCount = res.data.count;
+            this.$set(this, 'productList', res.data);
+            this.page.totalCount = res.page.total;
           }
         });
       },
@@ -268,11 +218,29 @@
 
     },
     created () {
-      this.$set(this.user, 'vendorId', 1);
-      if (!this.$route.query.brand || this.$route.query.brand == '') {
+      if (!this.$route.query.brand) {
         this.$router.push({ path: '/brandList' });
+      } else {
+        this.$set(this.brandDetail, 'id', this.$route.query.brand);
       }
-      this.getBrandByBrandId();
+      this.$set(this, 'user', JSON.parse(sessionStorage.getItem('user')));
+      this.getBrandById();
+      this.getProductList();
+      if(this.user) {
+        this.getAgentBrand();
+        this.getChannelList();
+      }
+    },
+    filters: {
+      formateStatusDesc: (status) => {
+        if (!status || status == 'R') {
+            return '申请代理';
+        } else if (status == 'W') {
+          return '等待审核';
+        } else {
+          return '已代理';
+        }
+      }
     }
   };
 </script>

@@ -69,6 +69,16 @@ export const deleteAddress = params => {
     return axios.post(`${base}/distributor/deleteAddress`, params).then(res => res.data);
 };
 
+// 获取已代理品牌
+export const getAgentBrand = params => {
+    return axios.post(`${base}/distributor/getAgentBrand`, params).then(res => res.data);
+};
+
+// 申请代理
+export const insertAgentBrand = params => {
+    return axios.post(`${base}/distributor/insertAgentBrand`, params).then(res => res.data);
+};
+
 // 获取banner列表
 export const getBannerList = params => {
     return axios.post(`${base}/resource/getBannerList`, params).then(res => res.data);
@@ -122,6 +132,16 @@ export const getNewBrandList = params => {
 // 根据一级类目获取品牌列表
 export const getBrandListByCategoryId = params => {
     return axios.post(`${base}/brand/getBrandListByCategoryId`, params).then(res => res.data);
+};
+
+// 获取品牌详情
+export const getBrandById = params => {
+    return axios.post(`${base}/brand/getBrandById`, params).then(res => res.data);
+};
+
+// 商品列表
+export const getProductList = params => {
+    return axios.post(`${base}/product/getProductList`, params).then(res => res.data);
 };
 
 // 获取订单列表
@@ -185,14 +205,7 @@ export const getStatisticOrderList = params => { return axios.post(`${base}/orde
 export const getOrderDetailByOrderCode = params => { return axios.post(`${base}/order/getOrderDetailByOrderCode`, params).then(res => res.data); };
 
 // brand
-// 获取热门品牌
-export const getRecommendBrandList = params => { return axios.post(`${base}/brand/getRecommendBrandList`, params).then(res => res.data); };
-// 获取品牌详情(增加一个根据erpBrandId查询)
-export const getBrandByBrandId = params => { return axios.post(`${base}/brand/getBrandByBrandId`, params).then(res => res.data); };
-// 是否已代理
-export const getDAgentBrand = params => { return axios.post(`${base}/brand/getDAgentBrand`, params).then(res => res.data); };
-// 申请代理
-export const insertDAgentBrand = params => { return axios.post(`${base}/brand/insertDAgentBrand`, params).then(res => res.data); };
+
 // 获取个人中心已代理品牌
 export const getBrandListByAgentBrand = params => { return axios.post(`${base}/brand/getBrandListByAgentBrand`, params).then(res => res.data); };
 // 获取公告详情
@@ -204,8 +217,6 @@ export const getCategorySpuList = params => { return axios.post(`${base}/brand/g
 export const getBrandDetail = params => { return axios.post(`${base}/brand/getBrandDetail`, params).then(res => res.data); };
 
 // product
-// 商品列表
-export const getProductList = params => { return axios.post(`${base}/product/getProductList`, params).then(res => res.data); };
 
 // 获取一些特殊的商品列表，比如推荐商品，相关商品，最近浏览
 export const getProductSpecialList = params => { return axios.post(`${base}/product/getProductSpecialList`, params).then(res => res.data); };
@@ -266,9 +277,6 @@ export const getRefundNum = params => { return axios.post(`${base}/refund/getRef
 export const getRefundReasons = params => { return axios.post(`${base}/refund/getRefundReasons`, params).then(res => res.data); };
 
 export const saveRefund = params => { return axios.post(`${base}/refund/saveRefund`, params).then(res => res.data); };
-
-// 获取一级类目下的商品
-export const getAgentBrand = params => { return axios.post(`${base}/manageDistributor/getAgentBrand`, params).then(res => res.data); };
 
 // 显示区域：1:banner下方；2:讨论区-评测；3:讨论区-行业资讯
 export const getArticleDetail = params => { return axios.post(`${base}/manageArticle/getArticleDetail`, params).then(res => res.data); };

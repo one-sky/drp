@@ -99,3 +99,16 @@ img {
 .input-error .el-input__inner{
   border: 1px solid #f00;
 }
+
+/*all center page dialog footer*/
+.center-dialog-bottom .el-button{
+  padding: 6px 12px !important;
+}
+
+.el-message-box__btns .el-button {
+  padding: 6px 12px !important;
+}
+
+.el-message-box__btns .el-button {
+  margin-right: 5px;
+}

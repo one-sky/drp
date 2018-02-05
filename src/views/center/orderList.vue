@@ -57,7 +57,7 @@
                       </div>
                     </div>
 
-                    <div class="hor-center" style="width:24%;">
+                    <div class="hor-ver-center" style="width:22%;">
                       ￥{{props.row.orderItemVOList[n-1].skuPrice|formatMoney}}*{{props.row.orderItemVOList[n-1].skuQuantity}}
                     </div>
                     <div class="flex-col hor-ver-center long-title" style="width:30%;">
@@ -90,7 +90,7 @@
                         </div>
 
                       </div>
-                      <div class="hor-center" style="width:22%;">
+                      <div class="hor-ver-center" style="width:22%;">
                         ￥{{props.row.orderItemVOList[n+2].skuPrice|formatMoney}}*{{props.row.orderItemVOList[n+2].skuQuantity}}
                       </div>
                       <div class="flex-col hor-ver-center long-title" style="width:30%;">
@@ -109,7 +109,7 @@
                   </template>
                 </template>
               </el-col>
-              <el-col :span="10" :key="props.row.isShowAll" class="hor-ver-center">
+              <el-col :span="11" :key="props.row.isShowAll" class="hor-ver-center">
                 <el-col :span="7">
                   ￥{{props.row.shippingCost|formatMoney}}{{props.row.shippingCost==0?'（包邮）':''}}
                 </el-col>
