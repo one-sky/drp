@@ -72,11 +72,10 @@
 
 <script>
   import {
-    getCollectionProductList,
-    cancelAttentionProduct,
-    batchCancelAttentionProduct,
-    stickyProduct
-  } from '../../api/api';
+    GetCollectionProductList,
+    AddCollectionProduct,
+    CancelCollectionProduct
+  } from '../../js/distributor';
   export default {
     data () {
       return {
@@ -84,9 +83,12 @@
         user: {},
         productList: [],
         handleProductList: [],
-        currentPage: 1,
-        pageSize: 5,
-        totalCount: 40,
+        page: {
+          currentPage: 1,
+          pageSize: 5,
+          totalCount: 40,
+        },
+       
         multipleOption: false,
         checked: false,
         multipleSelection: [],
@@ -95,130 +97,78 @@
       };
     },
     methods: {
-      // 获取已关注商品
-      getCollectionProductList: () => {
-        this.noneOption = true;
-        this.checked = false;
-        let param = {
-          distributorId: 35,
-          vendorId: 1,
-          pageNum: this.currentPage
-
-        };
-//        getCollectionProductList(param).then((res) => {
-//          if(res.status == 200){
-//            this.totalCount = res.page.totalNum;
-//            this.productList = res.data.listVO;
-//            this.loading = false;
-//            console.log(this.productList)
-//          }
-//
-//
-//        })
-        this.productList = [{
-          productName: '美国ROCKETBOOK创意云笔记本美国ROCKETBOOK创意云笔'
-        }];
-      },
-
-      // 取消已关注商品
-      cancelAttentionProduct: (row) => {
-        let param = {
-          distributorId: this.user.distributorId,
-          productId: row.productId
-
-        };
-        cancelAttentionProduct(param).then((res) => {
-          if (res.status == 200) {
-            this.$message({
-              message: '取关成功',
-              type: 'success'
-            });
-            this.getCollectionProductList();
+      // 收藏列表
+      getCollectionProductList: function () {
+        GetCollectionProductList(this.page.currentPage, this.page.pageSize, (res) => {
+          if (res.data) {
+            this.$set(this, 'productList', res.data);
+            this.$set(this.page, 'totalCount', res.page.total);
           }
         });
       },
 
-      // 批量处理取消关注
-      batchCancelAttentionProduct: () => {
-        if (!this.handleProductList || this.handleProductList == '') {
-          return false;
-        } else {
-          var productIds = new Array();
-          for (var i in this.handleProductList) {
-            productIds.push(this.handleProductList[i].productId);
-          }
-          let param = {
-            productIds: productIds,
-            distributorId: this.user.distributorId
-          };
-          batchCancelAttentionProduct(param).then((res) => {
-            if (res.status == 200) {
+      // 加入收藏
+      addCollectionProduct: function () {
+        !this.user.id && this.$router.push({path: '/login'});
+        AddCollectionProduct([this.productDetail.spuDetail.productId], (res) => {
+          let msg = '';
+          msg = res > 0 && '加入收藏成功' || '加入收藏失败，请重新取消';
+          this.$message({
+            message: msg,
+            type: 'success',
+            duration: 2000,
+            onClose: () => {
               this.getCollectionProductList();
             }
           });
-        }
+        });
       },
-
-      // 批量置顶商品
-      stickyProduct: (value) => {
-        var listId = new Array();
-        if (value && value != '') {
-          listId.push(value);
+      // 取消收藏
+      cancelCollectionProduct: function (row) {
+        let productIds = [];
+        if (row) {
+          productIds.push(row.productId);
         } else {
-          if (!this.handleProductList || this.handleProductList == '') {
-            return false;
-          } else {
-            for (var i in this.handleProductList) {
-              listId.push(this.handleProductList[i].id)
-            }
-          }
+          this.handleProductList.map(item => {
+            productIds.push(item.productId);
+          });
         }
-
-        let param = {
-          listId: listId,
-          distributorId: this.user.distributorId
-        };
-        stickyProduct(param).then((res) => {
-          if (res.status == 200) {
-            this.currentPage = 1;
-            this.getCollectionProductList();
-          }
+        CancelCollectionProduct(productIds, (res) => {
+          let msg = '';
+          msg = res > 0 && '取消收藏成功' || '取消收藏失败，请重新取消';
+          this.$message({
+            message: msg,
+            type: 'success',
+            duration: 2000,
+            onClose: () => {
+              this.getCollectionProductList();
+            }
+          });
         });
       },
 
-      // 降价通知
-      handlePriceRemind: (val) => {
-        if (val) {
-          this.handleProductList = val;
-        }
+      // 批量置顶商品
+      stickyProduct: function (value) {
+      },
 
-        /*
-         this.loading = true;
-         let para = Object.assign({}, this.handleProductList, userID: this.filter.userID);
-         handlePriceRemind(para).then((res) => {
-         this.loading = false;
-         this.$message({
-         message: '设置成功',
-         type: 'success'
-         });
-         });
-         */
+      // 降价通知
+      handlePriceRemind: function (val) {
       },
 
       // 页码变更
-      handleCurrentChange: (val) => {
+      handleCurrentChange: function (val) {
         this.currentPage = val;
         this.getCollectionProduct();
       },
 
       // 批量操作取消操作
-      handleSelection () {
+      handleSelection: function () {
         this.noneOption = !this.noneOption;
         this.checked = false;
       },
 
       // 全选按钮
-      toggleSelection: () => {
+      toggleSelection: function () {
         if (this.checked) {
           this.productList.forEach(row => {
             this.$refs.product_table.toggleRowSelection(row, true);
@@ -228,17 +178,13 @@
         }
       },
 
-      handleSelectionChange: (val) => {
+      handleSelectionChange: function (val) {
         this.handleProductList = val;
-        if (this.handleProductList.length < this.productList.length) {
-          this.checked = false;
-        } else {
-          this.checked = true;
-        }
+        this.checked = this.handleProductList.length >= this.productList.length;
       },
     },
     created () {
-      this.user = JSON.parse(sessionStorage.getItem('user'));
+      this.$set(this, 'user', JSON.parse(sessionStorage.getItem('user')));
       this.getCollectionProductList();
     }
   };

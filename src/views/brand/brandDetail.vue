@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <el-tabs class="middle" type="border-card">
+    <el-tabs class="middle" type="border-card" v-model="brandDetail_tab">
       <el-tab-pane label="商品" name="商品" class="flex-row-col">
         <div class="product" v-for="item in productList" >
           <router-link class="flex-row hor-ver-center":to="{path: '/productDetail', query:{ product: item.productId }}" >
@@ -118,8 +118,6 @@
           pageSize: 20,
           totalCount: null,
         },
-        
-
         // 商品tab
         brandDetail_tab: '商品',
       };
@@ -177,7 +175,7 @@
 
       // 点击申请代理btn
       handleAgentBrand: function () {
-        this.user.distributorId && (this.storeDialog = true) || $router.push({ path: '/login' })
+        this.user.distributorId && (this.storeDialog = true) || this.$router.push({ path: '/login' });
       },
 
       // 申请代理
@@ -195,7 +193,7 @@
       },
       getProductList: function () {
         const param = {
-          brandId: this.brandDetail.id,
+          brandIds: [this.brandDetail.id],
           page: this.page.currentPage,
           pageSize: this.page.pageSize
         };
@@ -226,7 +224,7 @@
       this.$set(this, 'user', JSON.parse(sessionStorage.getItem('user')));
       this.getBrandById();
       this.getProductList();
-      if(this.user) {
+      if (this.user) {
         this.getAgentBrand();
         this.getChannelList();
       }

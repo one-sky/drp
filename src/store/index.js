@@ -14,6 +14,12 @@ const state = {
     distributorId: 0,
     userId: 0,
     phone: 0
+  },
+  searchProduct: {
+    type: 1,
+    value: null,
+    priceType: 1,
+    categoryIds: null
   }
   
 };
@@ -30,7 +36,7 @@ const mutations = {
   },
   updateStepType (state, msg) {
     state.stepType = msg;
-  }
+  },
 };
 
 const getters = {

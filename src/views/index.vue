@@ -16,7 +16,7 @@
 
       <!--menu -->
       <div class="menu" :style="{left:(screenWidth>1200?(screenWidth-1200)/2:0)+'px'} ">
-        <el-button v-for="(item,index) in categoryList" type="text" @click="searchProduct(index,-1)" :key="index">
+        <el-button v-for="(item,index) in categoryList" type="text" @click="searchProduct(item)" :key="index">
           <div class="second-font-color flex-row hor-between">
             <div>{{item.categoryName}}</div>
             <div>&gt;</div>
@@ -246,7 +246,7 @@
     <div class="hor-center" style="background-color:#f2f2f2;" v-for="(item,index) in categoryList" :id="item.categoryName" :key="item.categoryName" >
       <div class="category flex-col hor-start">
         <div class="catalog-title flex-row">
-          <el-button type="text" @click="searchProduct(index,-1)">{{item.categoryName}}</el-button>
+          <el-button type="text" @click="searchProduct(item)">{{item.categoryName}}</el-button>
           <div class="flex-row hor-end ver-center" style="flex:1;">
             <div class="fz_font">0{{index+1}}</div>
             <div class="ver-center" ><img v-bind:src="item.icon" height="17" width="13"/></div>
@@ -263,7 +263,7 @@
           <div class="flex-row-col child-category-list ">
             <template v-for="( category, index) in item.childCategoryList" v-if="index<6"  >
               <div class="flex-row ver-center hor-around child-category-item" :style="{'margin-left': (index%3!=0>0?1:0)+'%'}" :key="index">
-                <el-button type="text" @click="searchProduct(index,3*n-3+i-1)" :style="{color:item.color}">
+                <el-button type="text" @click="searchProduct(item)" :style="{color:item.color}">
                   <div>{{category.categoryName}}</div>
                   <div class="fz_font info-font" >{{category.categoryEgName}}</div>
                 </el-button>
@@ -487,7 +487,7 @@
         };
         getCategoryList(param).then((res) => {
           if (res.status == 200) {
-            const categoryList = res.data && res.data != '' ? res.data : {};
+            const categoryList = res.data && res.data != '' ? res.data : [];
             // 获得一级类目
             this.categoryList = categoryList.filter((item, index) => {
               if (item.level == 1) {
@@ -541,7 +541,7 @@
           }
         });
       },
-      getStores: () => {
+      getStores: function () {
         this.storeList = [
           {
             id: 1,
@@ -576,7 +576,7 @@
         ];
       },
 
-      showActive: (key, prop, value) => {
+      showActive: function (key, prop, value) {
         this.$set(this.brandList[key], prop, value);
       },
 
@@ -589,20 +589,18 @@
           nickname: null
         };
       },
-//
-      searchProduct: (index, flag) => {
-        var category = [];
-        if (flag < 0) {
-          for (var i in this.categoryList[index].childCategoryList) {
-            category.push(this.categoryList[index].childCategoryList[i].id);
-          }
-        } else {
-          category.push(this.categoryList[index].childCategoryList[flag].id);
-        }
 
-//        this.$store.state.category = category;
+      searchProduct: function (category) {
+        if (category.level == 1) {
+          const categoryIds = [];
+          category.childCategoryList.map(item => {
+            categoryIds.push(item.id);
+          });
+          this.$set(this.$store.state.searchProduct, 'categoryIds', categoryIds);
+        } else {
+          this.$set(this.$store.state.searchProduct, 'categoryIds', [category.parentId]);
+        }
         this.$router.push({path: '/productList'});
-        this.$on('getProductList');
       },
 //      currentHeightListener() {
 //        this.currentHeight = document.body.scrollTop;

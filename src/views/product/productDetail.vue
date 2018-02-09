@@ -4,45 +4,49 @@
       <div class="flex-col left">
         <swiper :options="swiperOptionTop"  ref="swiperTop">
           <!-- 这部分放你要渲染的那些内容 -->
-          <swiper-slide v-if="(!attributeList||attributeList==''||checkCount>=attributeList.length)" v-for="item in otherAttributeList.skuImg">
-            <img v-bind:src="item.imageUrl" width="360" height="360"/>
+          <!-- <swiper-slide v-for="item in relativeAttrList.skuImg">
+            <img v-bind:src="item" width="360" height="360"/>
           </swiper-slide>
-          <swiper-slide v-else v-for="item in swiperPic"><img v-bind:src="item.imageUrl" width="360" height="360"/>
-          </swiper-slide>
-          <swiper-slide v-for="item in productDetail.productImg"><img v-bind:src="item.imageUrl" width="360" height="360"/>
-          </swiper-slide>
+          <swiper-slide
+            v-if="productDetail.spuDetail.thumbnailImage.length>0"
+            v-for="item in productDetail.spuDetail.thumbnailImage"
+          >
+            <img v-bind:src="item" width="360" height="360"/>
+          </swiper-slide> -->
         </swiper>
         <div class="swiper-thumb flex-row">
           <swiper :options="swiperOptionThumbs" ref="swiperThumbs" >
             <!-- 这部分放你要渲染的那些内容 -->
-            <swiper-slide v-if="(!attributeList||attributeList==''||checkCount>=attributeList.length)" v-for="item in otherAttributeList.skuImg">
-              <img v-bind:src="item.imageUrl" width="50" height="50" />
+            <!-- <swiper-slide v-for="item in relativeAttrList.skuImg">
+              <img v-bind:src="item" width="50" height="50" />
             </swiper-slide>
-            <swiper-slide v-else v-for="item in swiperPic"><img v-bind:src="item.imageUrl" width="50" height="50" />
-            </swiper-slide>
-            <swiper-slide v-for="item in productDetail.productImg"><img v-bind:src="item.imageUrl" width="50" height="50" />
-            </swiper-slide>
+            <swiper-slide
+              v-if="productDetail.spuDetail.thumbnailImage.length>0"
+              v-for="item in productDetail.spuDetail.thumbnailImage"
+            >
+              <img v-bind:src="item" width="50" height="50" />
+            </swiper-slide> -->
           </swiper>
           <div class="swiper-button-next swiper-button-black" slot="button-next"></div>
           <div class="swiper-button-prev swiper-button-black" slot="button-prev"></div>
         </div>
       </div>
       <div class="right">
-        <div class="stress-size sku-name flex-row ver-center">{{otherAttributeList.skuName}}</div>
+        <div class="stress-size sku-name flex-row ver-center">{{productDetail.spuDetail.productName}}</div>
         <div class="flex-row">
           <div class="price" :key="type.id">
 
             <!--一件代发-->
             <div v-if="!type.id">
               <span>一件代发价格：</span>
-              <div style="margin-left:0;" class="price-size third-font-color"><span class="price-icon-size">¥ </span>{{otherAttributeList.priceOne|formatMoney}}</div>
+              <div style="margin-left:0;" class="price-size third-font-color"><span class="price-icon-size">¥ </span>{{relativeAttrList.onePiece|formatMoney}}</div>
             </div>
             <!--批发-->
             <div v-else-if="type.id">
               <span>采购价：</span>
-              <template v-if="user.userId&&user.userId!=''">
-                <template v-if="status.status!='Y'">
-                  <div v-for="(item,index) in otherAttributeList.truePricePiece">
+              <template v-if="user.id">
+                <template v-if="brandAgent.status!='Y'">
+                  <div v-for="(item,index) in relativeAttrList.priceList">
                     <h1 class="price-size third-font-color"><span class="price-icon-size">¥ </span>{{item.price|formatMoney}}</h1>
                   </div>
                 </template>
@@ -56,8 +60,9 @@
             <!--起批量-->
             <div>
               <span>起批量：</span>
-              <div v-for="item in otherAttributeList.truePricePiece">
+              <div v-for="item in relativeAttrList.priceList">
                 {{item.startPiece}}-{{item.endPiece}}件
+                <div v-if="item.stock">{{`限购${item.stock}件`}}</div>
               </div>
             </div>
 
@@ -70,16 +75,16 @@
           <!--row-->
           <div>
             <h5>建议零售价：</h5>
-            <div>¥ {{otherAttributeList.retailPrice|formatMoney}}</div>
+            <div>¥ {{relativeAttrList.retailPrice|formatMoney}}</div>
             <h5>最低控价：</h5>
-            <div>¥ {{otherAttributeList.minPrice|formatMoney}}</div>
+            <div>¥ {{relativeAttrList.minPrice|formatMoney}}</div>
           </div>
           <!--row-->
           <div>
             <h5>毛利润：</h5>
-            <template v-if="user.userId&&user.userId!=''">
-              <div v-if="status.status=='Y'">
-                ¥ {{otherAttributeList.profit|formatMoney}}
+            <template v-if="user.id">
+              <div v-if="brandAgent.status=='Y'">
+                ¥ {{relativeAttrList.profit|formatMoney}}
               </div>
               <div v-else>
                 <img class="product_detail_title_margin" src="../../imgs/product/lock.png" height="20" width="16"/>
@@ -89,7 +94,7 @@
               登录后可查看
             </div>
             <h5>商品规格：</h5>
-            <div>{{otherAttributeList.cartonUnit}}</div>
+            <div>件</div>
           </div>
 
           <!--row-->
@@ -97,46 +102,38 @@
             <h5>发货商家：</h5>
             <p>本商品由<h6>品牌商</h6>发货并提供售后服务</p>
           </div>
-
-          <!--row shipping-->
-          <div class="ub" style="margin-top:20px;">
-            <h5>物流：</h5>
-            <el-cascader :options="areaList" popper-class="area_popper" :props="{value:'index' ,label:'regionName',children:'cities'}"
-                         @change="calculateShippingCost" @active-item-change="handleChooseProvince">
-
-            </el-cascader>
-            <div class="seperate">|</div>
-            <div>运费：¥{{shipCost|formatMoney}}</div>
-            <div v-if="shipCost==0">（包邮）</div>
+          <div>
+            <h5>运费：</h5>
+            <p>¥{{0|formatMoney}}<h6 v-if="!shipCost">（包邮）</h6></p>
           </div>
 
           <!--row attributes-->
-          <div v-for="(item,index) in attributeList">
-            <h5>{{item.attributeName}}：</h5>
-            <el-checkbox-group  v-model="size[index]" @change="checkAllow()" :max="2">
-              <el-checkbox-button v-for="(a,key) in item.attributes" :label="a" :disabled="a.checked">{{a.optionNameCn}}</el-checkbox-button>
+          <div v-for="(item,index) in productDetail.attributeList">
+            <h5>{{item.attr}}：</h5>
+            <el-checkbox-group  v-model="selectedAttr[index]" @change="checkAllow()" :max="2">
+              <el-checkbox-button v-for="(a,key) in item.value" :label="a" :disabled="a.checked">{{a.name}}</el-checkbox-button>
             </el-checkbox-group>
           </div>
           <!--row quantity-->
           <div>
             <h5>数量：</h5>
-            <el-input-number v-model="buyCount" @change="calculateShippingCost" :min="1" :max="otherAttributeList.stock">
+            <el-input-number v-model="buyCount" :min="1" :max="relativeAttrList.stock">
             </el-input-number>
-            <div>（库存：{{otherAttributeList.stock}}{{otherAttributeList.prodUnit|formatProdUnit}}）</div>
+            <div>（库存：{{relativeAttrList.stock}}件）</div>
           </div>
 
           <!--row brand agent-->
           <div>
-            <template v-if="!status.status||status.status==''||status.status=='R'">
-              <el-button type="text" class="agent" @click="openAgent">
+            <template v-if="!brandAgent || brandAgent.status=='R'">
+              <el-button type="text" class="agent hor-ver-center" @click="handleAgentBrand">
                 <img src="../../imgs/brand/agent.png" height="11" width="11"/>申请代理
               </el-button>
             </template>
-            <div class="agented" v-else>
-              {{status.statusDesc}}
+            <div class="agented hor-ver-center" v-else>
+              {{brandAgent.status|formateStatusDesc(brandAgent.status)}}
             </div>
             <div>
-              <el-button type="text" @click="addCollectionProduct" v-if="!isCollection">
+              <el-button type="text" @click="addCollectionProduct" v-if="!collected">
                 <img src="../../imgs/product/collect.png" height="11" width="12"/>加入收藏
               </el-button>
               <el-button type="text" @click="cancelAttentionProduct" v-else>
@@ -171,7 +168,14 @@
         <!--addShoppingCartBtn-->
         <!--选择好所有相关属性可点击, 未登录跳转login-->
         <div class="flex-row hor-center">
-          <el-button class="add" type="primary" @click="addToShoppingCart" :disabled="(otherAttributeList.stock<1||!(checkCount>=attributeList.length))||(type.id==true&&!(status.status&&status.status=='Y'))">加入进货单</el-button>
+          <el-button
+            class="add"
+            type="primary"
+            @click="addToShoppingCart"
+            :disabled="(relativeAttrList.stock<1 || !(selectedAttr.length === productDetail.attributeList.length))||(type.id && !(brandAgent && brandAgent.status=='Y'))"
+          >
+              加入进货单
+          </el-button>
         </div>
 
 
@@ -185,19 +189,22 @@
       <el-tabs class="left" type="border-card">
         <el-tab-pane label="商品图文详情">
           <div class="attribute">
-            <div v-for="item in this.productDetail.skuDetailList">
-              <div>商品编码 ： {{item.skuCode}}</div>
-              <div>品牌 ： {{productDetail.brandName}}</div>
-              <div>货号 ： {{item.mftProdCode}}</div>
-              <div>单位 ： {{item.prodUnit|formatProdUnit}}</div>
+            <div v-for="item in productDetail.skuDetailList">
+              <div>商品编码 ： 123456</div>
+              <div>品牌 ： {{productDetail.spuDetail.brandName}}</div>
+              <div>货号 ： 1234</div>
+              <div>单位 ： 件</div>
             </div>
           </div>
-          <template v-for="item in detailPic">
-            <img :src="item.imageUrl" width="802"/>
+          <template v-for="item in productDetail.spuDetail.thumbnailImage">
+            <img :src="item" width="802"/>
+          </template>
+          <template v-for="item in productDetail.skuImgList">
+            <img :src="item" width="802"/>
           </template>
         </el-tab-pane>
         <el-tab-pane label="商品评测">
-          <div v-for="item in productArticleList" v-html="item.content"></div>
+          <div v-for="item in productDetail.productArticleList" v-html="item.content"></div>
         </el-tab-pane>
       </el-tabs>
       <div class="right flex-col ver-center">
@@ -245,8 +252,8 @@
 
     </div>
 
-    <el-dialog title="申请代理" :visible.sync="storeDialog" @open="getChannelOption()" @close="resetDialog('storeForm')">
-      <el-form :model="dialogStoreData" :rules="dialog_rules" ref="storeForm" class="detail_shop_form">
+    <el-dialog title="申请代理" :visible.sync="storeDialog" @open="getChannelList()" @close="resetDialog('storeForm')">
+      <el-form :model="dialogStoreData" ref="storeForm" class="detail_shop_form">
         <el-form-item class="add_input add_select" style="margin-left:10px; margin-top:-10px;" prop="channelId" >
           <div class="ub" style="font-size:13px;">
             <div style="width:90px;">
@@ -254,7 +261,7 @@
             </div>
             <div class="ub">
               <el-select class="channel_select" v-model="dialogStoreData.channelId" >
-                <el-option v-for="channel in channelOption" :key="channel.id" :label="channel.channelName" :value="channel.id"></el-option>
+                <el-option v-for="channel in channelList" :key="channel.id" :label="channel.channelName" :value="channel.id"></el-option>
               </el-select>
             </div>
             <div style="padding-top:4px;">
@@ -278,23 +285,23 @@
 
 <script>
   import {
-    getProductDetail,
+    getSpuDetail,
     getProductSpecialList,
-    getDAgentBrand,
-    getBrandByBrandId,
-    insertDAgentBrand,
-    addCollectionProduct,
-    getCollectionProduct,
-    cancelAttentionProduct,
-    getChannelOption,
-    getProvinceList,
-    getCityListByProvince,
-    calculateShippingCost,
     addToShoppingCart
   } from '../../api/api.js';
+
+  import {
+    GetChannelList,
+    GetAgentBrand,
+    InsertAgentBrand,
+    GetCollectionProductList,
+    AddCollectionProduct,
+    CancelCollectionProduct
+  } from '../../js/distributor';
   export default {
     data () {
       return {
+        user: {},
         swiperOptionTop: {
           notNextTick: true,
           spaceBetween: 30,
@@ -309,25 +316,25 @@
           prevButton: '.swiper-button-prev',
           slideToClickedSlide: true
         },
-        user: {
+
+        productDetail: {
+          spuDetail: {}, // spu详情
+          attributeList: [], // 属性列表
+          skuDetailList: [], // sku列表
+          productArticleList: [], // 评测
+          skuImgList: [] // 所有sku的img
         },
-        productDetail: {},
         specialList: [], // 最近浏览列表、推荐列表
         relativeList: [], // 相关商品列表
-        productArticleList: [], // 评测
-        attributeList: [],   // 存放规格等选项
-        size: [],  // 监听当前选择项
+        selectedAttr: [],  // 监听当前选择项
 
-        checkCount: 0, // 当前选中项属性种类数
         // right_tab data
         rightTab: '3',
 
-        otherAttributeList: {},
-
-        // 轮播图
-        swiperPic: new Array(),
+        // 随着sku变化的属性
+        relativeAttrList: {},
         // 商品图文详情
-        detailPic: new Array(),
+        detailPic: [],
 
         // 申请代理
         dialogStoreData: {
@@ -335,120 +342,149 @@
         },
         storeDialog: false,
 
-        dialog_rules: {
-          channelId: [
-            {type: 'number', required: true, message: '请选择分销渠道', trigger: 'change'}
-          ]
-        },
-        channelOption: [{
-          id: null,
-          channelName: null
-        }],
-        status: {  // 代理状态
-          status: null,
-          statusDesc: null
-        },
+        channelList: [],
+        brandAgent: {},
 
         // 收藏
-        isCollection: false,
+        collected: false,
 
         type: {id: false, value: '批<br>发'}, // 查看价格按钮
 
+        // 购买数量
         buyCount: 1,
-
-        // area
-        areaList: [], // 选择地区列表
         shipCost: 0,
-        area: [],
         loading: false,
       };
     },
     methods: {
-      load: () => {
+      load: function () {
         window.location.reload();
       },
-      getProductDetail: () => {
+
+       // tab--最近浏览,推荐
+      handleClickTab: function (tab) {
+        // 最近浏览
+        // let param = {
+        //   spuId: this.$route.query.product,
+        //   distributorId: this.user.distributorId,
+        //   type: this.rightTab,
+        //   page: 1,
+        //   pageSize: 5
+        // };
+        // getProductSpecialList(param).then((res) => {
+        //   if (res.status == 200) {
+        //     this.specialList = res.data;
+        //   }
+        // });
+      },
+
+      // 申请代理
+      insertAgentBrand: function () {
+        InsertAgentBrand(
+          this.brandAgent.id,
+          this.channelId,
+          (result) => {
+            if (result) {
+              this.storeDialog = false;
+              this.getAgentBrand();
+            }
+          }
+        );
+      },
+
+      // 点击申请代理
+      handleAgentBrand: function () {
+        if (!this.user.userId || this.user.userId == '') {
+          this.$router.push({ path: '/login' });
+        } else {
+          this.storeDialog = true;
+        }
+      },
+
+      // 加入收藏
+      addCollectionProduct: function () {
+        !this.user.id && this.$router.push({path: '/login'});
+        AddCollectionProduct([this.productDetail.spuDetail.productId], (res) => {
+          let msg = '';
+          msg = res > 0 && '加入收藏成功' || '加入收藏失败，请重新取消';
+          this.$message({
+            message: msg,
+            type: 'success',
+            duration: 2000,
+            onClose: () => {
+              this.getCollectionProductList();
+            }
+          });
+        });
+      },
+      // 取消收藏
+      cancelCollectionProduct: function () {
+        CancelCollectionProduct([this.productDetail.spuDetail.productId], (res) => {
+          let msg = '';
+          msg = res > 0 && '取消收藏成功' || '取消收藏失败，请重新取消';
+          this.$message({
+            message: msg,
+            type: 'success',
+            duration: 2000,
+            onClose: () => {
+              this.getCollectionProductList();
+            }
+          });
+        });
+      },
+
+      getSpuDetail: function () {
         this.loading = true;
-        let param = {
-          vendorId: this.user.vendorId,
+        const param = {
           spuId: this.$route.query.product,
-          distributorId: this.user.distributorId,
-          userId: this.user.userId
+          distributorId: this.user.id || null,
         };
-        getProductDetail(param).then((res) => {
+        getSpuDetail(param).then((res) => {
           if (res.status == 200) {
-            this.checkCount = 0;
+            this.selectedAttr = [];
             this.buyCount = 1;
-            this.productDetail = res.data;
-            this.productDetail.skuDetailList[0].attributes.push({attributeId: 111, attributeName: '规格', attributeValueId: 123, optionNameCn: '小'});
-            this.productDetail.skuDetailList[1].attributes.push({attributeId: 111, attributeName: '规格', attributeValueId: 124, optionNameCn: '中'});
-            var productArticleList = res.data.productArticleList;
-            // 设置评测顺序与是否显示
-            for (var i in productArticleList) {
-              if (productArticleList[i].status == 1) {
-                this.productArticleList.push(productArticleList[i]);
-              }
-            }
-            if (this.productArticleList && this.productArticleList.length > 1) {
-              this.productArticleList.sort(function (a, b) {
-                return a.sortBy > b.sortBy;
+            const productDetail = res.data;
+            productDetail.spuSearchVO.thumbnailImage = productDetail.spuSearchVO.thumbnailImage && productDetail.spuSearchVO.thumbnailImage.split('；');
+            this.$set(this.productDetail, 'spuDetail', productDetail.spuSearchVO);
+            this.$set(this.productDetail, 'productArticleList', productDetail.pProductArticleEntity);
+            const skuImgList = [];
+            productDetail.skuDetailList.map(item => {
+              const sku = item.priceList[0];
+              skuImgList.push(sku.skuImg && sku.skuImg.split('；'));
+
+              // 设置价格优先度
+              item.priceList.map(price => {
+                if (price.special == 'Y') {
+                  price.priority = 3;
+                } else if (item.promotionId) {
+                  price.priority = 2;
+                } else {
+                  price.priority = 1;
+                }
               });
-            }
-            if (this.productDetail.skuDetailList.length > 0) {
-              // i-row   j-col
-              for (var i in this.productDetail.skuDetailList) {
-                for (var j in this.productDetail.skuDetailList[i].attributes) {
-                  if (i == 0) {
-                    // 建立属性分组的分组类名 attributeList    el-checkbox的size个数
-                    var attribute = {attributeName: this.productDetail.skuDetailList[i].attributes[j].attributeName, attributes: new Array()};
-                    this.attributeList.push(attribute);
-                    this.size.push(new Array());
-                  }
-                  var flag = false;
-                  // 过滤属性名重复项
-                  for (var k in this.attributeList[j].attributes) {
-                    if (this.attributeList[j].attributes[k].optionNameCn == this.productDetail.skuDetailList[i].attributes[j].optionNameCn) {
-                      flag = true;
-                    }
-                  }
-                  // 未重复项放入attributeList
-                  if (!flag) {
-                    var array = Object.assign({}, this.productDetail.skuDetailList[i].attributes[j], {checked: false});
-                    this.attributeList[j].attributes.push(array);
-                  }
-                }
+            });
+            this.$set(this.productDetail, 'skuDetailList', productDetail.skuDetailList);
+            this.$set(this.productDetail, 'skuImgList', skuImgList);
 
-                // 抽取轮播图图片、图文详情图片
-                for (var p in this.productDetail.skuDetailList[i].skuImgs) {
-                  if (this.productDetail.skuDetailList[i].skuImgs[p].imageType == 'B') {
-                    for (var z in this.productDetail.skuDetailList[i].skuImgs[p].imgList) {
-                      this.swiperPic.push(this.productDetail.skuDetailList[i].skuImgs[p].imgList[z]);
-                    }
-                  } else if (this.productDetail.skuDetailList[i].skuImgs[p].imageType == 'A' || this.productDetail.skuDetailList[i].skuImgs[p].imageType == 'O') {
-                    for (var z in this.productDetail.skuDetailList[i].skuImgs[p].imgList) {
-                      this.detailPic.push(this.productDetail.skuDetailList[i].skuImgs[p].imgList[z]);
-                    }
-                  }
-                }
-
-                // 主SKU的参数图放入图文详情图片
-                if (this.productDetail.skuDetailList[i].isDefault == 'Y') {
-                  for (var s in this.productDetail.skuDetailList[i].skuImgs) {
-                    if (this.productDetail.skuDetailList[i].skuImgs[s].imageType == 'G') {
-                      for (var z in this.productDetail.skuDetailList[i].skuImgs[s].imgList) {
-                        this.detailPic.push(this.productDetail.skuDetailList[i].skuImgs[s].imgList[z]);
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            // 已登陆用户调用代理
-            if (this.user.userId && this.user.userId != '') {
-             // this.getBrandByBrandId();
-              this.getCollectionProduct();
-            }
-            this.getProvince();
+            // 设置属性列表
+            const attributes = res.data.spuSearchVO.spuAttr;
+            const attributeList = [];
+            attributes && attributes.split('；').map(item => {
+              this.selectedAttr.push([]);
+              const attr = item.split('：')[0];
+              const value = item.split('：')[1].split('、');
+              const attrList = [];
+              value.map(item => {
+                attrList.push({
+                  name: item
+                });
+              });
+              attributeList.push({
+                attr,
+                value: attrList
+              });
+            });
+            this.$set(this.productDetail, 'attributeList', attributeList);
             this.handleClickTab();
             this.getRelativeProduct();
             this.getBasicAttributes();
@@ -457,337 +493,182 @@
         });
       },
 
-      // tab--最近浏览,推荐
-      handleClickTab: (tab) => {
-        // 最近浏览
-        let param = {
-          spuId: this.$route.query.product,
-          distributorId: this.user.distributorId,
-          type: this.rightTab,
-          vendorId: this.user.vendorId,
-          page: 1,
-          pageSize: 5
-        };
-        getProductSpecialList(param).then((res) => {
-          if (res.status == 200) {
-            this.specialList = res.data;
-          }
-        });
-      },
-
-      // 相关商品
-      getRelativeProduct: () => {
-        // 最近浏览
-        let param = {
-          spuId: this.$route.query.product,
-          distributorId: this.user.distributorId,
-          type: 2,
-          vendorId: this.user.vendorId,
-          page: 1,
-          pageSize: 5
-        };
-        getProductSpecialList(param).then((res) => {
-          if (res.status == 200) {
-            this.relativeList = res.data;
-          }
-        });
-      },
-
-      // 获取品牌详情(增加一个根据erpBrandId查询)
-      getBrandByBrandId: () => {
-        let param = {
-          erpBrandId: this.productDetail.brandId,
-          vendorId: this.user.vendorId
-        };
-        getBrandByBrandId(param).then((res) => {
-          if (res.status == 200) {
-            this.$set(this.productDetail, 'trueBrandId', res.data.id);
-            this.getDAgentBrand();
-          }
-        });
-      },
-      // 获取代理品牌
-      getDAgentBrand: () => {
-        let param = {
-          vendorId: this.user.vendorId,
-          distributorId: this.user.distributorId,
-          erpBrandId: this.productDetail.brandId
-        };
-        getDAgentBrand(param).then((res) => {
-          if (res.status == 200) {
-            if (res.data == null) {
-              this.$set(this.status, 'status', null);
-              this.status.statusDesc = '申请代理';
-            } else if (res.data.status == 'R') {
-              this.$set(this.status, 'status', 'R');
-              this.status.statusDesc = '申请代理';
-            } else if (res.data.status == 'W') {
-              this.$set(this.status, 'status', 'W');
-              this.status.statusDesc = '等待审核';
-            } else if (res.data.status == 'Y') {
-              this.$set(this.status, 'status', 'Y');
-              this.status.statusDesc = '已代理';
-            }
-          }
-        });
-      },
-
-      // 申请代理
-      insertDAgentBrand: (formName) => {
-        this.$refs[formName].validate((valid) => {
-          let param = {
-            brandId: this.productDetail.trueBrandId,
-            distributorId: this.user.distributorId,
-            channelId: this.dialogStoreData.channelId
-          };
-          insertDAgentBrand(param).then((res) => {
-            if (res.status == 200) {
-              this.storeDialog = false;
-              this.getDAgentBrand();
-            }
-          });
-        });
-      },
-
-      // 点击申请代理
-      openAgent: () => {
-        if (!this.user.userId || this.user.userId == '') {
-          $router.push({ path: '/login' });
-        } else {
-          this.storeDialog = true;
-        }
-      },
-
-      // 获取渠道列表
-      getChannelOption: () => {
-        let param = {};
-        this.channelOption = new Array();
-        getChannelOption(param).then((res) => {
-          if (res.status == 200) {
-            var channelOption = res.data;
-            for (var i in channelOption) {
-              if (channelOption[i].status == 1) {
-                this.channelOption.push(channelOption[i]);
-              }
-            }
-            this.getBrandByBrandId();
-          }
-        });
-      },
-
-      // 是否加入收藏
-      getCollectionProduct: () => {
-        let param = {
-          distributorId: this.user.distributorId,
-          productId: this.$route.query.product
-        };
-        getCollectionProduct(param).then((res) => {
-          if (res.status == 200) {
-            if (!res.data || res.data == '') {
-              this.isCollection = false;
-            } else {
-              this.isCollection = true;
-            }
-          }
-        });
-      },
-
-      // 加入收藏
-      addCollectionProduct: () => {
-        if (!this.user.userId || this.user.userId == '') {
-          this.$router.push({path: '/login'});
-        } else {
-          if (!this.isCollection) {
-            // 查找主sku 收藏时价格为主sku的一件代发价
-            var defaultSkuId = null;
-            var defaultSkuCode = null;
-            var price = null;
-            for (var j in this.productDetail.skuDetailList) {
-              var sku = this.productDetail.skuDetailList[j];
-              if (sku.isDefault == 'Y') {
-                for (var k in sku.priceList) {
-                  var skuPrice = sku.priceList[k];
-                  if (skuPrice.levelId == this.user.vipId && skuPrice.startPiece == 1 && skuPrice.endPiece == 1) { // 登录未代理，显示的是一件代发价(需要根据会员id确定)
-                    price = skuPrice.price; // 一件代发的价格
-                  }
-                }
-                defaultSkuId = sku.productBaseId;
-                defaultSkuCode = sku.skuCode;
-              }
-            }
-            let param = {
-              distributorId: this.user.distributorId,
-              productId: this.productDetail.productId,
-              defaultSkuId: defaultSkuId,
-              defaultSkuCode: defaultSkuCode,
-              price: price
-            };
-            addCollectionProduct(param).then((res) => {
-              if (res.status == 200) {
-                this.$message({
-                  message: '收藏成功',
-                  type: 'success'
-                });
-                this.getCollectionProduct();
-              }
-            });
-          }
-        }
-      },
-
-      // 取消收藏
-      cancelAttentionProduct: () => {
-        let param = {
-          distributorId: this.user.distributorId,
-          productId: this.productDetail.productId
-        };
-        cancelAttentionProduct(param).then((res) => {
-          if (res.status == 200) {
-            this.$message({
-              message: '取消收藏成功',
-              type: 'success'
-            });
-            this.getCollectionProduct();
-          }
-        });
-      },
-
-      // 获取获取响应组合的价格或主SKU价格等
-      getBasicAttributes: () => {
+      // 获取获取响应组合的价格
+      getBasicAttributes: function () {
         // 标记当前需要的sku
-        var currSku;
-        // 根据是否选全选项显示主Sku还是
+        let currSkuPriceList;
         // 根据用户是否登录判断显示的属性
         // 选全
-        if (this.checkCount >= this.attributeList.length) {
-          for (var i in this.productDetail.skuDetailList) {
-            var flag = true;
-            for (var j in this.productDetail.skuDetailList[i].attributes) {
-              if (this.productDetail.skuDetailList[i].attributes[j].optionNameCn != this.size[j][0].optionNameCn) {
-                // 有一个属性不相同
-                flag = false;
-                break;
-              }
-            }
-            if (flag == true) {
-              currSku = i;
-              break;
-            }
-          }
-          this.$refs.swiperTop.swiper.slideTo(0, 1000, false);
-        } else {
-          // 一个都没选
-          if (this.checkCount == 0) {
-            this.$refs.swiperTop.swiper.slideTo(0, 1000, false);
-          }
-          for (let i in this.productDetail.skuDetailList) {
-            if (this.productDetail.skuDetailList[i].isDefault == 'Y') {
-              currSku = i;
-              break;
-            }
-          }
-        }
-        // type.id==true 批发
-        if (this.type.id) {
-          // 价格与起批量
-          this.$set(this.otherAttributeList, 'pricePiece', []);
-          this.$set(this.otherAttributeList, 'truePricePiece', new Array());
-          this.productDetail.skuDetailList[0].priceList = new Array();
-          this.productDetail.skuDetailList[0].priceList.push({startPiece: 1, endPiece: 10, price: 10, levelId: 1});
-          this.productDetail.skuDetailList[0].priceList.push({startPiece: 11, endPiece: 100, price: 100, levelId: 1});
-          this.productDetail.skuDetailList[0].priceList.push({startPiece: 101, endPiece: 1000, price: 1000, levelId: 1});
-          for (let j in this.productDetail.skuDetailList[i].priceList) {
-            if (this.productDetail.skuDetailList[i].priceList[j].levelId == this.user.vipId) {
-              if (this.productDetail.skuDetailList[i].priceList[j].startPiece == 1 &&
-                this.productDetail.skuDetailList[i].priceList[j].endPiece == 1) {
-
-              } else {
-                // 设置批发价格
-                this.otherAttributeList.pricePiece.push(this.productDetail.skuDetailList[i].priceList[j]);
-              }
-            }
-          }
-          // 起批量从小到大排序,过滤促销时的非促销价
-          if (this.otherAttributeList.pricePiece && this.otherAttributeList.pricePiece.length > 1) {
-
-            this.otherAttributeList.pricePiece.sort((a, b) => {
-              if (a.startPiece == b.startPiece) {
-                return a.endPiece > b.endPiece;
-              } else {
-                return a.startPiece > b.startPiece;
-              }
+        if (this.selectedAttr.length === this.productDetail.attributeList.length) {
+          const currSku = this.productDetail.skuDetailList.find((item) => {
+            const sku = item.priceList[0];
+            const attrList = sku.skuAttr.split('；');
+            let flag = true;
+            attrList.map((attr, index) => {
+              flag = (attr.split('：')[1] == this.selectedAttr[index]);
             });
-            this.otherAttributeList.truePricePiece.push(this.otherAttributeList.pricePiece[0]);
-            for (let j = 1; j < this.otherAttributeList.pricePiece.length; j++) {
-              var price = this.otherAttributeList.truePricePiece.pop();
-              if (this.otherAttributeList.pricePiece[j].startPiece == price.startPiece) { // 2-10(促销) 2-20 10-20(促销) 则2-20不放入
-                if (this.otherAttributeList.pricePiece[j].promotionId > price.promotionId) {
-                  this.otherAttributeList.truePricePiece.push(this.otherAttributeList.pricePiece[j]);
-                } else {
-                  this.shoppingCart[i].truePricePiece.push(price);
-                }
-              } else if (this.otherAttributeList.pricePiece[j].endPiece == price.endPiece) { // 2-10 2-999(促销) 10-999 则10-999不放入
-                if (this.otherAttributeList.pricePiece[j].promotionId > price.promotionId) {
-                  this.otherAttributeList.truePricePiece.push(this.otherAttributeList.pricePiece[j]);
-                } else {
-                  this.otherAttributeList.truePricePiece.push(price);
-                }
-              } else {
-                this.otherAttributeList.truePricePiece.push(price);
-                this.otherAttributeList.truePricePiece.push(this.otherAttributeList.pricePiece[j]);
-              }
-            }
-          }
+            return flag;
+          });
+          this.$set(this.relativeAttrList, 'skuImg', currSku.skuImg.split['；']);
+          this.$refs.swiperTop.swiper.slideTo(0, 1000, false);
+          currSkuPriceList = [...currSku.priceList];
         } else {
-          // 设置一件代发价格
-          if (this.productDetail.skuDetailList[i].specialPrice && this.productDetail.skuDetailList[i].specialPrice != '') {
-            this.$set(this.otherAttributeList, 'priceOne', this.productDetail.skuDetailList[i].specialPrice);
-          } else {
-            // 促销Id
-            this.$set(this.otherAttributeList, 'promotionId', -1);
-            for (let j in this.productDetail.skuDetailList[i].priceList) {
-              if (this.productDetail.skuDetailList[i].priceList[j].levelId == this.user.vipId) {
-                if (this.productDetail.skuDetailList[i].priceList[j].startPiece == 1 && this.productDetail.skuDetailList[i].priceList[j].endPiece == 1) {
-                  if (this.productDetail.skuDetailList[i].priceList[j].promotionId > this.otherAttributeList.promotionId) {
-                    this.$set(this.otherAttributeList, 'priceOne', this.productDetail.skuDetailList[i].priceList[j].price);
-                    this.$set(this.otherAttributeList, 'promotionId', this.productDetail.skuDetailList[i].priceList[j].promotionId);
+          // 显示所有skuImg
+          this.$set(this.relativeAttrList, 'skuImg', this.productDetail.skuImgList);
+          currSkuPriceList = this.productDetail.skuDetailList[0].priceList;
+        }
+        let priceList = [];
+        // 价格与起批量 接口返回的数据顺序特殊价格、促销价格、普通价格
+        // 前端重新排序成起批量asc && （特殊、促销、普通）参照获取spuDetail时所设置的优先度
+        currSkuPriceList.sort((a, b) => {
+          if (a.startPiece == b.startPiece) {
+            return b.priority > a.priority;
+          }
+          return a.startPiece - b.startPiece;
+        });
+        // 抽取价格
+        for (let i = 0; i < currSkuPriceList.length; i++) {
+          let j = i + 1;
+          let notFind = true;
+          let isFirst = true;
+          while (j < currSkuPriceList.length && notFind) {
+            if (currSkuPriceList[i].priority < currSkuPriceList[j].priority) {
+              // 后者优先度高的时候 后者的起批量介于前者中间
+              if (currSkuPriceList[j].startPiece > currSkuPriceList[i].startPiece) {
+                if (currSkuPriceList[j].startPiece <= currSkuPriceList[i].endPiece) {
+                  // 后者截止量介于前者中间 如 普通价格：1-12；促销价格：3-5
+                  if (currSkuPriceList[j].endPiece <= currSkuPriceList[i].endPiece) {
+                    // 拆成 普通价格：1-2
+                  console.log(i)
+                    
+                    priceList.push({
+                      startPiece: currSkuPriceList[i].startPiece,
+                      endPiece: currSkuPriceList[j].startPiece - 1,
+                      price: currSkuPriceList[i].price,
+                      stock: currSkuPriceList[i].priority > 1 && currSkuPriceList[i].stock || 0
+                    });
+                  } else { // 后者截止量大于前者截止量 如 普通价格：1-12；促销价格：3-14
+                    // 拆成 普通价格：1-2
+                    
+                    priceList.push({
+                      startPiece: currSkuPriceList[i].startPiece,
+                      endPiece: currSkuPriceList[j].startPiece - 1,
+                      price: currSkuPriceList[i].price,
+                      stock: currSkuPriceList[i].priority > 1 && currSkuPriceList[i].stock || 0
+                    });
                   }
                 }
+                notFind = false;
+              } else { // 普通 1-12 特殊 1-4
+                priceList.push({
+                  startPiece: currSkuPriceList[j].startPiece,
+                  endPiece: currSkuPriceList[j].endPiece,
+                  price: currSkuPriceList[j].price,
+                  stock: currSkuPriceList[j].priority > 1 && currSkuPriceList[j].stock || 0
+                });
+                currSkuPriceList[i].startPiece = currSkuPriceList[j].endPiece + 1;
+                currSkuPriceList.splice(j, 1);
+                j = j - 1;
+              }
+            } else {
+              // 避免重复加入
+              if (isFirst) {
+                priceList.push({
+                  startPiece: currSkuPriceList[i].startPiece,
+                  endPiece: currSkuPriceList[i].endPiece,
+                  price: currSkuPriceList[i].price,
+                  stock: currSkuPriceList[i].priority > 1 && currSkuPriceList[i].stock || 0
+                });
+                isFirst = false;
+              }
+              
+              if (currSkuPriceList[j].startPiece > currSkuPriceList[i].endPiece) {
+                notFind = false;
+              } else {
+                // 包含关系，删除该价格
+                if (currSkuPriceList[j].endPiece <= currSkuPriceList[i].endPiece) {
+                  currSkuPriceList.splice(j, 1);
+                  j = j - 1;
+                } else { // 交叉关系
+                  currSkuPriceList[j].startPiece = currSkuPriceList[i].endPiece + 1;
+                }
               }
             }
+            
+            j = j + 1;
           }
         }
-        // 设置动态轮播图sku主图
-        for (let p in this.productDetail.skuDetailList[currSku].skuImgs) {
-          if (this.productDetail.skuDetailList[currSku].skuImgs[p].imageType == 'A') {
-            var list = new Array();
-            for (var s in this.productDetail.skuDetailList[currSku].skuImgs[p].imgList) {
-              list.push(this.productDetail.skuDetailList[currSku].skuImgs[p].imgList[s]);
-            }
-            this.$set(this.otherAttributeList, 'skuImg', list);
-          }
-        }
-        this.$set(this.otherAttributeList, 'skuName', this.productDetail.skuDetailList[currSku].skuName);
-        this.$set(this.otherAttributeList, 'retailPrice', this.productDetail.skuDetailList[currSku].retailPrice + '');
-        this.$set(this.otherAttributeList, 'minPrice', this.productDetail.skuDetailList[currSku].minPrice + '');
-        this.$set(this.otherAttributeList, 'profit', (this.productDetail.skuDetailList[currSku].retailPrice - this.productDetail.skuDetailList[i].minPrice) + '');
-        this.$set(this.otherAttributeList, 'retailPrice', this.productDetail.skuDetailList[currSku].retailPrice);
-        this.$set(this.otherAttributeList, 'prodUnit', this.productDetail.skuDetailList[currSku].prodUnit);
-        this.$set(this.otherAttributeList, 'stock', this.productDetail.skuDetailList[currSku].channels[0].stock);
-        this.$set(this.otherAttributeList, 'cartonUnit', this.productDetail.skuDetailList[currSku].cartonUnit);
-        // 用于计算运费
-        this.$set(this.otherAttributeList, 'packLength', this.productDetail.skuDetailList[currSku].packLength);
-        this.$set(this.otherAttributeList, 'packWidth', this.productDetail.skuDetailList[currSku].packWidth);
-        this.$set(this.otherAttributeList, 'packHeight', this.productDetail.skuDetailList[currSku].packHeight);
-        this.$set(this.otherAttributeList, 'packGrossWeight', this.productDetail.skuDetailList[currSku].packGrossWeight);
-        this.$set(this.otherAttributeList, 'templateId', this.productDetail.skuDetailList[currSku].defaultTemplateId);
+        // 最后一个放入
+        priceList.push({
+          startPiece: currSkuPriceList[currSkuPriceList.length - 1].startPiece,
+          endPiece: currSkuPriceList[currSkuPriceList.length - 1].endPiece,
+          price: currSkuPriceList[currSkuPriceList.length - 1].price,
+          stock: currSkuPriceList[currSkuPriceList.length - 1].priority > 1 && currSkuPriceList[currSkuPriceList.length - 1].stock || 0
+        });
+        // 设置一件代发价格
+        const onePiece = currSkuPriceList.find(item => {
+          return item.startPiece == 1;
+        });
+        const sku = currSkuPriceList.find(item => {
+            return !item.special && !item.promotionId;
+        });
+        this.$set(this.relativeAttrList, 'onePiece', onePiece.price);
+        this.$set(this.relativeAttrList, 'priceList', priceList);
+        this.$set(this.relativeAttrList, 'retailPrice', sku.retailPrice);
+        this.$set(this.relativeAttrList, 'minPrice', sku.minPrice);
+        this.$set(this.relativeAttrList, 'profit', sku.retailPrice - sku.minPrice);
+        this.$set(this.relativeAttrList, 'stock', sku.stock);
+      },
+      // 相关商品
+      getRelativeProduct: function () {
+        // 最近浏览
+        // let param = {
+        //   spuId: this.$route.query.product,
+        //   distributorId: this.user.distributorId,
+        //   type: 2,
+        //   vendorId: this.user.vendorId,
+        //   page: 1,
+        //   pageSize: 5
+        // };
+        // getProductSpecialList(param).then((res) => {
+        //   if (res.status == 200) {
+        //     this.relativeList = res.data;
+        //   }
+        // });
+      },
 
-        // 用于加入购物车
-        this.$set(this.otherAttributeList, 'productBaseId', this.productDetail.skuDetailList[currSku].productBaseId);
+      // 获取代理品牌
+      getAgentBrand: function () {
+        GetAgentBrand(
+          this.productDetail.spuDetail.brandId,
+          (brand) => {
+            this.$set(this, 'brandAgent', brand);
+          }
+        );
+      },
+      
+      // 获取分销商已代理渠道
+      getChannelList: function () {
+        GetChannelList((channelList) => this.$set(this, 'channelList', channelList));
+      },
+
+      // 收藏列表
+      getCollectionProductList: function () {
+        GetCollectionProductList(1, 10000, (res) => {
+          if (res.data) {
+              const collectionList = res.data;
+              const spuId = this.productDetail.spuId;
+              this.collected = !!collectionList.find(item => {
+                return item.spuId == spuId;
+              });
+            } else {
+              this.collected = false;
+            }
+        });
       },
 
       // 查看一代代发或批发按钮
-      updatePrice: () => {
+      updatePrice: function () {
         if (!this.type.id) {
           this.type.id = true;
           this.type.value = '一<br>件<br>代<br>发';
@@ -795,28 +676,31 @@
           this.type.id = false;
           this.type.value = '批<br>发';
         }
-        this.getBasicAttributes();
       },
 
-      resetDialog: (formName) => {
+      resetDialog: function (formName) {
         this.channelId = '';
         this.$refs[formName].resetFields();
       },
+
       // 规格变动，选择可选选项
-      checkAllow: () => {
+      checkAllow: function () {
         // 每次修改选择项，初始化已选个数
-        this.checkCount = 0;
         this.buyCount = 1;
-        for (var i in this.size) {
-          if (this.size[i] && this.size[i] != '') {
+        this.selectedAttr.map(item => {
+          if (item.length > 1) {
+              item.shift();
+          }
+          return true;
+        });
+        for (var i in this.selectedAttr) {
+          if (this.selectedAttr[i] && this.selectedAttr[i] != '') {
             // 若该属性组选了两个，移除第一个选中项
-            if (this.size[i].length > 1) {
-              this.size[i].shift();
+            if (this.selectedAttr[i].length > 1) {
             }
-            this.checkCount++;
           }
         }
-        if (this.checkCount > 0) {
+        if (this.selectedAttr.length > 0) {
           for (var k in this.attributeList) {
             for (var p in this.attributeList[k].attributes) {
               this.attributeList[k].attributes[p].checked = true;
@@ -831,7 +715,8 @@
                   // 将第i+1个sku的属性全部设为可选
                   for (let j in this.productDetail.skuDetailList[i].attributes) {
                     for (let k in this.attributeList[j].attributes) {
-                      if (this.attributeList[j].attributes[k].optionNameCn == this.productDetail.skuDetailList[i].attributes[j].optionNameCn) {
+                      if (this.attributeList[j].attributes[k].optionNameCn ==
+                        this.productDetail.skuDetailList[i].attributes[j].optionNameCn) {
                         this.attributeList[j].attributes[k].checked = false;
                       }
                     }
@@ -849,67 +734,15 @@
         }
         this.getBasicAttributes();
       },
-      // 获取省列表
-      getProvince: () => {
-        let param = {};
-        getProvinceList(param).then((res) => {
-          if (res.status == 200) {
-            this.areaList = res.data;
-            for (let i in this.areaList) {
-              this.$set(this.areaList[i], 'cities', []);
-              this.$set(this.areaList[i], 'index', i);
-            }
-          }
-        });
-      },
-
-      // 获取市列表
-      handleChooseProvince: (value) => {
-        if (value && value != '') {
-          let param = {
-            parentCode: this.areaList[value[0]].regionCode
-          };
-          getCityListByProvince(param).then((res) => {
-            if (res.status == 200) {
-              this.areaList[value[0]].cities = res.data;
-              for (var i in this.areaList[value[0]].cities) {
-                this.$set(this.areaList[value[0]].cities[i], 'index', i);
-              }
-            }
-          });
-        }
-      },
-
-      // 省市均选择后计算运费
-      calculateShippingCost: (value) => {
-        if (value && value != '') {
-          this.area = value;
-        }
-        if (this.area.length > 1) {
-          let param = {
-            provinceCode: this.areaList[this.area[0]].regionCode,
-            cityCode: this.areaList[this.area[0]].cities[this.area[1]].regionCode,
-            packingList: [Object.assign({}, this.otherAttributeList, {totalNumber: this.buyCount})]
-          };
-          calculateShippingCost(param).then((res) => {
-            if (res.status == 200) {
-              this.shipCost = res.data && res.data != '' ? res.data[0].shippingCost : 0;
-            }
-          });
-        }
-      },
 
       // 加入购物车
-      addToShoppingCart: () => {
-        if (!this.user.userId || this.user.userId == '') {
-          this.$router.push({path: '/login'});
-        }
-        let param = {
+      addToShoppingCart: function () {
+        !this.user.id && this.$router.push({path: '/login'});
+        const param = {
           distributorId: 1,
           userId: 1,
-          skuId: this.otherAttributeList.productBaseId,
           quantity: this.buyCount,
-          isAgent: this.status.status == 'Y'
+          isAgent: this.brandAgent.status == 'Y'
         };
         addToShoppingCart(param).then((res) => {
           if (res.status == 200) {
@@ -922,20 +755,29 @@
       }
     },
     created () {
-      this.$set(this.user, 'vipId', 1);
-      this.$set(this.user, 'distributorId', 1);
       if (!this.$route.query.product || this.$route.query.product == '') {
         this.$router.push({ path: '/productList' });
         return;
       }
-      this.getProductDetail();
+      this.$set(this.productDetail, 'spuId', parseInt(this.$route.query.product));
+      let user = JSON.parse(sessionStorage.getItem('user'));
+      // 已登陆用户调用代理
+      if (user) {
+        this.getCollectionProductList();
+      } else {
+        user = {
+          id: null
+        };
+      }
+      this.$set(this, 'user', user);
+      this.getSpuDetail();
       this.getRelativeProduct();
     },
     mounted () {
       const swiperTop = this.$refs.swiperTop.swiper;
       const swiperThumbs = this.$refs.swiperThumbs.swiper;
-      swiperTop.params.control = swiperThumbs;
-      swiperThumbs.params.control = swiperTop;
+      this.$set(swiperTop.params, 'control', swiperThumbs);
+      this.$set(swiperThumbs.params, 'control', swiperTop);
     },
 
     filters: {
@@ -943,6 +785,15 @@
         // 商品单位
         var prodUnit = ['件', '箱', '盒', '包', '个', '套', '把', '台', '块', '条', '支', '对', '只'];
         return (!val || val == '') ? prodUnit[0] : prodUnit[parseInt(val) - 1];
+      },
+      formateStatusDesc: (status) => {
+        if (!status || status == 'R') {
+            return '申请代理';
+        } else if (status == 'W') {
+          return '等待审核';
+        } else {
+          return '已代理';
+        }
       }
     }
   };

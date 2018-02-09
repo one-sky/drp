@@ -69,6 +69,11 @@ export const deleteAddress = params => {
     return axios.post(`${base}/distributor/deleteAddress`, params).then(res => res.data);
 };
 
+// 查询分销商品牌代理情况
+export const getBrandListByAgentBrand = params => {
+    return axios.post(`${base}/distributor/getBrandListByAgentBrand`, params).then(res => res.data);
+};
+
 // 获取已代理品牌
 export const getAgentBrand = params => {
     return axios.post(`${base}/distributor/getAgentBrand`, params).then(res => res.data);
@@ -77,6 +82,21 @@ export const getAgentBrand = params => {
 // 申请代理
 export const insertAgentBrand = params => {
     return axios.post(`${base}/distributor/insertAgentBrand`, params).then(res => res.data);
+};
+
+// 获取已关注商品列表
+export const getCollectionProductList = params => {
+    return axios.post(`${base}/distributor/getCollectionProductList`, params).then(res => res.data);
+};
+
+// 批量取消已关注商品
+export const cancelCollectionProduct = params => {
+    return axios.post(`${base}/distributor/cancelCollectionProduct`, params).then(res => res.data);
+};
+
+// 批量关注商品
+export const addCollectionProduct = params => {
+    return axios.post(`${base}/distributor/addCollectionProduct`, params).then(res => res.data);
 };
 
 // 获取banner列表
@@ -124,6 +144,16 @@ export const getCategoryList = params => {
     return axios.post(`${base}/category/getCategoryList`, params).then(res => res.data);
 };
 
+// 获取类目详情by parentId
+export const getCategoryByParentId = params => {
+    return axios.post(`${base}/category/getCategoryByParentId`, params).then(res => res.data);
+};
+
+// 获取属性列表
+export const getAttributeList = params => {
+    return axios.post(`${base}/category/getAttributeList`, params).then(res => res.data);
+};
+
 // 获取最新品牌
 export const getNewBrandList = params => {
     return axios.post(`${base}/brand/getNewBrandList`, params).then(res => res.data);
@@ -142,6 +172,11 @@ export const getBrandById = params => {
 // 商品列表
 export const getProductList = params => {
     return axios.post(`${base}/product/getProductList`, params).then(res => res.data);
+};
+
+// 获取spu明细
+export const getSpuDetail = params => {
+    return axios.post(`${base}/product/getSpuDetail`, params).then(res => res.data);
 };
 
 // 获取订单列表
@@ -206,8 +241,6 @@ export const getOrderDetailByOrderCode = params => { return axios.post(`${base}/
 
 // brand
 
-// 获取个人中心已代理品牌
-export const getBrandListByAgentBrand = params => { return axios.post(`${base}/brand/getBrandListByAgentBrand`, params).then(res => res.data); };
 // 获取公告详情
 export const getNoticebyId = params => { return axios.post(`${base}/brand/getNoticebyId`, params).then(res => res.data); };
 
@@ -220,29 +253,6 @@ export const getBrandDetail = params => { return axios.post(`${base}/brand/getBr
 
 // 获取一些特殊的商品列表，比如推荐商品，相关商品，最近浏览
 export const getProductSpecialList = params => { return axios.post(`${base}/product/getProductSpecialList`, params).then(res => res.data); };
-
-export const getProductDetail = params => { return axios.post(`${base}/product/getProductDetail`, params).then(res => res.data); };
-
-// 获取商品包裹信息
-export const getProductPackingInfo = params => { return axios.post(`${base}/product/getProductPackingInfo`, params).then(res => res.data); };
-
-// 计算运费
-export const calculateShippingCost = params => { return axios.post(`${base}/product/calculateShippingCost`, params).then(res => res.data); };
-
-// 获取已关注商品
-export const getCollectionProductList = params => { return axios.post(`${base}/product/getCollectionProductList`, params).then(res => res.data); };
-
-// 取消已关注商品
-export const cancelAttentionProduct = params => { return axios.post(`${base}/product/cancelAttentionProduct`, params).then(res => res.data); };
-
-// 批量取消已关注商品
-export const batchCancelAttentionProduct = params => { return axios.post(`${base}/product/batchCancelAttentionProduct`, params).then(res => res.data); };
-
-// 收藏商品
-export const addCollectionProduct = params => { return axios.post(`${base}/product/addCollectionProduct`, params).then(res => res.data); };
-
-// 查看是否收藏
-export const getCollectionProduct = params => { return axios.post(`${base}/product/getCollectionProduct`, params).then(res => res.data); };
 
 // 批量置顶商品
 export const stickyProduct = params => { return axios.post(`${base}/product/stickyProduct`, params).then(res => res.data); };

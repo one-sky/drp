@@ -43,16 +43,16 @@
     </div>
 
     <div class="pagination">
-      <el-pagination layout="prev, pager, next" :page-size="pageSize" :total="totalCount"
-                     :current-page="currentPage" @current-change="handleCurrentChange">
+      <el-pagination layout="prev, pager, next" :page-size="page.pageSize" :total="page.totalCount"
+                     :current-page="page.currentPage" @current-change="handleCurrentChange">
       </el-pagination>
     </div>
 
-    <el-dialog title="选择渠道" :visible.sync="dialogFormVisible" v-loading="loading" @open="getChannelOption()" @close="resetDialog('ruleForm')">
+    <el-dialog title="选择渠道" :visible.sync="dialogFormVisible" v-loading="loading" @open="getChannelList()" @close="resetDialog('ruleForm')">
       <el-form :model="channel" :rules="dialog_rules" ref="ruleForm">
-        <el-form-item label="分销渠道：" prop="channel" >
+        <el-form-item label="分销渠道：">
           <el-select v-model="channel.channel" >
-            <el-option v-for="item in channelOption" :key="item.id" :label="item.channelName" :value="item.id"></el-option>
+            <el-option v-for="item in channelList" :key="item.id" :label="item.channelName" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -70,7 +70,16 @@
 </style>
 
 <script>
-  import {getBrandListByAgentBrand, getChannelOption} from '../../api/api';
+  import {
+    getBrandListByAgentBrand,
+  } from '../../api/api';
+
+  import {
+    GetChannelList,
+    GetAgentBrand,
+    InsertAgentBrand
+  } from '../../js/distributor';
+
   export default {
     data () {
       return {
@@ -90,72 +99,48 @@
 
         brandList: [],
 
-        channelOption: [],
+        channelList: [],
         channel: {
           channel: null
         },
         currBrand: null, // 下载授权书时标记品牌下标
-
-        pageSize: 10,
-        totalCount: 40,
-        currentPage: 1,
+        page: {
+          pageSize: 10,
+          totalCount: 40,
+          currentPage: 1,
+        },
+        
         loading: false,
         dialogFormVisible: false,
 
-        dialog_rules: {
-          channel: [
-            {
-              type: 'number',
-              required: true,
-              message: '请选择分销渠道',
-              trigger: 'change'
-            }
-          ],
-        },
       };
     },
 
     methods: {
-      getBrandListByAgentBrand: () => {
+      getBrandListByAgentBrand: function () {
         this.loading = true;
-        let param = {
-          distributorId: this.user.distributorId,
-          vendorId: this.user.vendorId,
+        const param = {
+          distributorId: this.user.id,
           brandName: this.searchForm.name,
-          status: this.activeName == 'N' ? '' : this.activeName,
-          pageNum: this.currentPage
+          status: this.activeName == 'N' ? null : this.activeName,
+          pageNum: this.page.currentPage,
+          pageSize: this.page.pageSize
         };
         getBrandListByAgentBrand(param).then((res) => {
           if (res.status == 200) {
-            this.totalCount = res.page.totalNum;
-            this.brandList = res.data;
-            for (var i in this.brandList.rBrands) {
-              this.$set(this.brandList.rBrands[i], 'packageActive', false);
-              this.$set(this.brandList.rBrands[i], 'authorActive', false);
-            }
-            this.loading = false;
+            this.page.totalCount = res.page.total;
+            this.$set(this, 'brandList', res.data);
           }
         });
       },
 
-      // 获取渠道列表
-      getChannelOption: () => {
-        let param = {};
-        this.channelOption = new Array();
-        getChannelOption(param).then((res) => {
-          if (res.status == 200) {
-            var channelOption = res.data;
-            for (var i in channelOption) {
-              if (channelOption[i].status == 1) {
-                this.channelOption.push(channelOption[i]);
-              }
-            }
-          }
-        });
+      // 获取分销商已代理渠道
+      getChannelList: function () {
+        GetChannelList((channelList) => this.$set(this, 'channelList', channelList));
       },
 
       // tab_event
-      handleClick: (tab, event) => {
+      handleClick: function (tab, event) {
         // reset
         this.searchGroup = {
           name: ''
@@ -163,21 +148,21 @@
         this.searchForm = {
           name: ''
         };
-        this.currentPage = 1;
+        this.page.currentPage = 1;
         this.getBrandListByAgentBrand();
       },
 
-      handleSearch: () => {
-        this.searchForm.name = this.searchGroup.name;
-        this.currentPage = 1;
+      handleSearch: function () {
+        this.searchForm = {...this.searchGroup};
+        this.page.currentPage = 1;
         this.getBrandListByAgentBrand();
       },
 
-      showActive: (key, prop, value) => {
+      showActive: function (key, prop, value) {
         this.$set(this.brandList.rBrands[key], prop, value);
       },
 
-      fileDownload: (id) => {
+      fileDownload: function (id) {
         for (var i in this.brandList.agentBrandVOS) {
           if (this.brandList.agentBrandVOS[i].id == this.brandList.rBrands[id].id) {
             window.open(this.brandList.agentBrandVOS[i].brandCertificate, '_blank');
@@ -190,7 +175,7 @@
         });
       },
 
-      authorFileDownload: () => {
+      authorFileDownload: function () {
         for (var i in this.brandList.agentBrandVOS) {
           // key
           if (this.brandList.agentBrandVOS.channelId == this.channel.channel) {
@@ -206,23 +191,23 @@
       },
 
       // 页码变更
-      handleCurrentChange: (val) => {
-        this.currentPage = val;
-        this.getBrandList(this.searchForm, this.currentPage);
+      handleCurrentChange: function (val) {
+        this.page.currentPage = val;
+        this.getBrandListByAgentBrand();
       },
 
-      openDialog: (key) => {
+      openDialog: function (key) {
         this.dialogFormVisible = true;
         this.currBrand = key;
       },
 
-      resetDialog: (formName) => {
+      resetDialog: function (formName) {
         this.$refs[formName].resetFields();
       }
     },
 
     created () {
-      this.user = JSON.parse(sessionStorage.getItem('user'));
+      this.$set(this, 'user', JSON.parse(sessionStorage.getItem('user')));
       this.getBrandListByAgentBrand();
     }
 
