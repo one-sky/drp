@@ -50,10 +50,7 @@
 </style>
 
 <script>
-  import md5 from 'md5';
-  import QRCode from '../../../node_modules/qrcode';
   import {
-    getCharge,
     getOrderDetailByOrderCode
   } from '../../api/api';
   export default {
@@ -92,10 +89,9 @@
       };
     },
     methods: {
-      getOrderDetailByOrderCode: () => {
-        var param = {
+      getOrderDetailByOrderCode: function () {
+        const param = {
           orderCode: this.orderCode,
-          vendorId: this.user.vendorId
         };
         getOrderDetailByOrderCode(param).then((res) => {
           if (res.status == 200 && res.data.status < 20 && res.data.status != 0) { // 显示的订单状态为未支付
@@ -118,7 +114,7 @@
         });
       },
 
-      changeSelected: (val) => {
+      changeSelected: function (val) {
         for (var i in this.payChannel) {
           if (i != val) {
             this.payChannel[i].selected = false;
@@ -129,9 +125,9 @@
         }
       },
 
-      toPay: () => {
+      toPay: function () {
       },
-      toPaySuccess: () => {
+      toPaySuccess: function () {
         this.$router.push(
           {
             path: '/paySuccess',

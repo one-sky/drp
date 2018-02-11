@@ -99,6 +99,16 @@ export const addCollectionProduct = params => {
     return axios.post(`${base}/distributor/addCollectionProduct`, params).then(res => res.data);
 };
 
+// 加入或购物车中减少删除等
+export const updateShoppingCartList = params => {
+    return axios.post(`${base}/distributor/updateShoppingCartList`, params).then(res => res.data);
+};
+
+// 获取购物车列表
+export const getShoppingCartList = params => {
+    return axios.post(`${base}/distributor/getShoppingCartList`, params).then(res => res.data);
+};
+
 // 获取banner列表
 export const getBannerList = params => {
     return axios.post(`${base}/resource/getBannerList`, params).then(res => res.data);
@@ -256,17 +266,6 @@ export const getProductSpecialList = params => { return axios.post(`${base}/prod
 
 // 批量置顶商品
 export const stickyProduct = params => { return axios.post(`${base}/product/stickyProduct`, params).then(res => res.data); };
-
-// shoppingCart
-// 加入购物车
-export const addToShoppingCart = params => { return axios.post(`${base}/shoppingCart/addToShoppingCart`, params).then(res => res.data); };
-
-// 批量删除购物车
-export const batchDeleteCollection = params => { return axios.post(`${base}/shoppingCart/batchDeleteCollection`, params).then(res => res.data); };
-
-// 获取购物车
-export const getShoppingCart = params => { return axios.post(`${base}/shoppingCart/getShoppingCart`, params).then(res => res.data); };
-
 // 从购物车中收藏商品
 export const collectionProductToShoppingCart = params => { return axios.post(`${base}/shoppingCart/collectionProductToShoppingCart`, params).then(res => res.data); };
 

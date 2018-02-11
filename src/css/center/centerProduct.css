@@ -12,6 +12,15 @@
 .center-product .table{
   word-wrap: break-word;
 }
+.center-product .batchBtn {
+  display: flex;
+  margin-top: 20px;
+  width: 200px;
+
+}
+.center-product .batchBtn .el-button {
+  padding: 10px 10px !important;
+}
 
 /*关注时价格*/
 .center-product .table .last-price{

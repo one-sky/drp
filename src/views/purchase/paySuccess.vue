@@ -41,13 +41,13 @@
 </style>
 
 <script>
-  import md5 from 'md5';
-  import {searchCharge, getOrderDetailByOrderCode} from '../../api/api';
+  import {
+    getOrderDetailByOrderCode
+  } from '../../api/api';
   export default {
 
     data () {
       return {
-
         orderCode: null,
         user: {},
         orderDetail: {},
@@ -57,20 +57,8 @@
       };
     },
     methods: {
-
-      searchCharge () {
-        let param = {
-          orderNumber: this.orderCode,
-          vendorId: 1,
-        };
-        searchCharge(param).then((res) => {
-          if (res.data == 1) {
-            this.getOrderDetailByOrderCode();
-          }
-        });
-      },
-      getOrderDetailByOrderCode: () => {
-        var param = {
+      getOrderDetailByOrderCode: function () {
+        const param = {
           orderCode: this.orderCode,
         };
         getOrderDetailByOrderCode(param).then((res) => {
@@ -81,7 +69,7 @@
           }
         });
       },
-      toOrder (id) {
+      toOrder: function (id) {
         this.$router.push(
           {
             path: '/center/orderDetail',
@@ -91,21 +79,21 @@
           }
         );
       },
-      toShoppingCart () {
+      toShoppingCart: function () {
         this.$router.push(
           {
             path: '/shoppingCart'
           }
         );
       },
-      toProductList () {
+      toProductList: function () {
         this.$router.push(
           {
             path: '/productList'
           }
         );
       },
-      toPayPage () {
+      toPayPage: function () {
         this.$router.push(
           {
             path: '/toPay',

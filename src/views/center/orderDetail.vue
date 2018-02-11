@@ -158,10 +158,10 @@
   } from '../../api/api';
 
 export default {
-    data() {
+    data () {
         return {
             user: {},
-            statusDesc:['确认订单', '买家付款', '卖家发货', '交易完成'],
+            statusDesc: ['确认订单', '买家付款', '卖家发货', '交易完成'],
             statusList: [],
             orderItemList: {},
             deliveryInfo: [],
@@ -172,7 +172,6 @@ export default {
 
     methods: {
         getOrderDetail: function () {
-
             this.loading = true;
             const orderIds = [];
             orderIds.push(this.$route.query.order);
@@ -181,61 +180,62 @@ export default {
                 orderIds
             };
             getOrderDetail(param).then((res) => {
-            this.orderItemList = res.data;
-            //status_Array
-            const status = [this.orderItemList.orderTime, this.orderItemList.paymentTime, this.orderItemList.deliveryTime, this.orderItemList.finishTime];
-            status.map((item, index) => {
-                const i = {
-                    statusDesc: this.statusDesc[index],
-                    statusTime: item
-                };
-                this.statusList.push(i);
-            })
-            this.loading = false;
-            })
+                this.orderItemList = res.data;
+                // status_Array
+                const status = [
+                    this.orderItemList.orderTime,
+                    this.orderItemList.paymentTime,
+                    this.orderItemList.deliveryTime,
+                    this.orderItemList.finishTime
+                ];
+                status.map((item, index) => {
+                    const i = {
+                        statusDesc: this.statusDesc[index],
+                        statusTime: item
+                    };
+                    this.statusList.push(i);
+                });
+                this.loading = false;
+            });
         },
 
-        getDeliveryInfo(deliveryCompany, deliveryID){
-            //根据deliveryCompany, deliveryID查询
+        getDeliveryInfo: function (deliveryCompany, deliveryID) {
+            // 根据deliveryCompany, deliveryID查询
             this.deliveryInfo = [{
-                time: "2015-05-17 01:20:07",
-                context: "合肥市|发件|合肥市【合肥分拨中心】，正发往【天津分拨中心】"
+                time: '2015-05-17 01:20:07',
+                context: '合肥市|发件|合肥市【合肥分拨中心】，正发往【天津分拨中心】'
             },
             {
-                time: "2015-05-17 01:18:20",
-                context: "合肥市|到件|到合肥市【合肥分拨中心】"
+                time: '2015-05-17 01:18:20',
+                context: '合肥市|到件|到合肥市【合肥分拨中心】'
             },
             {
-                time: "2015-05-16 19:45:27",
-                context: "宿州市|发件|宿州市【宿州分拨仓】，正发往【合肥分拨中心】"
+                time: '2015-05-16 19:45:27',
+                context: '宿州市|发件|宿州市【宿州分拨仓】，正发往【合肥分拨中心】'
             },
             {
-                time: "2015-05-16 16:38:48",
-                context: "宿州市|到件|到宿州市【宿州分拨仓】"
+                time: '2015-05-16 16:38:48',
+                context: '宿州市|到件|到宿州市【宿州分拨仓】'
             },
             {
-                time: "2015-05-16 15:24:38",
-                context: "宿州市|发件|宿州市【宿州市区八部】，正发往【宿州分拨仓】"
+                time: '2015-05-16 15:24:38',
+                context: '宿州市|发件|宿州市【宿州市区八部】，正发往【宿州分拨仓】'
             },
             {
-                time: "2015-05-16 15:17:59",
-                context: "宿州市|收件|宿州市【宿州市区八部】，【宿州市区八部/0557-2229660】已揽收"
+                time: '2015-05-16 15:17:59',
+                context: '宿州市|收件|宿州市【宿州市区八部】，【宿州市区八部/0557-2229660】已揽收'
             }];
-
         },
 
-        //list_button_event
-        handleRefund(orderId,productID){
-            console.log(orderId);
+        // list_button_event
+        handleRefund: function (orderId, productID) {
         },
-
 
     },
-    created()  {
+    created () {
         this.$set(this, 'user', JSON.parse(sessionStorage.getItem('user')));
         this.getOrderDetail();
     },
   };
-
 </script>
 

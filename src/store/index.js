@@ -20,6 +20,9 @@ const state = {
     value: null,
     priceType: 1,
     categoryIds: null
+  },
+  handleCart: {
+    
   }
   
 };

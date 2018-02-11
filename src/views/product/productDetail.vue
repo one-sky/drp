@@ -45,7 +45,7 @@
             <div v-else-if="type.id">
               <span>采购价：</span>
               <template v-if="user.id">
-                <template v-if="brandAgent.status!='Y'">
+                <template v-if="!brandAgent || brandAgent.status!='Y'">
                   <div v-for="(item,index) in relativeAttrList.priceList">
                     <h1 class="price-size third-font-color"><span class="price-icon-size">¥ </span>{{item.price|formatMoney}}</h1>
                   </div>
@@ -83,7 +83,7 @@
           <div>
             <h5>毛利润：</h5>
             <template v-if="user.id">
-              <div v-if="brandAgent.status=='Y'">
+              <div v-if="brandAgent && brandAgent.status=='Y'">
                 ¥ {{relativeAttrList.profit|formatMoney}}
               </div>
               <div v-else>
@@ -111,7 +111,7 @@
           <div v-for="(item,index) in productDetail.attributeList">
             <h5>{{item.attr}}：</h5>
             <el-checkbox-group  v-model="selectedAttr[index]" @change="checkAllow()" :max="2">
-              <el-checkbox-button v-for="(a,key) in item.value" :label="a" :disabled="a.checked">{{a.name}}</el-checkbox-button>
+              <el-checkbox-button v-for="(a,key) in item.value" :label="a.name" :disabled="!a.canChoose">{{a.name}}</el-checkbox-button>
             </el-checkbox-group>
           </div>
           <!--row quantity-->
@@ -136,7 +136,7 @@
               <el-button type="text" @click="addCollectionProduct" v-if="!collected">
                 <img src="../../imgs/product/collect.png" height="11" width="12"/>加入收藏
               </el-button>
-              <el-button type="text" @click="cancelAttentionProduct" v-else>
+              <el-button type="text" @click="cancelCollectionProduct" v-else>
                 <img src="../../imgs/product/collect.png" height="11" width="12"/>取消收藏
               </el-button>
             </div>
@@ -252,27 +252,22 @@
 
     </div>
 
-    <el-dialog title="申请代理" :visible.sync="storeDialog" @open="getChannelList()" @close="resetDialog('storeForm')">
-      <el-form :model="dialogStoreData" ref="storeForm" class="detail_shop_form">
-        <el-form-item class="add_input add_select" style="margin-left:10px; margin-top:-10px;" prop="channelId" >
-          <div class="ub" style="font-size:13px;">
-            <div style="width:90px;">
-              分销渠道：
-            </div>
-            <div class="ub">
-              <el-select class="channel_select" v-model="dialogStoreData.channelId" >
-                <el-option v-for="channel in channelList" :key="channel.id" :label="channel.channelName" :value="channel.id"></el-option>
-              </el-select>
-            </div>
-            <div style="padding-top:4px;">
-              <span style="color:red;margin-left:5px;">*</span>
-            </div>
-          </div>
+    <el-dialog title="申请代理" :visible.sync="storeDialog" @close="resetDialog('storeForm')" class="dialog" >
+      <el-form ref="storeForm"  class="form" label-width="100px">
+        <el-form-item label="分销渠道：">
+            <el-select v-model="channelId" ref="channel">
+              <el-option
+                v-for="channel in channelList"
+                :key="channel.id"
+                :label="channel.name"
+                :value="channel.id"
+              ></el-option>
+            </el-select>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer" style="margin-top:-30px;margin-bottom:10px;">
+      <div slot="footer" class="center-dialog-bottom">
         <el-button @click="storeDialog = false">取 消</el-button>
-        <el-button type="primary"  @click="insertDAgentBrand('storeForm')">确 定</el-button>
+        <el-button type="primary" :disabled="!channelId" @click="insertAgentBrand()">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -287,7 +282,7 @@
   import {
     getSpuDetail,
     getProductSpecialList,
-    addToShoppingCart
+    updateShoppingCartList
   } from '../../api/api.js';
 
   import {
@@ -298,6 +293,8 @@
     AddCollectionProduct,
     CancelCollectionProduct
   } from '../../js/distributor';
+
+  let CURR_SKU;
   export default {
     data () {
       return {
@@ -337,9 +334,7 @@
         detailPic: [],
 
         // 申请代理
-        dialogStoreData: {
-          channelId: null
-        },
+        channelId: null,
         storeDialog: false,
 
         channelList: [],
@@ -381,7 +376,7 @@
       // 申请代理
       insertAgentBrand: function () {
         InsertAgentBrand(
-          this.brandAgent.id,
+          this.productDetail.spuDetail.brandId,
           this.channelId,
           (result) => {
             if (result) {
@@ -394,7 +389,7 @@
 
       // 点击申请代理
       handleAgentBrand: function () {
-        if (!this.user.userId || this.user.userId == '') {
+        if (!this.user.id) {
           this.$router.push({ path: '/login' });
         } else {
           this.storeDialog = true;
@@ -421,7 +416,7 @@
       cancelCollectionProduct: function () {
         CancelCollectionProduct([this.productDetail.spuDetail.productId], (res) => {
           let msg = '';
-          msg = res > 0 && '取消收藏成功' || '取消收藏失败，请重新取消';
+          msg = res > 0 ? '取消收藏成功' : '取消收藏失败，请重新取消';
           this.$message({
             message: msg,
             type: 'success',
@@ -449,7 +444,19 @@
             this.$set(this.productDetail, 'productArticleList', productDetail.pProductArticleEntity);
             const skuImgList = [];
             productDetail.skuDetailList.map(item => {
-              const sku = item.priceList[0];
+              const sku = item.priceList[item.priceList.length - 1];
+
+              // 设置属性
+              const attrList = [];
+              sku.skuAttr.split('；').map(i => {
+                const attr = i.split('：');
+                attrList.push(attr[1]);
+              });
+              item.skuAttr = attrList;
+
+              // skuImg
+              item.skuImg = sku.skuImg.split('；');
+
               skuImgList.push(sku.skuImg && sku.skuImg.split('；'));
 
               // 设置价格优先度
@@ -487,7 +494,11 @@
             this.$set(this.productDetail, 'attributeList', attributeList);
             this.handleClickTab();
             this.getRelativeProduct();
-            this.getBasicAttributes();
+            this.checkAllow();
+            if (this.user.id) {
+              this.getAgentBrand();
+              this.getChannelList();
+            }
             this.loading = false;
           }
         });
@@ -496,27 +507,7 @@
       // 获取获取响应组合的价格
       getBasicAttributes: function () {
         // 标记当前需要的sku
-        let currSkuPriceList;
-        // 根据用户是否登录判断显示的属性
-        // 选全
-        if (this.selectedAttr.length === this.productDetail.attributeList.length) {
-          const currSku = this.productDetail.skuDetailList.find((item) => {
-            const sku = item.priceList[0];
-            const attrList = sku.skuAttr.split('；');
-            let flag = true;
-            attrList.map((attr, index) => {
-              flag = (attr.split('：')[1] == this.selectedAttr[index]);
-            });
-            return flag;
-          });
-          this.$set(this.relativeAttrList, 'skuImg', currSku.skuImg.split['；']);
-          this.$refs.swiperTop.swiper.slideTo(0, 1000, false);
-          currSkuPriceList = [...currSku.priceList];
-        } else {
-          // 显示所有skuImg
-          this.$set(this.relativeAttrList, 'skuImg', this.productDetail.skuImgList);
-          currSkuPriceList = this.productDetail.skuDetailList[0].priceList;
-        }
+        const currSkuPriceList = [...CURR_SKU.priceList];
         let priceList = [];
         // 价格与起批量 接口返回的数据顺序特殊价格、促销价格、普通价格
         // 前端重新排序成起批量asc && （特殊、促销、普通）参照获取spuDetail时所设置的优先度
@@ -539,8 +530,6 @@
                   // 后者截止量介于前者中间 如 普通价格：1-12；促销价格：3-5
                   if (currSkuPriceList[j].endPiece <= currSkuPriceList[i].endPiece) {
                     // 拆成 普通价格：1-2
-                  console.log(i)
-                    
                     priceList.push({
                       startPiece: currSkuPriceList[i].startPiece,
                       endPiece: currSkuPriceList[j].startPiece - 1,
@@ -686,65 +675,96 @@
       // 规格变动，选择可选选项
       checkAllow: function () {
         // 每次修改选择项，初始化已选个数
-        this.buyCount = 1;
-        this.selectedAttr.map(item => {
-          if (item.length > 1) {
-              item.shift();
-          }
-          return true;
-        });
-        for (var i in this.selectedAttr) {
-          if (this.selectedAttr[i] && this.selectedAttr[i] != '') {
-            // 若该属性组选了两个，移除第一个选中项
-            if (this.selectedAttr[i].length > 1) {
+        CURR_SKU = null;
+        if (this.productDetail.attributeList.length > 0) {
+          this.buyCount = 1;
+          // 若该属性组选了两个，移除第一个选中项
+          this.selectedAttr.length > 0 && this.selectedAttr.map(item => {
+            if (item.length > 1) {
+                item.shift();
             }
-          }
-        }
-        if (this.selectedAttr.length > 0) {
-          for (var k in this.attributeList) {
-            for (var p in this.attributeList[k].attributes) {
-              this.attributeList[k].attributes[p].checked = true;
-            }
-          }
-          for (let p in this.size) {
-            // 去掉size中的空项
-            if (this.size[p] && this.size[p] != '') {
-              for (let i in this.productDetail.skuDetailList) {
-                // 查找到含有该属性的sku
-                if (this.productDetail.skuDetailList[i].attributes[p].optionNameCn == this.size[p][0].optionNameCn) {
-                  // 将第i+1个sku的属性全部设为可选
-                  for (let j in this.productDetail.skuDetailList[i].attributes) {
-                    for (let k in this.attributeList[j].attributes) {
-                      if (this.attributeList[j].attributes[k].optionNameCn ==
-                        this.productDetail.skuDetailList[i].attributes[j].optionNameCn) {
-                        this.attributeList[j].attributes[k].checked = false;
-                      }
+            return true;
+          });
+
+          // 先将所有选项设为禁止状态
+          this.productDetail.attributeList.map(item => {
+            item.value.map(attr => {
+              this.$set(attr, 'canChoose', false);
+            });
+          });
+
+          // 判断是否没有选中任何一项
+          let checkAttr = 0;
+          this.selectedAttr.map((item, key) => {
+            // 有选中项的时候匹配
+            if (item.length > 0) {
+              checkAttr = checkAttr + 1;
+              this.productDetail.skuDetailList.map(sku => {
+                // 如点击红色，查找到了，则其如规格14寸属性等也可点击
+                if (sku.skuAttr[key] == item[0]) {
+                  sku.skuAttr.map((i, row) => {
+                    const otherSku = this.productDetail.attributeList[row].value.find(a => {
+                      return a.name == i;
+                    });
+                    if (otherSku) {
+                      otherSku.canChoose = true;
                     }
-                  }
+                  });
                 }
+              });
+            }
+          });
+          // 没有选中项,设置有sku的可点击
+          if (checkAttr < this.productDetail.attributeList.length) {
+            CURR_SKU = {...this.productDetail.skuDetailList[0]};
+            // 显示所有skuImg
+            this.$set(this.relativeAttrList, 'skuImg', this.productDetail.skuImgList);
+            if (checkAttr === 0) {
+              this.productDetail.skuDetailList.map(item => {
+                item.skuAttr.map((attr, index) => {
+                  this.productDetail.attributeList[index].value.find(i => {
+                    i.name == attr && !i.canChoose && this.$set(i, 'canChoose', true);
+                  });
+                });
+              });
+            }
+          } else { // 属性选全
+            for (let i in this.productDetail.skuDetailList) {
+              let currSku = true;
+              for (let j in this.productDetail.skuDetailList[i].skuAttr) {
+                if (this.productDetail.skuDetailList[i].skuAttr[j] != this.selectedAttr[j][0]) {
+                  currSku = false;
+                  break;
+                }
+              }
+              if (currSku) {
+                CURR_SKU = {...this.productDetail.skuDetailList[i]};
+                this.$set(this.relativeAttrList, 'skuImg', CURR_SKU.skuImg);
+                break;
               }
             }
           }
-        } else if (this.checkCount == 0) {
-          for (let k in this.attributeList) {
-            for (let p in this.attributeList[k].attributes) {
-              this.attributeList[k].attributes[p].checked = false;
-            }
-          }
+          this.$refs.swiperTop.swiper.slideTo(0, 1000, false);
+        } else {
+          CURR_SKU = {...this.productDetail.skuDetailList[0]};
         }
+        
         this.getBasicAttributes();
       },
 
       // 加入购物车
       addToShoppingCart: function () {
         !this.user.id && this.$router.push({path: '/login'});
+        const sku = CURR_SKU.priceList[CURR_SKU.priceList.length - 1];
         const param = {
-          distributorId: 1,
-          userId: 1,
-          quantity: this.buyCount,
-          isAgent: this.brandAgent.status == 'Y'
+          distributorId: this.user.id,
+          shoppingCartItemVOList: [{
+            skuId: sku.skuId,
+            quantity: this.buyCount,
+            type: this.brandAgent.status == 'Y' ? 1 : 2
+          }]
         };
-        addToShoppingCart(param).then((res) => {
+        updateShoppingCartList(param).then((res) => {
           if (res.status == 200) {
             this.$message({
               message: '加入进货单成功',
