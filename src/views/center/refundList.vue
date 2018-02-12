@@ -56,7 +56,7 @@
                     <div class="flex-col ver-center" style="width:22%;">
                       ￥{{props.row.orderItem[n-1].paidAmount|formatMoney}}
                       <p class="third-font-color">
-                        （ 支付方式：{{props.row.payChannel}}）
+                        （ 支付方式：{{props.row.payChannel|payChannel(props.row.payChannel)}}）
                       </p>
                     </div>
                     <div class="text-center" style="width:28%;">
@@ -86,7 +86,7 @@
                       <div class="flex-col ver-center" style="width:22%;">
                         ￥{{props.row.orderItem[n+2].paidAmount|formatMoney}}
                         <p class="third-font-color">
-                          （ 支付方式：{{props.row.payChannel}}）
+                          （ 支付方式：{{props.row.payChannel|payChannel(props.row.payChannel)}}）
                         </p>
                       </div>
                       <div class="text-center" style="width:28%;">
@@ -101,10 +101,10 @@
               </el-col>
               <el-col :span="8" :key="isShowAll" class="hor-ver-center">
                 <el-col :span="10" class="text-center">
-                  {{props.row.status}}
+                  {{props.row.status|orderStatus(props.row.status)}}
                 </el-col>
                 <el-col :span="14" class="text-center">
-                  {{props.row.reviewStatus}}
+                  {{props.row.reviewStatus|refundStatus(props.row.reviewStatus)}}
                 </el-col>
               </el-col>
             </el-row>
@@ -139,11 +139,6 @@
 </style>
 
 <script>
-  import {
-    getRefundList,
-    getOrderStatus
-  } from '../../api/api';
-
   export default {
     data () {
       return {
@@ -179,41 +174,34 @@
       };
     },
     methods: {
-      getRefundList: () => {
-        let param = Object.assign({}, this.searchForm, { distributorId: this.user.distributorId, vendorId: this.user.vendorId, pageNum: this.currentPage, pageSize: this.pageSize });
-        getRefundList(param).then((res) => {
-          if (res.status == 200) {
-            this.totalCount = res.page.totalNum;
-            this.orderList = res.data;
-
-            this.orderList = [{
-              orderCode: '1111',
-              orderTime: '12232312313',
-              orderItem: [{
-                skuAttributes: '颜色分类：红；',
-                refundQuantity: 1,
-                refundMoney: 1.0
-              },
-                {
-                  skuAttributes: '颜色分类：白；'
-                }],
-              productName: 'aa',
-              receiveName: 'cyw',
-              reveivePhone: '17826856409',
-              provinceDesc: '浙江省',
-              cityDesc: '杭州市',
-              areaDesc: '浙江理工大学生活一区',
-              status: 'a',
-              reviewStatus: 'a'
-
-            }];
-          }
-        });
+      getRefundList: function () {
+        this.orderList = [{
+          orderCode: '1111',
+          orderTime: '12232312313',
+          orderItem: [{
+            skuAttributes: '颜色分类：红；',
+            refundQuantity: 1,
+            refundMoney: 112.0,
+          },
+          {
+            skuAttributes: '颜色分类：白；',
+            refundQuantity: 1,
+            refundMoney: 100.0,
+          }],
+          payChannel: 'alipay_pc_direct',
+          productName: 'aa',
+          receiveName: 'cyw',
+          reveivePhone: '17826856409',
+          provinceDesc: '浙江省',
+          cityDesc: '杭州市',
+          areaDesc: '浙江理工大学生活一区',
+          status: 1,
+          reviewStatus: 1
+        }];
       },
-
       // form_button_event
-      handleSearch () {
-        for (var p in this.searchGroup) {
+      handleSearch: function () {
+        for (let p in this.searchGroup) {
           this.searchForm[p] = this.searchGroup[ p ];
         }
         this.searchForm.startDate = (!this.searchForm.startDate || this.searchForm.startDate == '') ? '' : date.formatDate.format(new Date(this.searchForm.startDate), 'yyyy-MM-dd');
@@ -224,15 +212,11 @@
         this.getRefundList();
       },
 
-      handleExport: () => {
+      handleExport: function () {
       },
 
-
-
-
-
       // 页码变更
-      handleCurrentChange: (val) => {
+      handleCurrentChange: function (val) {
         for (var p in this.searchForm) {
           this.searchGroup[ p ] = this.searchForm[ p ];
         }
@@ -240,7 +224,7 @@
         this.getRefundList();
       },
 
-      handleShowAll: () => {
+      handleShowAll: function () {
         this.isShowAll = !this.isShowAll;
         if (this.isShowAll) {
           this.more_button_message = '收起';
@@ -254,41 +238,41 @@
       this.getRefundList();
     },
     filters: {
-
-      // 过滤支付方式
-      filterPayChannel: (value) => {
-        if (value == 'alipay_pc_direct') {
-          return '支付宝';
-        } else if(value == 'wx_pub_qr') {
-          return '微信';
-        } else if ( value == 'upacp_pc') {
-          return '银联';
-        } else {
-          return '支付宝';
-        }
-      },
-      // 过滤订单状态
-      filterOrderStatus: (value) => {
-        if (value == 1) {
-          return '待退款';
-        } else if (value == 2) {
-          return '已退款';
-        } else if (value == 3) {
-          return '已关闭';
-        } else {
-          return '已取消';
-        }
-      },
-      // 过滤退款审核状态
-      filterRefundStatus: (value) => {
-        if (value == 1) {
-          return '审批中';
-        } else if (value == 2) {
-          return '审批通过';
-        } else if (value == 3) {
-          return '审批未通过';
+      payChannel: (channel) => {
+        console.log(channel)
+        switch (channel) {
+          case 'upacp_pc':
+            return '银联';
+          case 'wx_pub_qr':
+            return '微信支付';
+          default:
+            return '支付宝';
         }
       }
-    }
+    },
+    // 过滤订单状态
+    orderStatus: (value) => {
+      switch (value) {
+        case 1:
+          return '待退款';
+        case 2:
+          return '已退款';
+        case 3:
+          return '已关闭';
+        default:
+          return '已取消';
+      }
+    },
+    // 过滤退款审核状态
+    refundStatus: (value) => {
+      switch (value) {
+        case 1:
+          return '审批中';
+        case 2:
+          return '审批通过';
+        default:
+          return '审批未通过';
+      }
+    },
   };
 </script>

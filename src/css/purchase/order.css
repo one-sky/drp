@@ -136,3 +136,20 @@
     font-size: 2.4rem;
 }
 
+/* dialog */
+.generator .el-radio {
+    margin-top: 10px;
+}
+
+.generator .el-radio__label {
+    display: flex;
+    flex-direction: row;
+}
+
+.generator .el-radio__label div {
+    margin-left: 20px;
+}
+.generator .el-radio+.el-radio {
+    margin-left: 0;
+}
+

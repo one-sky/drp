@@ -110,3 +110,8 @@
 .pay .success .success-icon+div{
     font-size: 2rem;
 }
+
+.pay .success .el-button{
+    padding: 10px 20px !important;
+    margin-top: 20px;
+}

@@ -12,7 +12,7 @@
             <template v-else>
             <div class="info">
                 <img src="../../imgs/shoppingCart/person.png" height="12" width="10" />
-                <span>{{addressList[defaultAddress].receiveName}}</span>
+                <span>{{addressList[defaultAddress].receiverName}}</span>
             </div>
             <div class="info">
                 <img src="../../imgs/shoppingCart/address.png" height="12" width="9"/>
@@ -25,7 +25,7 @@
                 <span>{{addressList[defaultAddress].phone}}</span>
             </div>
             <el-button type="text" @click="updateAddressVisible = true ">更改</el-button>
-            <el-button type="text" @click="addressDialogVisible = true;">新增地址</el-button>
+            <el-button type="text" v-if="addressList.length < 5" @click="addressDialogVisible = true;">新增地址</el-button>
             </template>
         </div>
 
@@ -46,7 +46,7 @@
             <el-table-column label="单价（元）" width="140">
                 <template scope="scope">
                 <div>
-                    ¥{{scope.row.unitPrice|formatMoney}}
+                    ¥{{scope.row.onePrice|formatMoney}}
                 </div>
                 </template>
             </el-table-column>
@@ -58,7 +58,7 @@
             <el-table-column label="金额（元）" width="136" style="color:#ffa800">
                 <template scope="scope">
                 <div>
-                    ¥{{(scope.row.unitPrice*scope.row.quantity)|formatMoney}}
+                    ¥{{(scope.row.onePrice * scope.row.quantity)|formatMoney}}
                 </div>
                 </template>
             </el-table-column>
@@ -83,13 +83,13 @@
           <div class="flex-row ver-center">
             <p>总计：</p>
             <p>货品种类：<span>{{shoppingCart&&shoppingCart!=''?shoppingCart.length:0}}</span>种</p>
-            <p>数量总计：<span>{{realTotalCount}}</span>件</p>
+            <p>数量总计：<span>{{totalCount}}</span>件</p>
             <p class="statistic-box flex-normal" >优惠金额：<span>0.00</span>元</p>
           </div>
           <div class="statistic-box">
-            <p>运费共计：<span>{{shippingCost|formatMoney}}</span>元</p>
-            <p>货品总金额：<span>{{realTotalAmount|formatMoney}}</span>元</p>
-            <p>应付总额（含运费）：<span>{{realTrueAmount|formatMoney}}</span>元</p>
+            <p>运费共计：<span>{{0|formatMoney}}</span>元</p>
+            <p>货品总金额：<span>{{totalAmount|formatMoney}}</span>元</p>
+            <p>应付总额（含运费）：<span>{{totalAmount|formatMoney}}</span>元</p>
           </div>
         </div>
 
@@ -102,6 +102,76 @@
                     @click="generateOrder()">提交订单</el-button>
             </div>
         </div>
+        <!-- 查看地址列表 -->
+        <el-dialog title="地址列表" :visible.sync="updateAddressVisible" @close="setDefault(false)" class="dialog" custom-class="center-dialog-bottom">
+          <el-radio-group v-model="tmpDefaultAddress" class="flex-col">
+            <el-radio v-for="(item, index) in addressList" :label="index" class="flex-row ver-center">
+              <div class="info">
+                <img src="../../imgs/shoppingCart/person.png" height="12" width="10" />
+                <span>{{item.receiverName}}</span>
+              </div>
+              <div class="info">
+                  <img src="../../imgs/shoppingCart/address.png" height="12" width="9"/>
+                  <span>{{item.provinceDesc}}{{item.cityDesc}}{{item.areaDesc}} 
+                      {{item.detailAddress}}
+                  </span>
+              </div>
+              <div class="info">
+                  <img src="../../imgs/shoppingCart/phone.png" height="11" width="11" />
+                  <span>{{item.phone}}</span>
+              </div>
+            </el-radio>
+          </el-radio-group>
+          <div slot="footer" class="center-dialog-bottom">
+            <el-button @click="setDefault(false)">取 消</el-button>
+            <el-button type="primary" @click="setDefault(true)">确 定</el-button>
+          </div>
+        </el-dialog>
+        <!-- 新增地址 -->
+        <el-dialog title="新增地址" :visible.sync="addressDialogVisible" @close="resetDialog('addressDialogForm')" class="dialog" custom-class="center-dialog-bottom">
+          <el-form :model="updateAddress" ref="addressDialogForm" :rules="form_rules" class="form" labelWidth="100px">
+            <el-form-item label="收件人：" prop="receiverName">
+              <el-input v-model="updateAddress.receiverName" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="所在地区：">
+              <el-select v-model="updateAddress.province" ref="province" placeholder="省" @change="getCityListByProvince">
+                <el-option
+                  v-for="province in provinceList"
+                  :key="province.regionCode"
+                  :label="province.regionName"
+                  :value="province.regionCode">
+                </el-option>
+              </el-select>
+              <el-select v-model="updateAddress.city" ref="city" placeholder="市" @change="getAreaListByCity">
+                <el-option
+                  v-for="city in cityList"
+                  :key="city.regionCode"
+                  :label="city.regionName"
+                  :value="city.regionCode">
+                </el-option>
+              </el-select>
+              <el-select v-model="updateAddress.area" ref="area" placeholder="区">
+                <el-option
+                  v-for="area in areaList"
+                  :key="area.regionCode"
+                  :label="area.regionName"
+                  :value="area.regionCode">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="详细地址：" prop="detailAddress">
+              <el-input v-model="updateAddress.detailAddress" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="联系电话：" prop="phone">
+              <el-input v-model="updateAddress.phone" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="center-dialog-bottom">
+            <el-button @click="addressDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="submitAddress('addressDialogForm')">确 定</el-button>
+          </div>
+        </el-dialog>
+
     </div>
   
 </template>
@@ -114,7 +184,6 @@
   import {
     getAddressList,
     saveAddress,
-    getAgentBrand,
     generateOrder
     } from '../../api/api';
     import {
@@ -125,6 +194,17 @@
 
   export default {
     data () {
+      const VALIDATEPHONE = (rule, value, callback) => {
+        if (!value || value.length <= 0) {
+          return callback(new Error('请输入手机号码'));
+        } else {
+          if (!(/^1\d{10}$/.test(value))) {
+            return callback(new Error('请输入正确的手机号码'));
+          } else {
+            callback();
+          }
+        }
+      };
       return {
         user: {},
         shoppingCart: [],
@@ -132,8 +212,17 @@
         // 地址列表
         addressList: [],
 
+        provinceList: [],
+        cityList: [],
+        areaList: [],
+
+        addressDialogVisible: false,
+        updateAddressVisible: false,
+
         // 默认地址，初始默认第一个
         defaultAddress: 0,
+        // 监听设置临时默认地址id
+        tmpDefaultAddress: 0,
         // 备注
         buyerMessage: null,
 
@@ -143,6 +232,25 @@
         realTotalAmount: 0,
         // 应付总额
         realTrueAmount: 0,
+
+        // 新增地址
+        updateAddress: {},
+
+        form_rules: {
+          receiverName: [
+            {required: true, message: '请输入收件人姓名', trigger: 'blur'}
+          ],
+          province: [
+            {required: true, message: '请输入所在地区', trigger: 'change'}
+          ],
+          detailAddress: [
+            {required: true, message: '请输入详细地址', trigger: 'blur'}
+          ],
+          phone: [
+            {validator: VALIDATEPHONE, trigger: 'blur'}
+          ],
+
+        },
 
       };
     },
@@ -158,6 +266,7 @@
             this.$set(this, 'addressList', res.data);
             this.addressList = res.data;
             this.defaultAddress = 0;
+            this.tmpDefaultAddress = 0;
           }
         });
       },
@@ -212,6 +321,15 @@
         });
       },
 
+      setDefault: function (value) {
+        if (value) {
+          this.defaultAddress = this.tmpDefaultAddress;
+        } else {
+          this.tmpDefaultAddress = this.defaultAddress;
+        }
+        this.updateAddressVisible = false;
+      },
+
       resetDialog (formName) {
         this.updateAddress = {
           id: null,
@@ -227,30 +345,24 @@
 
       // 生成订单，进入支付
       generateOrder: function () {
-        var shopCartItem = new Array();
-        for (var i in this.shoppingCart) {
-          this.$set(this.shoppingCart[i], 'price', this.shoppingCart[i].unitPrice);
-          shopCartItem.push(this.shoppingCart[i]);
-        }
-        let param = {
-          type: parseInt(this.tabActive),
-          vendorId: this.user.vendorId,
-          distributorId: this.user.distributorId,
-          userId: this.user.userId,
-          levelId: this.user.vipId,
+        const param = {
+          type: this.shoppingCart[0].type,
+          distributorId: this.user.id,
           buyerMessage: this.buyerMessage,
-          address: Object.assign({}, this.addressList[this.defaultAddress]),
-          shopCartItems: shopCartItem,
+          address: {...this.addressList[this.defaultAddress]},
+          shoppingCartItemVOList: this.shoppingCart,
         };
         generateOrder(param).then((res) => {
           if (res.status == 200) {
-            this.orderCode = res.data;
-            this.$router.push({
-              path: '/toPay',
-              query: {
-                orderCode: this.orderCode
-              }
-            });
+            if (parseInt(res.data) > 0) {
+              this.orderId = res.data;
+              this.$router.push({
+                path: '/pay',
+                query: {
+                  order: this.orderId
+                }
+              });
+            }
           }
         });
       },
@@ -272,7 +384,7 @@
       }
       this.$set(this, 'shoppingCart', this.$store.handleCart);
       this.getAddressList();
-      this.getProvince();
+      this.getProvinceList();
       this.$store.commit('updateStepType', 'purchase');
       this.$store.commit('updateStep', '1');
     },
@@ -288,7 +400,7 @@
       totalAmount: function () {
         let totalAmount = 0.00;
         this.shoppingCart.map(item => {
-          totalAmount += parseFloat(item.unitPrice) * parseFloat(item.quantity);
+          totalAmount += parseFloat(item.onePrice) * parseFloat(item.quantity);
         });
         return totalAmount.toFixed(2);
       }

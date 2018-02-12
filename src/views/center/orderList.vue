@@ -46,14 +46,14 @@
                   <div class="flex-row">
                     <div class="flex-row" style="width:43%;">
                       <router-link :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n-1].spuId}}">
-                        <img v-bind:src="props.row.orderItemVOList[n-1].skuImg" width="51" height="51">
+                        <img v-bind:src="props.row.orderItemVOList[n-1].skuImg.split('；')[0]" width="51" height="51">
                       </router-link>
                       <div class="flex-col">
-                        <router-link class="link a4_link" :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n-1].spuId}}">
+                        <router-link class="long-title link a4_link" :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n-1].spuId}}">
                           {{props.row.orderItemVOList[n-1].spuName}}
                         </router-link>
                         {{props.row.orderItemVOList[n-1].skuAttr|formatAttribute}}
-                        <el-button class="detailBtn" :disabled="props.row.orderItemVOList[n-1].status<11" @click="handleRefund(props.row.id,props.row.orderItemVOList[n-1].orderId)" type="primary">申请售后</el-button>
+                        <el-button class="detailBtn" :disabled="props.row.status<11" @click="handleRefund(props.row.id,props.row.orderItemVOList[n-1].orderId)" type="primary">申请售后</el-button>
                       </div>
                     </div>
 
@@ -68,7 +68,7 @@
                         {{props.row.receivePhone}}
                       </div>
                       <div class="text-center">
-                        {{props.row.provinceDesc}}{{props.row.cityDesc}}{{props.row.areaDesc}} {{props.row.detailAddress}}
+                        {{props.row.province}}{{props.row.city}}{{props.row.area}} {{props.row.detailAddress}}
                       </div>
                     </div>
 
@@ -79,14 +79,14 @@
                     <div class="flex-row">
                       <div class="flex-row" style="width:42%;">
                         <router-link :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n+2].spuId}}">
-                          <img v-bind:src="props.row.orderItemVOList[n+2].skuImg" width="51" height="51">
+                          <img v-bind:src="props.row.orderItemVOList[n+2].skuImg.split('；')[0]" width="51" height="51">
                         </router-link>
                         <div class="flex-col">
-                          <router-link class="link a4_link" :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n+2].spuId}}">
+                          <router-link class="long-title link a4_link" :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n+2].spuId}}">
                             {{props.row.orderItemVOList[n+2].spuName}}
                           </router-link>
                           {{props.row.orderItemVOList[n+2].skuAttr|formatAttribute}}
-                          <el-button class="detailBtn" :disabled="props.row.orderItemVOList[n-1].status<11" @click="handleRefund(props.row.id,props.row.orderItemVOList[n+2].orderId)" type="primary">申请售后</el-button>
+                          <el-button class="detailBtn" :disabled="props.row.status<11" @click="handleRefund(props.row.id,props.row.orderItemVOList[n+2].orderId)" type="primary">申请售后</el-button>
                         </div>
 
                       </div>
@@ -101,7 +101,7 @@
                           {{props.row.receivePhone}}
                         </div>
                         <div class="text-center">
-                          {{props.row.provinceDesc}}{{props.row.cityDesc}}{{props.row.areaDesc}} {{props.row.detailAddress}}
+                          {{props.row.province}}{{props.row.city}}{{props.row.area}} {{props.row.detailAddress}}
                         </div>
                       </div>
 
@@ -114,9 +114,9 @@
                   ￥{{props.row.shippingCost|formatMoney}}{{props.row.shippingCost==0?'（包邮）':''}}
                 </el-col>
                 <el-col :span="6">
-                  ￥{{props.row.paidAmount|formatMoney}}
+                  ￥{{props.row.totalAmount|formatMoney}}
                   <p v-if="props.row.status>10" class="third-font-color">
-                    （ 支付方式：{{props.row.paymentChannel}}）
+                    （ {{props.row.paymentChannel|paymentChannel(props.row.paymentChannel)}}）
                   </p>
                   <div v-else-if="props.row.status==9">
                     <el-button  @click="$router.push({path:'/toPay', query:{ orderCode: props.row.orderCode }}); ">去支付</el-button>
@@ -238,9 +238,6 @@
   import {
     getOrderList,
     cancelOrder,
-    getRefundReasons,
-    saveRefund,
-    getRefundNum
   } from '../../api/api';
 
   import * as formatDate from '../../js/date';
@@ -331,8 +328,8 @@
            this.page.totalCount = res.page.totalNum;
            this.orderList = res.data;
            this.expand = [];
-           this.expand.push(this.orderList && this.orderList[0].id);
-           this.orderList.map(item => {
+           this.expand.push(this.orderList.length > 0 && this.orderList[0].id);
+           this.orderList.length > 0 && this.orderList.map(item => {
              this.$set(item, 'moreDesc', '更多');
            });
          }
@@ -373,7 +370,7 @@
       },
 
       // tab_event
-      handleClick: (tab, event) => {
+      handleClick: function (tab, event) {
         this.searchGroup = {};
         this.searchForm = {};
         this.page.pageNum = 1;
@@ -386,8 +383,6 @@
         this.$set(this.refund, 'orderId', orderId);
         this.$set(this.refund, 'type', 1);
         this.$set(this.refund, 'number', 1);
-        this.getRefundReasons();
-        this.getRefundNum();
       },
       resetDialog: (formName) => {
         this.refund = {
@@ -463,6 +458,18 @@
     created () {
       this.$set(this, 'user', JSON.parse(sessionStorage.getItem('user')));
       this.getOrderList();
+    },
+    filters: {
+      paymentChannel: (channel) => {
+        switch (channel) {
+          case 'upacp_pc':
+            return '银联';
+          case 'wx_pub_qr':
+            return '微信支付';
+          default:
+            return '支付宝';
+        }
+      }
     }
     
   };

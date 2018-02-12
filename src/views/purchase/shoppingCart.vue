@@ -326,15 +326,10 @@
         }
       },
 
-      // 表h格上方自带的全选按钮
+      // 表格上方自带的全选按钮
       handleSelectionChange: function (row) {
         this.handleShoppingCart = row;
-        if (this.handleShoppingCart.length == 0) {
-          this.checked = false;
-        }
-        if (this.handleShoppingCart.length == this.onlineCount) {
-          this.checked = true;
-        }
+        this.checked = this.handleShoppingCart.length == this.onlineCount;
       },
 
       // 批量或单个删除购物车中的商品

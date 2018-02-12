@@ -31,7 +31,7 @@
             </div>
             <div class="flex-row infoItem" >
                 <div>收货地址：</div>
-                <div class="infoItemDesc">{{orderItemList.provinceDesc}}{{orderItemList.cityDesc}}{{orderItemList.areaDesc}} {{orderItemList.detailAddress}}</div>
+                <div class="infoItemDesc">{{orderItemList.province}}{{orderItemList.city}}{{orderItemList.area}} {{orderItemList.detailAddress}}</div>
             </div>
             <div class="buyer_message flex-row infoItem">
                 <div>买家留言：</div>
@@ -82,13 +82,13 @@
             </div>
         </div>
         <div id="refundItem" v-for="orderItem in orderItemList.orderItemVOList" >
-            <div class="flex-row ver-center hor-end" style="height:20px;background-color:#eeeeee;">
+            <div v-if="orderItemList.status > 20" class="flex-row ver-center hor-end" style="height:20px;background-color:#eeeeee;">
                 <div>
-                    快递公司：{{orderItem.deliverName}}
+                    快递公司：{{orderItem.deliverName || '申通'}}
                 </div>
 
                 <div style="margin-left:220px;">
-                    快递单号：{{orderItem.trackingNumber}}
+                    快递单号：{{orderItem.trackingNumber || '3242342343423432'}}
                 </div>
 
                 <div style="margin-left:160px;">
@@ -107,14 +107,14 @@
             <div class="flex-row">
                 <div class="flex-row" style="width:419px;">
                     <div style="margin-top:15px;margin-left: 30px;width:60px;">
-                        <img v-bind:src="orderItem.skuImg" />
+                        <img v-bind:src="orderItem.skuImg.split('；')[0]" />
                     </div>
                     <div class="flex-col" style="width:280px;">
                         <div>
-                            {{orderItem.skuName}}
+                            {{orderItem.spuName}}
                         </div>
                         <div style="color:#e5e5e5">
-                            颜色分类：{{orderItem.skuAttributes}}
+                            颜色分类：{{orderItem.skuAttr}}
                         </div>
                         <div>
                             <el-button @click="handleRefund(orderItemList.id, orderItem.id)" class="service" style="color:#ffa800; text-decoration-line: underline;">申请退款／退货</el-button>
@@ -131,7 +131,7 @@
                     ￥{{orderItem.skuPrice*orderItem.skuQuantity+orderItemList.shippingCost}}
                 </div>
                 <div class="flex-row ver-center" style="width:163px;">
-                    {{orderItem.status}}
+                    {{orderItemList.status|status(orderItemList.status)}}
                 </div>
             </div>
         </div>
@@ -173,14 +173,12 @@ export default {
     methods: {
         getOrderDetail: function () {
             this.loading = true;
-            const orderIds = [];
-            orderIds.push(this.$route.query.order);
             const param = {
                 distributorId: this.user.id,
-                orderIds
+                orderIds: [this.$route.query.order]
             };
             getOrderDetail(param).then((res) => {
-                this.orderItemList = res.data;
+                this.$set(this, 'orderItemList', res.data);
                 // status_Array
                 const status = [
                     this.orderItemList.orderTime,
@@ -236,6 +234,20 @@ export default {
         this.$set(this, 'user', JSON.parse(sessionStorage.getItem('user')));
         this.getOrderDetail();
     },
+    filters: {
+      status: (status) => {
+        switch (status) {
+          case 10:
+            return '未支付';
+          case 20:
+            return '未发货';
+          case 30:
+            return '未收货';
+          default:
+            return '未支付';
+        }
+      }
+    }
   };
 </script>
 

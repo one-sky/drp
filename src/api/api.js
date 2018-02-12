@@ -3,8 +3,6 @@
  */
 import axios from 'axios';
 
-// let base = 'http://106.12.21.230:8484/inheater-distribution';
-
 let base = 'http://localhost:8282/drp';
 
 axios.defaults.headers.get['Content-Type'] = 'application/json';
@@ -67,6 +65,11 @@ export const setAddressDefault = params => {
 // 删除地址
 export const deleteAddress = params => {
     return axios.post(`${base}/distributor/deleteAddress`, params).then(res => res.data);
+};
+
+// 获取积分列表
+export const getPoints = params => {
+    return axios.post(`${base}/distributor/getPoints`, params).then(res => res.data);
 };
 
 // 查询分销商品牌代理情况
@@ -189,6 +192,16 @@ export const getSpuDetail = params => {
     return axios.post(`${base}/product/getSpuDetail`, params).then(res => res.data);
 };
 
+// 生成订单
+export const generateOrder = params => {
+    return axios.post(`${base}/order/generateOrder`, params).then(res => res.data);
+};
+
+// 支付订单
+export const payOrder = params => {
+    return axios.post(`${base}/order/payOrder`, params).then(res => res.data);
+};
+
 // 获取订单列表
 export const getOrderList = params => {
     return axios.post(`${base}/order/getOrderList`, params).then(res => res.data);
@@ -239,8 +252,6 @@ export const getChannelOption = params => { return axios.post(`${base}/channel/g
 export const orderAmount = params => { return axios.post(`${base}/order/orderAmount`, params).then(res => res.data); };
 
 export const getAftermarkets = params => { return axios.post(`${base}/order/getAftermarkets`, params).then(res => res.data); };
-
-export const generateOrder = params => { return axios.post(`${base}/order/generateOrder`, params).then(res => res.data); };
 
 export const getOrderStatistics = params => { return axios.post(`${base}/order/getOrderStatistics`, params).then(res => res.data); };
 

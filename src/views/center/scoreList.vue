@@ -20,7 +20,7 @@
       <el-table :data="scoreList" v-loading="loading" border >
         <el-table-column label="时间" width="230" align="center">
           <template scope="scope">
-            {{orderTime|formatDate}}
+            {{formatDate(orderTime)}}
           </template>
         </el-table-column>
         <el-table-column prop="pointsType" label="来源" width="216" align="center">
@@ -38,8 +38,8 @@
 
 
     <div class="pagination">
-      <el-pagination layout="prev, pager, next" :page-size="pageSize" :total="totalCount"
-                     :current-page="currentPage" @current-change="handleCurrentChange">
+      <el-pagination layout="prev, pager, next" :page-size="page.pageSize" :total="page.totalCount"
+                     :current-page="page.pageNum" @current-change="handleCurrentChange">
       </el-pagination>
     </div>
 
@@ -52,15 +52,14 @@
 </style>
 
 <script>
-  import { getPoints } from '../../api/api';
+  import {
+    getPoints
+  } from '../../api/api';
+  import * as formatDate from '../../js/date';
   export default {
     data () {
       return {
-        user: {
-          userId: 1,
-          vendorId: 1,
-          distributorId: 13
-        },
+        user: {},
         searchGroup: {
           orderCode: '',
           startDate: '',
@@ -72,46 +71,46 @@
           endDate: ''
         },
         scoreList: [],
-        currentPage: 1,
-        pageSize: 10,
-        totalCount: 40,
+        page: {
+          pageNum: 1,
+          pageSize: 10,
+          totalCount: 40,
+        },
         loading: false,
       };
     },
     methods: {
-      getPoints: () => {
+      getPoints: function () {
         this.loading = true;
-        let param = Object.assign({}, this.searchForm, {distributorId: this.user.distributorId, vendorId:this.user.vendorId, pageNum: this.currentPage});
+        const param = {
+          ...this.searchForm,
+          distributorId: this.user.id,
+          pageNum: this.page.currentPage
+        };
         getPoints(param).then((res) => {
           this.loading = false;
-          this.totalCount = res.page.totalNum;
-          this.scoreList = res.data;
+          this.page.totalCount = res.page.totalNum;
+          this.$set(this, 'scoreList', res.data);
         });
       },
-      formatDate (row, column, cellValue) {
-        var time = row[column.property];
-        return (!time || time == '') ? '' : date.formatDate.format(new Date(time), 'yyyy-MM-dd hh:mm:ss');
-      },
-
-      handleSearch: () => {
-        this.searchForm.orderCode = this.searchGroup.orderCode;
-        this.searchForm.startDate = (!this.searchGroup.startDate || this.searchGroup.startDate === '') ? '' : date.formatDate.format(new Date(this.searchGroup.startDate), 'yyyy-MM-dd hh:mm:ss');
-        this.searchForm.endDate = (!this.searchGroup.endDate || this.searchGroup.endDate === '') ? '' : date.formatDate.format(new Date(this.searchGroup.endDate), 'yyyy-MM-dd hh:mm:ss');
-        this.currentPage = 1;
+      handleSearch: function () {
+        this.searchForm.startDate = this.searchForm.startDate && formatDate.formatDate.format(new Date(this.searchForm.startDate), 'yyyy-MM-dd');
+        this.searchForm.endDate = this.searchForm.endDate && formatDate.formatDate.format(new Date(this.searchForm.endDate), 'yyyy-MM-dd');
+        this.page.pageNum = 1;
         this.getPoints();
       },
 
       // 页码变更
-      handleCurrentChange: (val) => {
+      handleCurrentChange: function (val) {
         for (var p in this.searchForm) {
           this.searchGroup[p] = this.searchForm[p];
         }
-        this.currentPage = val;
+        this.page.pageNum = val;
         this.getPoints();
       }
     },
     created () {
-      this.user = JSON.parse(sessionStorage.getItem('user'));
+      this.$set(this, 'user', JSON.parse(sessionStorage.getItem('user')));
       this.getPoints();
     }
 

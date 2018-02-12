@@ -14,7 +14,7 @@
         <div>【交易编号】:{{orderDetail.orderCode}}</div>
         <div>{{orderDetail.orderTime|formatDate}}</div>
       </div>
-      <div class="receiver">收货人信息 :{{orderDetail.receiveName}} {{orderDetail.reveivePhone}}
+      <div class="receiver">收货人信息 :{{orderDetail.receiveName}} {{orderDetail.receivePhone}}
         <span class="address">地址： </span>{{orderDetail.provinceDesc}}{{orderDetail.cityDesc}}{{orderDetail.areaDesc}} {{orderDetail.detailAddress}}
       </div>
     </div>
@@ -29,16 +29,9 @@
           <img :style="{position:'relative',left:'0px',top:item.selected?'-53px':'0px'}" v-bind:src="item.img" height="41" width="110"/>
         </el-button>
       </div>
-      <div v-if="stepActive">
-        <div class="ub ub-ac" style="margin-top:10px;"><canvas id="canvas"></canvas></div>
-        <div class="ub ub-ac">
-          <el-button type="text" @click="toPaySuccess()">付款后,点击可查看付款成功页面</el-button>
-        </div>
-      </div>
-
     </div>
     <div class="hor-center">
-      <el-button class="pay-btn" type="primary" @click="toPay()">去付款</el-button>
+      <el-button class="pay-btn" type="primary" @click="payOrder()">去付款</el-button>
     </div>
     
 
@@ -51,21 +44,20 @@
 
 <script>
   import {
-    getOrderDetailByOrderCode
+    getOrderDetail,
+    payOrder
   } from '../../api/api';
   export default {
 
     data () {
       return {
-
-        orderCode: null,
         user: {},
         payChannel: [
           {
             id: 1,
             img: require('@/imgs/shoppingCart/alipay.png'),
             name: 'alipay_pc_direct',
-            selected: false
+            selected: true
           },
           {
             id: 2,
@@ -89,20 +81,16 @@
       };
     },
     methods: {
-      getOrderDetailByOrderCode: function () {
+      getOrderDetail: function () {
         const param = {
-          orderCode: this.orderCode,
+          distributorId: this.user.id,
+          orderIds: [this.orderId]
         };
-        getOrderDetailByOrderCode(param).then((res) => {
+        getOrderDetail(param).then((res) => {
           if (res.status == 200 && res.data.status < 20 && res.data.status != 0) { // 显示的订单状态为未支付
-            this.orderDetail = res.data;
+            this.$set(this, 'orderDetail', res.data);
             if (this.orderDetail.trancationId != null && this.orderDetail.trancationId != '') {
               this.flagChannel = false;
-              for (var i in this.payChannel) {
-                if (this.payChannel[i].name == this.orderDetail.paymentChannel) {
-                  this.changeSelected(i);
-                }
-              }
             }
           } else {
             if (res.order.status && res.order.status != '00') {
@@ -115,38 +103,58 @@
       },
 
       changeSelected: function (val) {
-        for (var i in this.payChannel) {
-          if (i != val) {
-            this.payChannel[i].selected = false;
+        this.payChannel.map(item => {
+          item.selected = false;
+        });
+        this.payChannel[val].selected = true;
+        this.channel = this.payChannel[val].name;
+      },
+
+      payOrder: function () {
+        const param = {
+          distributorId: this.user.id,
+          id: this.orderId,
+          paymentChannel: this.channel,
+          ...this.orderDetail
+        };
+        payOrder(param).then((res) => {
+          if (res.status == 200 && res.data > 0) {
+            this.$message({
+              message: '支付成功',
+              type: 'success',
+              duration: 2000,
+              onClose: () => {
+                this.$router.push({
+                  path: '/paySuccess',
+                  query: {
+                    order: this.orderId
+                  }
+                });
+              }
+            });
           } else {
-            this.payChannel[i].selected = true;
-            this.channel = this.payChannel[i].name;
+            this.$message({
+              message: '支付失败',
+              type: 'warning',
+              duration: 2000
+            });
           }
-        }
-      },
-
-      toPay: function () {
-      },
-      toPaySuccess: function () {
-        this.$router.push(
-          {
-            path: '/paySuccess',
-            query: {
-              orderCode: this.orderCode
-            }
-          }
-        );
+        });
       }
-
     },
     created () {
-      // if(!this.$route.query.orderCode||this.$route.query.orderCode==''){
-      //   this.$router.push({ path: '/center/dashboard' });
-      //   return;
-      // }
-      // this.orderCode = this.$route.query.orderCode;
-
-      this.getOrderDetailByOrderCode();
+      const user = JSON.parse(sessionStorage.getItem('user'));
+      if (user && user.distributorId != 0) {
+        this.user = user;
+      } else {
+        this.$router.push({ path: '/login' });
+      }
+      if (!this.$route.query.order) {
+        this.$router.push({ path: '/center/dashboard' });
+        return;
+      }
+      this.orderId = this.$route.query.order;
+      this.getOrderDetail();
     }
   };
 </script>
