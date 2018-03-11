@@ -239,7 +239,6 @@
     },
     filters: {
       payChannel: (channel) => {
-        console.log(channel)
         switch (channel) {
           case 'upacp_pc':
             return '银联';

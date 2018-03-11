@@ -403,25 +403,10 @@
 
       // 获取售后原因
       getRefundReasons: function () {
-        let param = {};
-        getRefundReasons(param).then((res) => {
-          if (res.status == 200) {
-            this.refundReason = res.data;
-          }
-        });
       },
 
       // 获取可退款数量
       getRefundNum: function () {
-        let param = {
-          orderItemId: this.refund.orderItemId
-        };
-        getRefundNum(param).then((res) => {
-          if (res.status == 200) {
-            this.$set(this.refund, 'avaNumber', parseInt(res.data) || 0);
-            this.refundDialogVisible = true;
-          }
-        });
       },
 
       // 申请售后提交
