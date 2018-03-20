@@ -21,7 +21,7 @@
     </div>
 
     <div class="grid flex-row-col" v-loading="loading" >
-        <div class="brand" v-for="(brand,index) in brandList.rBrands" :style="{'margin-left': (index%7==0?0:15)+'px'}">
+        <div class="brand" v-for="(brand,index) in brandList" :style="{'margin-left': (index%7==0?0:15)+'px'}">
           <router-link :to="{path: '/brandDetail', query:{brand: brand.brandId}}" >
             <img v-bind:src="brand.logo" width="160" height="130">
           </router-link>
@@ -49,10 +49,10 @@
     </div>
 
     <el-dialog title="选择渠道" :visible.sync="dialogFormVisible" v-loading="loading" @open="getChannelList()" @close="resetDialog('ruleForm')">
-      <el-form :model="channel" :rules="dialog_rules" ref="ruleForm">
+      <el-form :model="channel" ref="ruleForm">
         <el-form-item label="分销渠道：">
           <el-select v-model="channel.channel" >
-            <el-option v-for="item in channelList" :key="item.id" :label="item.channelName" :value="item.id"></el-option>
+            <el-option v-for="item in channelList" :key="item.channelId" :label="item.name" :value="item.channelId"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -122,7 +122,7 @@
         const param = {
           distributorId: this.user.id,
           brandName: this.searchForm.name,
-          status: this.activeName == 'N' ? null : this.activeName,
+          status: this.activeName == 'N' ? 'all' : this.activeName,
           pageNum: this.page.currentPage,
           pageSize: this.page.pageSize
         };
@@ -130,6 +130,7 @@
           if (res.status == 200) {
             this.page.totalCount = res.page.total;
             this.$set(this, 'brandList', res.data);
+            this.loading = false;
           }
         });
       },
@@ -159,7 +160,7 @@
       },
 
       showActive: function (key, prop, value) {
-        this.$set(this.brandList.rBrands[key], prop, value);
+        this.$set(this.brandList[key], prop, value);
       },
 
       fileDownload: function (id) {
@@ -176,13 +177,13 @@
       },
 
       authorFileDownload: function () {
-        for (var i in this.brandList.agentBrandVOS) {
-          // key
-          if (this.brandList.agentBrandVOS.channelId == this.channel.channel) {
-            window.open(this.brandList.agentBrandVOS[i].brandCertificate, '_blank');
-            return;
-          }
-        }
+        // for (var i in this.brandList.agentBrandVOS) {
+        //   // key
+        //   if (this.brandList.agentBrandVOS.channelId == this.channel.channel) {
+        //     window.open(this.brandList.agentBrandVOS[i].brandCertificate, '_blank');
+        //     return;
+        //   }
+        // }
         this.$message({
           message: '下载失败，请重试',
           type: 'error'

@@ -45,7 +45,7 @@
             <div v-else-if="type.id">
               <span>采购价：</span>
               <template v-if="user.id">
-                <template v-if="!brandAgent || brandAgent.status!='Y'">
+                <template v-if="brandAgent && brandAgent.status=='Y'">
                   <div v-for="(item,index) in relativeAttrList.priceList">
                     <h1 class="price-size third-font-color"><span class="price-icon-size">¥ </span>{{item.price|formatMoney}}</h1>
                   </div>

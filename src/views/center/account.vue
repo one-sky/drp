@@ -235,8 +235,6 @@
             class="upload"
             ref="upload"
             action= "https://jsonplaceholder.typicode.com/posts/"
-            :on-remove="handleRemove"
-            :on-success="handleFileSuccess"
             :file-list="addStore.storePic"
             :multiple="false"
             :limit="1">
@@ -293,11 +291,12 @@
         }
       };
       const VALIDATE_PIC = (rule, value, callback) => {
-        if (!value.length) {
-          return callback(new Error('请上传文件'));
-        } else {
-          callback();
-        }
+        callback();
+        // if (!value.length) {
+        //   return callback(new Error('请上传文件'));
+        // } else {
+        //   callback();
+        // }
       };
       return {
         activeTab: 'account',
@@ -571,14 +570,14 @@
         window.open(file, '_blank');
       },
 
-      // file upload
-      handleRemove: function (file, fileList) {
-        this.addStore.storePic = null;
-      },
+      // // file upload
+      // handleRemove: function (file, fileList) {
+      //   this.addStore.storePic = null;
+      // },
 
-      handleFileSuccess: function (response, file, fileList) {
-        this.addStore.storePic = fileList[0].response.data.filePath;
-      },
+      // handleFileSuccess: function (response, file, fileList) {
+      //   this.addStore.storePic = fileList[0].response.data.filePath;
+      // },
 
       resetDialog: function (formName) {
         this.$refs[formName].resetFields();

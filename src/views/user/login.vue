@@ -112,8 +112,8 @@
             const {
               phone
             } = this.user;
-            const password = this.user.password;
-            // const password = md5(this.user.password).toUpperCase();
+            // const password = this.user.password;
+            const password = md5(this.user.password).toUpperCase();
             login({phone, password}).then((res) => {
               if (res.status == 200) {
                 const userData = res.data;

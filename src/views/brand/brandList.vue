@@ -25,7 +25,7 @@
         </div>
         <div class="flex-row-col item">
           <template v-for="(brand, index) in item.children">
-            <router-link :to="{path: '/brandDetail', query:{ brand: brand.brandId }}">
+            <router-link :to="{path: '/brandDetail', query:{ brand: brand.id }}">
               <img v-bind:src="brand.logo" height="234" width="234"/>
             </router-link>
           </template>
