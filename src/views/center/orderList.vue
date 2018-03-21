@@ -118,12 +118,12 @@
                   <p v-if="props.row.status>10" class="third-font-color">
                     （ {{props.row.paymentChannel|paymentChannel(props.row.paymentChannel)}}）
                   </p>
-                  <div v-else-if="props.row.status==9">
-                    <el-button  @click="$router.push({path:'/toPay', query:{ orderCode: props.row.orderCode }}); ">去支付</el-button>
+                  <div v-else-if="props.row.status==10">
+                    <el-button type="primary" @click="$router.push({path:'/pay', query:{ order: props.row.id }}); ">去支付</el-button>
                   </div>
                 </el-col>
                 <el-col :span="10" class="flex-col hor-ver-center">
-                  {{props.row.statusDesc}}
+                  {{props.row.status|status(props.row.status)}}
                   <router-link class="detailBtn" :to="{path: '/center/orderDetail', query:{ order: props.row.id }}">
                     订单详情
                   </router-link>
@@ -143,7 +143,11 @@
         <el-table-column label="收货人信息" width="170" align="center"></el-table-column>
         <el-table-column label="运费" width="100" align="center"></el-table-column>
         <el-table-column label="订单金额" width="120" align="center"></el-table-column>
-        <el-table-column label="订单状态" prop="orderTime" align="center"></el-table-column>
+        <el-table-column label="订单状态" align="center">
+          <template scope="scope">
+            {{scope.row.orderTime|formatDate(scope.row.orderTime)}}
+          </template>
+        </el-table-column>
       </el-table>
 
     </div>
@@ -339,7 +343,7 @@
       cancelOrder: function (order) {
         this.loading = true;
         let param = [{
-          orderId: order.id,
+          id: order.id,
           distributorId: this.user.id
         }];
         cancelOrder(param).then((res) => {
@@ -453,6 +457,20 @@
             return '微信支付';
           default:
             return '支付宝';
+        }
+      },
+      status: (status) => {
+        switch (status) {
+          case 10:
+            return '待付款';
+          case 20:
+            return '待发货';
+          case 30:
+            return '待收货';
+          case 40:
+            return '已完成';
+          default:
+            return '已取消';
         }
       }
     }

@@ -44,11 +44,11 @@
               <div :class="{'text-through': scope.row.quantity>=item.startPiece&&scope.row.quantity<=item.endPiece? false: true}">
                 <template v-if="item.startPiece==item.endPiece">
                   {{item.startPiece}}件：{{item.price|formatMoney}}
-                  <div v-if="item.stock">{{`限购${item.stock}件`}}</div>
+                  <div v-if="item.stock">{{`(限购${item.stock}件)`}}</div>
                 </template>
                 <template v-else>
                   {{item.startPiece}}-{{item.endPiece}}件：{{item.price|formatMoney}}
-                  <div v-if="item.stock">{{`限购${item.stock}件`}}</div>
+                  <div v-if="item.stock">{{`(限购${item.stock}件)`}}</div>
                 </template>
 
               </div>
@@ -67,7 +67,12 @@
       </el-table-column>
       <el-table-column label="金额（元）" width="130" style="color:#ffa800">
         <template scope="scope">
-          <span class="price-icon-size">¥</span>{{scope.row.amount|formatMoney}}
+          <div>
+            <span class="price-icon-size">¥</span>{{scope.row.amount|formatMoney}}
+          </div>
+          <div>
+            <span class="price-icon-size">{{scope.row.onePrice}} * {{scope.row.quantity}}</span>
+          </div>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="124">
@@ -196,7 +201,12 @@
             }
             shoppingCartList.map((cart, i) => {
               if (this.tabActive == 1) {
-                const currSkuPriceList = [...cart.skuPriceDetailVO];
+
+                // 对象数组深拷贝
+                let currSkuPriceList = [];
+                cart.skuPriceDetailVO.forEach(price => {
+                  currSkuPriceList.push({...price});
+                });
             
                 let priceList = [];
                 currSkuPriceList.map(item => {
@@ -215,8 +225,10 @@
                   return a.startPiece - b.startPiece;
                 });
                 
-                const tmpPriceList = [...currSkuPriceList];
-                
+                const tmpPriceList = [];
+                currSkuPriceList.forEach(price => {
+                  tmpPriceList.push({...price});
+                });
                 // 抽取价格
                 for (let i = 0; i < currSkuPriceList.length; i++) {
                   let j = i + 1;
@@ -296,13 +308,13 @@
                   stock: currSkuPriceList[currSkuPriceList.length - 1].priority > 1 &&
                             currSkuPriceList[currSkuPriceList.length - 1].stock || 0
                 });
-                cart.priceList = [...priceList];
+                cart.priceList = priceList;
                 //  设置金额
                 tmpPriceList.map(item => {
-                  console.log(item)
-                  if (item.priority < 2 || cart.quantity < item.stock) {
+                  if (item.priority < 2 || cart.quantity <= item.stock) {
                     if (cart.quantity <= item.endPiece && cart.quantity >= item.startPiece) {
                       cart.amount = cart.quantity * item.price;
+                      cart.onePrice = item.price;
                       return false;
                     }
                   }
@@ -322,7 +334,10 @@
             });
             this.$set(this, 'shoppingCartList', shoppingCartList);
             this.loading = false;
+
+            console.log(shoppingCartList)
           }
+
         });
       },
 
