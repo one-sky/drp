@@ -107,7 +107,7 @@
             <div class="flex-row">
                 <div class="flex-row" style="width:419px;">
                     <div style="margin-top:15px;margin-left: 30px;width:60px;">
-                        <img v-bind:src="orderItem.skuImg.split('；')[0]" />
+                        <img v-bind:src="orderItem.skuImg.split(';')[0]" />
                     </div>
                     <div class="flex-col" style="width:280px;">
                         <div>

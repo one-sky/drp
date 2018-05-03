@@ -34,7 +34,7 @@
             <el-table-column label="货品信息" width="450">
                 <template scope="scope">
                 <div class="flex-row">
-                  <img class="sku-img" v-bind:src="scope.row.skuImg" width="105" height="89">
+                  <img class="sku-img" v-bind:src="scope.row.skuImg.split(';')[0]" width="105" height="89">
                   <div class="flex-col hor-around">
                     <h5>{{scope.row.spuName}}</h5>
                     <h6 class="spu-size">{{scope.row.skuAttr|formatAttribute}}</h6>
@@ -97,7 +97,7 @@
         <div class="option flex-row">
             <el-button type="text" @click="backShoppingCart">返回进货单</el-button>
             <div class="flex-normal ver-center hor-end">
-                <div class="money" >应付总额（包含运费）：<span>{{realTrueAmount|formatMoney}}</span>元</div>
+                <div class="money" >应付总额（包含运费）：<span>{{totalAmount|formatMoney}}</span>元</div>
                 <el-button class="submit" type="primary"  :disabled="!shoppingCart||shoppingCart==''||!addressList||addressList==''" 
                     @click="generateOrder()">提交订单</el-button>
             </div>

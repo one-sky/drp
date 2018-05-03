@@ -2,7 +2,7 @@
   <div class="brand-detail flex-col ver-center">
     <div class="top flex-row">
       <!--left pic-->
-      <img v-bind:src="brandDetail.brandPic" height="270" width="720"/>
+      <img v-bind:src="brandDetail.brandPic.attachmentUrl" height="270" width="720"/>
       <!--right info-->
       <div class="right flex-col">
         <div class="flex-row">
@@ -44,7 +44,7 @@
         <p v-html="brandDetail.brandDiary"></p>
       </el-tab-pane> -->
       <el-tab-pane label="招募书" name="招募书">
-        <p v-html="brandDetail.recruitment"></p>
+        <p v-html="brandDetail.recruitment.attachmentUrl"></p>
       </el-tab-pane>
     </el-tabs>
     <!--分页-->
@@ -215,13 +215,19 @@
       },
 
     },
-    created () {
+    mounted () {
       if (!this.$route.query.brand) {
         this.$router.push({ path: '/brandList' });
       } else {
         this.$set(this.brandDetail, 'id', this.$route.query.brand);
       }
-      this.$set(this, 'user', JSON.parse(sessionStorage.getItem('user')));
+      let user = JSON.parse(sessionStorage.getItem('user'));
+      if (!user) {
+        user = {
+          distributorId: null
+        };
+      }
+      this.$set(this, 'user', user);
       this.getBrandById();
       this.getProductList();
       if (this.user) {

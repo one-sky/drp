@@ -7,7 +7,7 @@
           :data="{distributorId:user.distributorId,originalPath:user.headUrl}"
           :show-file-list="false"
           :on-success="handleAvatarSuccess">
-          <img v-if="!(user.headUrl && user.headUrl!='')" width="80" height="80" :src="user.headUrl">
+          <img v-if="(user.headUrl && user.headUrl!=='')" width="80" height="80" :src="user.headUrl">
           <div v-else  class="hor-ver-center avatar-uploader">
             <i class="el-icon-plus avatar-uploader-icon"></i>
           </div>
@@ -89,19 +89,19 @@
           待付款单：
         </div>
         <span>
-          {{statisticList.countNoPayment}}
+          1
         </span>
         <div>
           待发货单：
         </div>
         <span>
-          {{statisticList.countNoShip}}
+          0
         </span>
         <div>
           待收货单：
         </div>
         <span>
-          {{statisticList.countNoReceipt}}
+          2
         </span>
       </div>
       <div class="name ver-center">
@@ -112,19 +112,19 @@
           本月交易：
         </div>
         <span>
-          {{statisticList.monthPaidAmount}}
+          6000.00
         </span>
         <div>
           本月毛利：
         </div>
         <span>
-          {{statisticList.monthGrossProfit}}
+          2000.03
         </span>
         <div>
           本月订单：
         </div>
         <span>
-          {{statisticList.monthOrderAmount}}
+          10
         </span>
       </div>
       <div class="name ver-center">
@@ -135,19 +135,19 @@
           交易总额：
         </div>
         <span>
-          {{statisticList.paidAmount}}
+          100000.04
         </span>
         <div>
           累计毛利：
         </div>
         <span>
-          {{statisticList.grossProfit}}
+          10002.45
         </span>
         <div>
           累计订单：
         </div>
         <span>
-          {{statisticList.orderAmount}}
+          100
         </span>
       </div>
     </div>

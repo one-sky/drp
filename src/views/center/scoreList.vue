@@ -20,7 +20,7 @@
       <el-table :data="scoreList" v-loading="loading" border >
         <el-table-column label="时间" width="230" align="center">
           <template scope="scope">
-            {{formatDate(orderTime)}}
+            {{scope.row.orderTime|formatDate(scope.row.orderTime)}}
           </template>
         </el-table-column>
         <el-table-column prop="pointsType" label="来源" width="216" align="center">

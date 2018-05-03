@@ -99,7 +99,7 @@
     methods: {
       getNewBrandList: function () {
         const param = {
-          num: 10,
+          num: 5,
         };
         getNewBrandList(param).then((res) => {
           if (res.status == 200) {

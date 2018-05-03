@@ -13,7 +13,7 @@
         <template scope="scope">
           <div class="flex-row">
             <router-link class="sku-img" :to="{path: '/productDetail', query: {product: scope.row.spuId}}">
-              <img v-bind:src="scope.row.skuImg.split('；')[0]" width="105" height="89" />
+              <img v-bind:src="scope.row.skuImg.split(';')[0]" width="105" height="89" />
             </router-link>
             <div class="flex-col hor-around">
               <router-link :to="{path: '/productDetail', query: {product: scope.row.spuId}}">
@@ -201,7 +201,6 @@
             }
             shoppingCartList.map((cart, i) => {
               if (this.tabActive == 1) {
-
                 // 对象数组深拷贝
                 let currSkuPriceList = [];
                 cart.skuPriceDetailVO.forEach(price => {
@@ -334,10 +333,7 @@
             });
             this.$set(this, 'shoppingCartList', shoppingCartList);
             this.loading = false;
-
-            console.log(shoppingCartList)
           }
-
         });
       },
 

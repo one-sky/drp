@@ -120,7 +120,7 @@
                 if (userData) {
                   userData.distributorId = userData.id;
                   // 存在用户但不存在分销商， 跳转到完善页面
-                  if (userData.userId == 0) {
+                  if (userData.userId && !userData.distributorId) {
                     sessionStorage.setItem('user', JSON.stringify(userData));
                     this.$message({
                       message: '用户信息不完善，请完善信息',

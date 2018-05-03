@@ -224,7 +224,7 @@
         <div class="content flex-row">
           <img src="../imgs/home/home_brand_title.png"/>
           <div class="flex-row-col">
-            <div v-for="(item,index) in brandList" :key="item.id" style="margin-left:4px;position:relative" @mouseenter="showActive(index-1, 'isShowActive', true)" @mouseleave="showActive(index-1,'isShowActive', false)">
+            <div v-for="(item,index) in brandList" :key="item.id" style="margin-left:4px;position:relative" @mouseenter="showActive(index, 'isShowActive', true)" @mouseleave="showActive(index,'isShowActive', false)">
               <div>
                 <img v-bind:src="item.logo" height="100" width="155" style=""/>
               </div>
@@ -258,7 +258,7 @@
           </div>
         </div>
         <div class="content flex-row">
-          <div style="height:445px; width:247px;background-color:#ff1;">
+          <div class="categoryImg" :style="`height:445px; width:247px;background-image:url(${item.categoryPic})`">
           </div>
           <div class="flex-row-col child-category-list ">
             <template v-for="( category, index) in item.childCategoryList" v-if="index<6"  >

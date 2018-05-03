@@ -53,9 +53,9 @@
           </el-form-item>
         </el-row>
         <el-row>
-          <el-form-item class="channel" label="主营渠道：">
-            <el-checkbox-group v-model="user.saleChannel">
-              <el-checkbox v-for="channel in channelList" :label="channel.id" :key="channel.id" :value="channel.id">{{channel.channelName}}</el-checkbox>
+          <el-form-item class="channel" label="主营渠道：" >
+            <el-checkbox-group v-model="saleChannel">
+              <el-checkbox v-for="channel in channelList" :label="channel.id" :key="channel.id">{{channel.channelName}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
         </el-row>
@@ -130,6 +130,7 @@
       };
       return {
         active: 0,
+        saleChannel: [],
         isAllowGetCode: false,
         second: 0,
         phoneMsg: false,
@@ -145,7 +146,6 @@
           contractor: '',
           contractAddress: '',
           email: '',
-          saleChannel: [],
           cooperateMode: '',
         },
         channelList: '',
@@ -228,10 +228,11 @@
                 }
               });
             } else if (this.active == 1) { // second  step
-              this.user.saleChannel = this.user.saleChannel.toString();
-              completeDistributor(this.user).then((res) => {
+              completeDistributor({...this.user, saleChannel: this.saleChannel.toString()}).then((res) => {
                 if (res.status == 200 && res.data == 1) {
                   this.active = 2;
+                  this.$set(this.$store.state, 'step', 2);
+                  this.$set(this.$store.state, 'stepType', 'register');
                 }
               });
             }
@@ -244,10 +245,13 @@
         return this.second > 0 ? `${this.second}后重新获取` : '获取验证码';
       }
     },
-    created () {
-      this.$store.commit('updateStepType', 'register');
-      this.$store.commit('updateStep', '0');
+    mounted () {
       this.user = {...JSON.parse(sessionStorage.getItem('user'))};
+      if (this.$route.query.active) {
+        this.active = parseInt(this.$route.query.active);
+      }
+      this.$set(this.$store.state, 'stepType', 'register');
+      this.$set(this.$store.state, 'step', this.active + '');
       if (this.active != 1 && this.active != 0) {
         this.$router.push({ path: '/register' });
         return;

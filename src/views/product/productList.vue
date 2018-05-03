@@ -251,16 +251,24 @@
               productIds.push(...item.spuIds.split(','));
             });
           } else {
-            productIds = attribute.spuIds.split(',');
+            productIds = attribute.spuIds && attribute.spuIds.split(',');
           }
         } else {  // 多选
           // 设置查询类目的条件
           this.checkAttributeList.map(item => {
-            productIds.push(...item.spuIds.split(','));
+            productIds.push(...(item.spuIds && item.spuIds.split(',')));
             return true;
           });
         }
+        if (!productIds || productIds.length === 0) {
+          productIds = [];
+          productIds.push(-1);
+        }
+        productIds.map(item => {
+          item = parseInt(item);
+        });
         this.$set(this.search, 'productIds', [...new Set(productIds)]);
+
         this.getProductList();
       },
 
@@ -289,14 +297,14 @@
               this.$router.push({path: '/'});
             }
             this.$set(this, 'attributeList', attributeList);
-            // 去所有属性中的商品Id
-            const productIds = [];
-            attributeList.map(item => {
-              item.attrValueEntityList.map(item => {
-                item.spuIds && productIds.push(...item.spuIds.split(','));
-              });
-            });
-            this.$set(this.search, 'productIds', [...new Set(productIds)]);
+            // // 去所有属性中的商品Id
+            // const productIds = [];
+            // attributeList.map(item => {
+            //   item.attrValueEntityList.map(item => {
+            //     item.spuIds && productIds.push(...item.spuIds.split(','));
+            //   });
+            // });
+            // this.$set(this.search, 'productIds', [...new Set(productIds)]);
             this.getProductList();
           }
         });

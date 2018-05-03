@@ -3,8 +3,7 @@
     <div class="top flex-row">
       <div class="flex-col left">
         <swiper :options="swiperOptionTop"  ref="swiperTop">
-          <!-- 这部分放你要渲染的那些内容 -->
-          <!-- <swiper-slide v-for="item in relativeAttrList.skuImg">
+          <swiper-slide v-for="item in relativeAttrList.skuImg">
             <img v-bind:src="item" width="360" height="360"/>
           </swiper-slide>
           <swiper-slide
@@ -12,12 +11,11 @@
             v-for="item in productDetail.spuDetail.thumbnailImage"
           >
             <img v-bind:src="item" width="360" height="360"/>
-          </swiper-slide> -->
+          </swiper-slide>
         </swiper>
         <div class="swiper-thumb flex-row">
           <swiper :options="swiperOptionThumbs" ref="swiperThumbs" >
-            <!-- 这部分放你要渲染的那些内容 -->
-            <!-- <swiper-slide v-for="item in relativeAttrList.skuImg">
+            <swiper-slide v-for="item in relativeAttrList.skuImg">
               <img v-bind:src="item" width="50" height="50" />
             </swiper-slide>
             <swiper-slide
@@ -25,7 +23,7 @@
               v-for="item in productDetail.spuDetail.thumbnailImage"
             >
               <img v-bind:src="item" width="50" height="50" />
-            </swiper-slide> -->
+            </swiper-slide>
           </swiper>
           <div class="swiper-button-next swiper-button-black" slot="button-next"></div>
           <div class="swiper-button-prev swiper-button-black" slot="button-prev"></div>
@@ -439,7 +437,7 @@
             this.selectedAttr = [];
             this.buyCount = 1;
             const productDetail = res.data;
-            productDetail.spuSearchVO.thumbnailImage = productDetail.spuSearchVO.thumbnailImage && productDetail.spuSearchVO.thumbnailImage.split('；');
+            productDetail.spuSearchVO.thumbnailImage = productDetail.spuSearchVO.thumbnailImage && productDetail.spuSearchVO.thumbnailImage.split(';');
             this.$set(this.productDetail, 'spuDetail', productDetail.spuSearchVO);
             this.$set(this.productDetail, 'productArticleList', productDetail.pProductArticleEntity);
             const skuImgList = [];
@@ -455,9 +453,10 @@
               item.skuAttr = attrList;
 
               // skuImg
-              item.skuImg = sku.skuImg.split('；');
-
-              skuImgList.push(sku.skuImg && sku.skuImg.split('；'));
+              item.skuImg = sku.skuImg.split(';');
+              sku.skuImg && sku.skuImg.split(';').map(item => {
+                skuImgList.push(item);
+              });
 
               // 设置价格优先度
               item.priceList.map(price => {
@@ -474,7 +473,7 @@
             this.$set(this.productDetail, 'skuImgList', skuImgList);
 
             // 设置属性列表
-            const attributes = res.data.spuSearchVO.spuAttr;
+            const attributes = res.data.spuSearchVO.size;
             const attributeList = [];
             attributes && attributes.split('；').map(item => {
               this.selectedAttr.push([]);

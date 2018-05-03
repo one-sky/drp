@@ -238,12 +238,16 @@
 
 /*size*/
 .product-detail .top .right .attribute .el-checkbox-group{
-  width: auto;
+  min-width: 600px;
+}
+
+.product-detail .top .right .attribute .el-checkbox-group .el-checkbox-button {
+  margin-right: 10px;
+  margin-bottom: 4px;
 }
 .product-detail .top .right .attribute .el-checkbox-group .el-checkbox-button .el-checkbox-button__inner{
   border-radius:0;
   -webkit-border-radius: 0;
-  margin-left:10px;
   height:28px;
   padding:4px 6px;
   font-weight:bold;

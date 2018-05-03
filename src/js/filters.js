@@ -10,7 +10,7 @@ let formatMoney = value => {
 let formatAttribute = value => {
   var a;
   if (value && value != '') {
-    a = value.split('；');
+    a = value.split(';');
     if (a.length > 1 && a[1] != '') {
       var attribute = '';
       for (var i = 0; i < a.length - 2; i++) {

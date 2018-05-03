@@ -232,6 +232,11 @@
   color: #000;
 }
 
+.index .categoryImg {
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 .index .content{
   margin-top:15px;
 }

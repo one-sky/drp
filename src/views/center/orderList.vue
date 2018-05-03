@@ -46,9 +46,9 @@
                   <div class="flex-row">
                     <div class="flex-row" style="width:43%;">
                       <router-link :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n-1].spuId}}">
-                        <img v-bind:src="props.row.orderItemVOList[n-1].skuImg.split('；')[0]" width="51" height="51">
+                        <img v-bind:src="props.row.orderItemVOList[n-1].skuImg.split(';')[0]" width="51" height="51">
                       </router-link>
-                      <div class="flex-col">
+                      <div class="flex-col" style="flex: 1;">
                         <router-link class="long-title link a4_link" :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n-1].spuId}}">
                           {{props.row.orderItemVOList[n-1].spuName}}
                         </router-link>
@@ -74,14 +74,14 @@
 
                   </div>
                 </template>
-                <template v-if="props.row.orderItemVOList.length>3">
+                <template v-if="props.row.isShowAll && props.row.orderItemVOList.length>3">
                   <template v-for="n in props.row.orderItemVOList.length-3 ">
                     <div class="flex-row">
                       <div class="flex-row" style="width:42%;">
                         <router-link :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n+2].spuId}}">
                           <img v-bind:src="props.row.orderItemVOList[n+2].skuImg.split('；')[0]" width="51" height="51">
                         </router-link>
-                        <div class="flex-col">
+                        <div class="flex-col" style="flex: 1;">
                           <router-link class="long-title link a4_link" :to="{path: '/productDetail', query: {product: props.row.orderItemVOList[n+2].spuId}}">
                             {{props.row.orderItemVOList[n+2].spuName}}
                           </router-link>
